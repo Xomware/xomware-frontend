@@ -125,16 +125,16 @@
 }
 
 .card-logo {
-  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: $spacing-md;
+  width: 100%;
 
   img {
-    max-height: 70px;
-    max-width: 200px;
-    width: auto;
+    width: 85%;
+    max-width: 220px;
+    height: auto;
     object-fit: contain;
     transition: all $transition-base;
   }
@@ -227,13 +227,14 @@
     gap: $spacing-md;
 
     .card-logo {
-      height: 45px;
       margin-bottom: 0;
       flex-shrink: 0;
+      width: auto;
 
       img {
-        max-height: 45px;
-        max-width: 120px;
+        width: auto;
+        max-width: 140px;
+        max-height: 50px;
       }
     }
 

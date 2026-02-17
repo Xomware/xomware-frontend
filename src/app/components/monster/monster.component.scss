@@ -333,10 +333,6 @@
     transform-origin: 150px 145px;
   }
 
-  .football-held {
-    animation: footballTuck 0.6s ease-in-out infinite;
-  }
-
   .mouth-bar {
     opacity: 0.6;
     width: 28px;
@@ -527,11 +523,6 @@
 @keyframes headRunBob {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(2deg); }
-}
-
-@keyframes footballTuck {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-3px) rotate(2deg); }
 }
 
 @keyframes shadowRun {
