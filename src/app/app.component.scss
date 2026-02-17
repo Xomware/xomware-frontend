@@ -130,10 +130,12 @@
   justify-content: center;
   margin-bottom: $spacing-md;
   width: 100%;
+  height: 80px;
 
   img {
-    width: 85%;
-    max-width: 220px;
+    max-width: 90%;
+    max-height: 100%;
+    width: auto;
     height: auto;
     object-fit: contain;
     transition: all $transition-base;
