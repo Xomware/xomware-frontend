@@ -1,141 +1,186 @@
 <div class="monster-wrapper" [ngClass]="state">
-  <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" class="monster-svg">
+  <svg viewBox="0 0 300 320" xmlns="http://www.w3.org/2000/svg" class="monster-svg">
     <defs>
-      <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:#1a2a3a;stop-opacity:1" />
-        <stop offset="100%" style="stop-color:#0d1520;stop-opacity:1" />
-      </linearGradient>
-      <linearGradient id="bodyHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" style="stop-color:#2a3a4a;stop-opacity:0.6" />
-        <stop offset="100%" style="stop-color:#0d1520;stop-opacity:0" />
-      </linearGradient>
-      <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" style="stop-color:#00b4d8;stop-opacity:0.15" />
-        <stop offset="100%" style="stop-color:#00b4d8;stop-opacity:0" />
+      <radialGradient id="bodyGrad" cx="45%" cy="40%" r="55%">
+        <stop offset="0%" stop-color="#2a3a4a" />
+        <stop offset="70%" stop-color="#1a2535" />
+        <stop offset="100%" stop-color="#0f1a25" />
       </radialGradient>
-      <filter id="monsterGlow">
-        <feGaussianBlur stdDeviation="2" result="blur" />
+      <radialGradient id="bellyGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#2e4055" stop-opacity="0.6" />
+        <stop offset="100%" stop-color="#1a2535" stop-opacity="0" />
+      </radialGradient>
+      <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#00b4d8" stop-opacity="0.2" />
+        <stop offset="100%" stop-color="#00b4d8" stop-opacity="0" />
+      </radialGradient>
+      <filter id="softGlow">
+        <feGaussianBlur stdDeviation="3" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      <filter id="shadow">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3" />
+      </filter>
     </defs>
 
-    <!-- Ambient glow -->
-    <ellipse cx="150" cy="200" rx="100" ry="30" fill="url(#glowGradient)" class="ambient-glow" />
+    <!-- Ground glow -->
+    <ellipse cx="150" cy="280" rx="90" ry="18" fill="url(#glowGrad)" class="ground-glow" />
 
-    <!-- Body -->
-    <g class="body-group">
-      <!-- Shadow -->
-      <ellipse cx="150" cy="235" rx="55" ry="10" fill="rgba(0,0,0,0.3)" class="shadow" />
+    <!-- Shadow on ground -->
+    <ellipse cx="150" cy="275" rx="50" ry="8" fill="rgba(0,0,0,0.25)" class="ground-shadow" />
 
-      <!-- Main body blob -->
-      <ellipse cx="150" cy="170" rx="65" ry="70" fill="url(#bodyGradient)" stroke="#00b4d8" stroke-width="1.5" stroke-opacity="0.4" />
-      <ellipse cx="150" cy="170" rx="65" ry="70" fill="url(#bodyHighlight)" />
-
-      <!-- Left arm -->
-      <g class="left-arm">
-        <path d="M90 180 Q70 185 65 200 Q63 208 68 210 Q73 212 75 205 Q78 195 90 190Z"
-              fill="url(#bodyGradient)" stroke="#00b4d8" stroke-width="1" stroke-opacity="0.3" />
-      </g>
-
-      <!-- Right arm -->
-      <g class="right-arm">
-        <path d="M210 180 Q230 185 235 200 Q237 208 232 210 Q227 212 225 205 Q222 195 210 190Z"
-              fill="url(#bodyGradient)" stroke="#00b4d8" stroke-width="1" stroke-opacity="0.3" />
-      </g>
-
+    <g class="character" filter="url(#shadow)">
       <!-- Left leg -->
       <g class="left-leg">
-        <path d="M120 230 Q118 245 115 255 Q113 260 118 260 Q123 260 122 253 Q124 243 125 232Z"
-              fill="url(#bodyGradient)" stroke="#00b4d8" stroke-width="1" stroke-opacity="0.3" />
+        <path d="M118 248 Q116 268 112 278 Q110 284 116 286 Q122 286 120 278 Q122 268 124 250"
+              fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
+        <!-- Foot -->
+        <ellipse cx="116" cy="285" rx="10" ry="4" fill="#0f1a25" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.2" />
       </g>
 
       <!-- Right leg -->
       <g class="right-leg">
-        <path d="M180 230 Q182 245 185 255 Q187 260 182 260 Q177 260 178 253 Q176 243 175 232Z"
-              fill="url(#bodyGradient)" stroke="#00b4d8" stroke-width="1" stroke-opacity="0.3" />
+        <path d="M176 248 Q178 268 182 278 Q184 284 178 286 Q172 286 174 278 Q172 268 170 250"
+              fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
+        <ellipse cx="178" cy="285" rx="10" ry="4" fill="#0f1a25" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.2" />
       </g>
+
+      <!-- Left arm -->
+      <g class="left-arm">
+        <path d="M88 185 Q68 192 58 210 Q55 218 62 220 Q68 220 66 212 Q72 198 88 192"
+              fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
+        <!-- Hand -->
+        <circle cx="60" cy="216" r="6" fill="#0f1a25" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.2" />
+      </g>
+
+      <!-- Right arm -->
+      <g class="right-arm">
+        <path d="M212 185 Q232 192 242 210 Q245 218 238 220 Q232 220 234 212 Q228 198 212 192"
+              fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
+        <circle cx="240" cy="216" r="6" fill="#0f1a25" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.2" />
+      </g>
+
+      <!-- Main body -->
+      <ellipse cx="150" cy="195" rx="72" ry="78" fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="1.2" stroke-opacity="0.3" />
+
+      <!-- Belly highlight -->
+      <ellipse cx="150" cy="210" rx="40" ry="35" fill="url(#bellyGrad)" />
+
+      <!-- Body shine -->
+      <ellipse cx="130" cy="160" rx="25" ry="18" fill="white" opacity="0.04" transform="rotate(-15 130 160)" />
 
       <!-- Eyes -->
       <g class="eyes">
         <!-- Left eye -->
-        <ellipse cx="130" cy="155" rx="18" ry="20" fill="#e8edf2" class="eye-white" />
-        <circle cx="132" cy="157" r="9" fill="#0d1520" class="pupil left-pupil" />
-        <circle cx="135" cy="153" r="3" fill="white" class="eye-shine" />
-
+        <g class="left-eye">
+          <ellipse cx="125" cy="175" rx="22" ry="24" fill="#eef2f7" />
+          <ellipse cx="125" cy="175" rx="21" ry="23" fill="white" />
+          <g class="left-pupil-group">
+            <circle cx="128" cy="178" r="10" fill="#0a1018" />
+            <circle cx="128" cy="178" r="6" fill="#152030" />
+            <circle cx="131" cy="174" r="3.5" fill="white" opacity="0.9" />
+            <circle cx="125" cy="181" r="1.5" fill="white" opacity="0.4" />
+          </g>
+        </g>
         <!-- Right eye -->
-        <ellipse cx="170" cy="155" rx="18" ry="20" fill="#e8edf2" class="eye-white" />
-        <circle cx="172" cy="157" r="9" fill="#0d1520" class="pupil right-pupil" />
-        <circle cx="175" cy="153" r="3" fill="white" class="eye-shine" />
+        <g class="right-eye">
+          <ellipse cx="175" cy="175" rx="22" ry="24" fill="#eef2f7" />
+          <ellipse cx="175" cy="175" rx="21" ry="23" fill="white" />
+          <g class="right-pupil-group">
+            <circle cx="178" cy="178" r="10" fill="#0a1018" />
+            <circle cx="178" cy="178" r="6" fill="#152030" />
+            <circle cx="181" cy="174" r="3.5" fill="white" opacity="0.9" />
+            <circle cx="175" cy="181" r="1.5" fill="white" opacity="0.4" />
+          </g>
+        </g>
       </g>
 
-      <!-- Eyelids (for blink/sleep) -->
+      <!-- Eyelids -->
       <g class="eyelids">
-        <ellipse cx="130" cy="155" rx="19" ry="21" fill="url(#bodyGradient)" class="left-eyelid" />
-        <ellipse cx="170" cy="155" rx="19" ry="21" fill="url(#bodyGradient)" class="right-eyelid" />
+        <ellipse cx="125" cy="175" rx="23" ry="25" fill="url(#bodyGrad)" class="left-eyelid" />
+        <ellipse cx="175" cy="175" rx="23" ry="25" fill="url(#bodyGrad)" class="right-eyelid" />
       </g>
 
       <!-- Mouth -->
       <g class="mouth">
-        <path d="M140 190 Q150 198 160 190" stroke="#4a5568" stroke-width="2.5" fill="none" stroke-linecap="round" class="mouth-line" />
+        <path d="M138 215 Q150 224 162 215" stroke="#3a5068" stroke-width="2.5" fill="none" stroke-linecap="round" class="mouth-line" />
+      </g>
+
+      <!-- Cheek blush -->
+      <ellipse cx="102" cy="198" rx="10" ry="6" fill="#00b4d8" opacity="0.08" class="left-cheek" />
+      <ellipse cx="198" cy="198" rx="10" ry="6" fill="#00b4d8" opacity="0.08" class="right-cheek" />
+
+      <!-- Little antenna/horn -->
+      <g class="antenna">
+        <path d="M150 118 Q148 98 155 85" stroke="#00b4d8" stroke-width="2" fill="none" stroke-linecap="round" stroke-opacity="0.5" />
+        <circle cx="155" cy="83" r="5" fill="#00b4d8" opacity="0.6" filter="url(#softGlow)" class="antenna-tip" />
       </g>
     </g>
 
-    <!-- Headphones (xomify state) -->
+    <!-- Headphones accessory (xomify) -->
     <g class="headphones-accessory">
-      <path d="M95 145 Q95 100 150 95 Q205 100 205 145" stroke="#9c0abf" stroke-width="5" fill="none" stroke-linecap="round" />
-      <rect x="80" y="140" width="22" height="30" rx="8" fill="#9c0abf" />
-      <rect x="198" y="140" width="22" height="30" rx="8" fill="#9c0abf" />
-      <rect x="83" y="143" width="16" height="24" rx="6" fill="#7a0896" />
-      <rect x="201" y="143" width="16" height="24" rx="6" fill="#7a0896" />
+      <path d="M90 162 Q90 110 150 105 Q210 110 210 162" stroke="#9c0abf" stroke-width="6" fill="none" stroke-linecap="round" />
+      <rect x="74" y="155" width="24" height="35" rx="10" fill="#9c0abf" />
+      <rect x="202" y="155" width="24" height="35" rx="10" fill="#9c0abf" />
+      <rect x="78" y="159" width="16" height="27" rx="7" fill="#7a0896" />
+      <rect x="206" y="159" width="16" height="27" rx="7" fill="#7a0896" />
+      <!-- Music notes floating -->
+      <text x="60" y="140" fill="#9c0abf" font-size="16" opacity="0.7" class="note1">&#9835;</text>
+      <text x="230" y="130" fill="#9c0abf" font-size="12" opacity="0.5" class="note2">&#9834;</text>
     </g>
 
-    <!-- DJ Turntable (xomcloud state) -->
+    <!-- DJ turntable accessory (xomcloud) -->
     <g class="dj-accessory">
-      <!-- Turntable base -->
-      <rect x="70" y="220" width="160" height="60" rx="8" fill="#2a1a0a" stroke="#ff6b35" stroke-width="1.5" stroke-opacity="0.5" />
+      <rect x="60" y="252" width="180" height="55" rx="8" fill="#2a1a0a" stroke="#ff6b35" stroke-width="1.5" stroke-opacity="0.4" />
+      <rect x="65" y="255" width="170" height="48" rx="6" fill="#1a1008" />
       <!-- Left platter -->
-      <circle cx="120" cy="245" r="22" fill="#1a1a1a" stroke="#ff6b35" stroke-width="1" stroke-opacity="0.4" />
-      <circle cx="120" cy="245" r="15" fill="none" stroke="#333" stroke-width="0.5" />
-      <circle cx="120" cy="245" r="8" fill="none" stroke="#333" stroke-width="0.5" />
-      <circle cx="120" cy="245" r="3" fill="#ff6b35" class="platter-center" />
+      <circle cx="110" cy="275" r="20" fill="#1a1a1a" stroke="#ff6b35" stroke-width="1" stroke-opacity="0.3" />
+      <circle cx="110" cy="275" r="13" fill="none" stroke="#282828" stroke-width="0.5" />
+      <circle cx="110" cy="275" r="7" fill="none" stroke="#282828" stroke-width="0.5" />
+      <circle cx="110" cy="275" r="3" fill="#ff6b35" class="platter-left" />
       <!-- Right platter -->
-      <circle cx="180" cy="245" r="22" fill="#1a1a1a" stroke="#ff6b35" stroke-width="1" stroke-opacity="0.4" />
-      <circle cx="180" cy="245" r="15" fill="none" stroke="#333" stroke-width="0.5" />
-      <circle cx="180" cy="245" r="8" fill="none" stroke="#333" stroke-width="0.5" />
-      <circle cx="180" cy="245" r="3" fill="#ff6b35" class="platter-center" />
-      <!-- Crossfader -->
-      <rect x="142" y="260" width="16" height="6" rx="3" fill="#444" />
-      <rect x="147" y="259" width="6" height="8" rx="2" fill="#ff6b35" class="crossfader" />
+      <circle cx="190" cy="275" r="20" fill="#1a1a1a" stroke="#ff6b35" stroke-width="1" stroke-opacity="0.3" />
+      <circle cx="190" cy="275" r="13" fill="none" stroke="#282828" stroke-width="0.5" />
+      <circle cx="190" cy="275" r="7" fill="none" stroke="#282828" stroke-width="0.5" />
+      <circle cx="190" cy="275" r="3" fill="#ff6b35" class="platter-right" />
+      <!-- Mixer -->
+      <rect x="138" y="268" width="24" height="14" rx="3" fill="#333" />
+      <rect x="146" y="266" width="8" height="6" rx="2" fill="#ff6b35" class="crossfader" />
+      <!-- Headphones on ear (DJ style, one ear) -->
+      <path d="M85 165 Q85 145 100 148" stroke="#ff6b35" stroke-width="4" fill="none" stroke-linecap="round" />
+      <rect x="74" y="160" width="18" height="25" rx="7" fill="#ff6b35" />
+      <rect x="77" y="163" width="12" height="19" rx="5" fill="#cc5520" />
     </g>
 
-    <!-- Football Helmet (xomper state) -->
+    <!-- Football helmet accessory (xomper) -->
     <g class="football-accessory">
-      <!-- Helmet shell -->
-      <path d="M95 145 Q95 95 150 90 Q205 95 205 145 Q205 155 195 155 L105 155 Q95 155 95 145Z"
+      <path d="M90 163 Q88 108 150 100 Q212 108 210 163 Q210 172 200 172 L100 172 Q90 172 90 163Z"
             fill="#0d3320" stroke="#00ffab" stroke-width="2" />
-      <!-- Facemask -->
-      <path d="M120 150 Q125 162 135 165 Q150 168 165 165 Q175 162 180 150"
-            stroke="#00ffab" stroke-width="2.5" fill="none" stroke-linecap="round" />
-      <line x1="135" y1="150" x2="140" y2="163" stroke="#00ffab" stroke-width="2" stroke-linecap="round" />
-      <line x1="165" y1="150" x2="160" y2="163" stroke="#00ffab" stroke-width="2" stroke-linecap="round" />
-      <!-- Center stripe -->
-      <path d="M150 90 Q150 85 150 90 L150 120" stroke="#00ffab" stroke-width="2" stroke-opacity="0.5" />
+      <path d="M150 100 L150 135" stroke="#00ffab" stroke-width="2.5" stroke-opacity="0.5" />
+      <path d="M115 168 Q120 182 135 185 Q150 188 165 185 Q180 182 185 168"
+            stroke="#00ffab" stroke-width="3" fill="none" stroke-linecap="round" />
+      <line x1="135" y1="168" x2="140" y2="183" stroke="#00ffab" stroke-width="2" stroke-linecap="round" />
+      <line x1="165" y1="168" x2="160" y2="183" stroke="#00ffab" stroke-width="2" stroke-linecap="round" />
+      <!-- Football in hand -->
+      <ellipse cx="55" cy="208" rx="14" ry="9" fill="#5c3a1a" stroke="#00ffab" stroke-width="1" transform="rotate(-25 55 208)" class="football" />
+      <line x1="50" y1="204" x2="60" y2="212" stroke="#fff" stroke-width="0.8" opacity="0.5" />
     </g>
 
     <!-- Sleep Z's -->
     <g class="sleep-zs">
-      <text x="200" y="120" fill="#00b4d8" font-size="18" font-weight="bold" opacity="0.7" class="z1">Z</text>
-      <text x="215" y="100" fill="#00b4d8" font-size="14" font-weight="bold" opacity="0.5" class="z2">z</text>
-      <text x="225" y="85" fill="#00b4d8" font-size="10" font-weight="bold" opacity="0.3" class="z3">z</text>
+      <text x="210" y="140" fill="#00b4d8" font-size="20" font-weight="bold" class="z1">Z</text>
+      <text x="228" y="118" fill="#00b4d8" font-size="15" font-weight="bold" class="z2">z</text>
+      <text x="240" y="100" fill="#00b4d8" font-size="11" font-weight="bold" class="z3">z</text>
     </g>
 
-    <!-- Wave hand (for idle wave) -->
+    <!-- Wave hand (replaces right arm on wave) -->
     <g class="wave-hand">
-      <path d="M210 175 Q235 170 240 155 Q242 148 237 147 Q232 147 230 155 Q228 165 210 170Z"
-            fill="url(#bodyGradient)" stroke="#00b4d8" stroke-width="1" stroke-opacity="0.3" />
+      <path d="M215 180 Q238 172 245 155 Q248 145 242 143 Q236 143 235 152 Q232 166 215 175"
+            fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.3" />
+      <circle cx="243" cy="148" r="6" fill="#0f1a25" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.2" />
     </g>
   </svg>
 </div>

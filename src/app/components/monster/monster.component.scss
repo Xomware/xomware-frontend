@@ -1,12 +1,14 @@
 .monster-wrapper {
-  width: 220px;
-  height: 220px;
+  width: 240px;
+  height: 260px;
   position: relative;
+  cursor: default;
 }
 
 .monster-svg {
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
 
 // ==============================
@@ -18,39 +20,107 @@
 .sleep-zs,
 .wave-hand {
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
 }
 
 .eyelids {
   .left-eyelid,
   .right-eyelid {
     transform: scaleY(0);
-    transform-origin: center 145px;
+    transform-origin: center 165px;
     transition: transform 0.3s ease;
   }
+}
+
+// Hide right arm when waving
+.wave-hand + .character .right-arm {
+  transition: opacity 0.3s ease;
 }
 
 // ==============================
 // IDLE state
 // ==============================
 .idle {
-  .body-group {
-    animation: breathe 3s ease-in-out infinite;
+  .character {
+    animation: idleSway 5s ease-in-out infinite;
   }
 
   .eyes {
-    animation: lookAround 6s ease-in-out infinite;
+    animation: lookAround 8s ease-in-out infinite;
+  }
+
+  .left-pupil-group,
+  .right-pupil-group {
+    animation: pupilDrift 6s ease-in-out infinite;
   }
 
   .eyelids {
     .left-eyelid,
     .right-eyelid {
-      animation: blink 4s ease-in-out infinite;
+      animation: blink 5s ease-in-out infinite;
     }
   }
 
-  .ambient-glow {
-    animation: glowPulse 3s ease-in-out infinite;
+  .ground-glow {
+    animation: glowPulse 4s ease-in-out infinite;
+  }
+
+  .antenna-tip {
+    animation: antennaPulse 2s ease-in-out infinite;
+  }
+
+  .left-arm {
+    animation: armSwing 4s ease-in-out infinite;
+    transform-origin: 88px 185px;
+  }
+
+  .right-arm {
+    animation: armSwing 4s ease-in-out 0.5s infinite;
+    transform-origin: 212px 185px;
+  }
+
+  .left-leg,
+  .right-leg {
+    animation: legShift 5s ease-in-out infinite;
+  }
+  .right-leg {
+    animation-delay: 0.3s;
+  }
+
+  .left-cheek,
+  .right-cheek {
+    animation: cheekGlow 3s ease-in-out infinite;
+  }
+}
+
+// ==============================
+// WAVE state (periodic or transition)
+// ==============================
+.wave {
+  .wave-hand {
+    opacity: 1;
+    animation: waveMotion 0.6s ease-in-out 4;
+  }
+
+  .right-arm {
+    opacity: 0;
+  }
+
+  .character {
+    animation: idleSway 5s ease-in-out infinite;
+  }
+
+  .eyes {
+    animation: happySquint 1.2s ease-in-out infinite;
+  }
+
+  .mouth-line {
+    d: path("M135 213 Q150 225 165 213");
+  }
+
+  .antenna-tip {
+    animation: antennaPulse 1s ease-in-out infinite;
   }
 }
 
@@ -58,8 +128,8 @@
 // SLEEP state
 // ==============================
 .sleep {
-  .body-group {
-    animation: breatheSlow 4s ease-in-out infinite;
+  .character {
+    animation: sleepBreath 5s ease-in-out infinite;
   }
 
   .eyelids {
@@ -71,20 +141,23 @@
 
   .sleep-zs {
     opacity: 1;
-
-    .z1 {
-      animation: floatZ 2s ease-in-out infinite;
-    }
-    .z2 {
-      animation: floatZ 2s ease-in-out 0.4s infinite;
-    }
-    .z3 {
-      animation: floatZ 2s ease-in-out 0.8s infinite;
-    }
+    .z1 { animation: floatZ 2.5s ease-in-out infinite; }
+    .z2 { animation: floatZ 2.5s ease-in-out 0.5s infinite; }
+    .z3 { animation: floatZ 2.5s ease-in-out 1s infinite; }
   }
 
   .mouth-line {
-    d: path("M140 192 Q150 188 160 192");
+    d: path("M140 217 Q150 213 160 217");
+  }
+
+  .ground-glow {
+    animation: glowPulse 5s ease-in-out infinite;
+    opacity: 0.5;
+  }
+
+  .antenna-tip {
+    opacity: 0.3;
+    animation: antennaPulse 4s ease-in-out infinite;
   }
 }
 
@@ -96,21 +169,46 @@
     opacity: 1;
   }
 
-  .body-group {
-    animation: headBob 0.6s ease-in-out infinite;
+  .character {
+    animation: headBob 0.7s ease-in-out infinite;
   }
 
   .eyes {
-    animation: happyEyes 1.2s ease-in-out infinite;
+    animation: happySquint 1.5s ease-in-out infinite;
   }
 
   .mouth-line {
-    d: path("M135 188 Q150 200 165 188");
+    d: path("M133 213 Q150 228 167 213");
   }
 
-  .ambient-glow {
-    animation: glowPulseColor 0.6s ease-in-out infinite;
-    fill: rgba(156, 10, 191, 0.15);
+  .left-cheek, .right-cheek {
+    opacity: 0.15;
+    fill: #9c0abf;
+  }
+
+  .ground-glow {
+    animation: glowPulseColor 0.7s ease-in-out infinite;
+  }
+
+  .antenna-tip {
+    animation: antennaPulse 0.7s ease-in-out infinite;
+    fill: #9c0abf;
+  }
+
+  .left-arm {
+    animation: armBop 0.7s ease-in-out infinite;
+    transform-origin: 88px 185px;
+  }
+  .right-arm {
+    animation: armBop 0.7s ease-in-out 0.35s infinite;
+    transform-origin: 212px 185px;
+  }
+
+  .note1 {
+    animation: floatNote 2s ease-in-out infinite;
+  }
+  .note2 {
+    animation: floatNote 2s ease-in-out 0.8s infinite;
   }
 }
 
@@ -122,40 +220,52 @@
     opacity: 1;
   }
 
-  .body-group {
-    transform: translateY(-15px);
+  .character {
+    animation: djBounce 0.8s ease-in-out infinite;
+    transform: translateY(-20px);
   }
 
   .left-arm {
-    animation: scratchLeft 0.8s ease-in-out infinite;
-    transform-origin: 90px 180px;
+    animation: scratchArm 0.5s ease-in-out infinite;
+    transform-origin: 88px 185px;
   }
 
   .right-arm {
-    animation: scratchRight 0.8s ease-in-out infinite alternate;
-    transform-origin: 210px 180px;
+    animation: scratchArm 0.5s ease-in-out 0.25s infinite alternate-reverse;
+    transform-origin: 212px 185px;
   }
 
-  .platter-center {
-    animation: spin 1s linear infinite;
+  .platter-left,
+  .platter-right {
+    animation: spin 1.2s linear infinite;
     transform-origin: center;
   }
 
   .crossfader {
-    animation: crossfade 1.6s ease-in-out infinite;
+    animation: crossfade 1.8s ease-in-out infinite;
   }
 
   .mouth-line {
-    d: path("M135 188 Q150 202 165 188");
+    d: path("M133 213 Q150 230 167 213");
   }
 
   .eyes {
-    animation: happyEyes 1s ease-in-out infinite;
+    animation: happySquint 1s ease-in-out infinite;
   }
 
-  .ambient-glow {
-    fill: rgba(255, 107, 53, 0.15);
+  .ground-glow {
+    fill: rgba(255, 107, 53, 0.2);
     animation: glowPulseColor 0.8s ease-in-out infinite;
+  }
+
+  .antenna-tip {
+    fill: #ff6b35;
+    animation: antennaPulse 0.5s ease-in-out infinite;
+  }
+
+  .left-cheek, .right-cheek {
+    opacity: 0.12;
+    fill: #ff6b35;
   }
 }
 
@@ -167,99 +277,167 @@
     opacity: 1;
   }
 
-  .left-leg,
-  .right-leg {
-    animation: runLegs 0.4s ease-in-out infinite alternate;
-    transform-origin: center 230px;
+  .character {
+    animation: runBounce 0.35s ease-in-out infinite;
   }
 
+  .left-leg {
+    animation: runLeg 0.35s ease-in-out infinite;
+    transform-origin: 121px 248px;
+  }
   .right-leg {
-    animation-delay: 0.2s;
+    animation: runLeg 0.35s ease-in-out 0.175s infinite;
+    transform-origin: 173px 248px;
   }
 
   .left-arm {
-    animation: pumpArm 0.4s ease-in-out infinite;
-    transform-origin: 90px 180px;
+    animation: pumpArm 0.35s ease-in-out infinite;
+    transform-origin: 88px 185px;
   }
-
   .right-arm {
-    animation: pumpArm 0.4s ease-in-out infinite alternate;
-    transform-origin: 210px 180px;
-  }
-
-  .body-group {
-    animation: runBounce 0.4s ease-in-out infinite;
+    animation: pumpArm 0.35s ease-in-out 0.175s infinite;
+    transform-origin: 212px 185px;
   }
 
   .mouth-line {
-    d: path("M135 188 Q150 200 165 188");
+    d: path("M135 213 Q150 225 165 213");
   }
 
-  .ambient-glow {
-    fill: rgba(0, 255, 171, 0.15);
-    animation: glowPulseColor 0.4s ease-in-out infinite;
+  .eyes {
+    animation: determinedEyes 0.7s ease-in-out infinite;
+  }
+
+  .ground-glow {
+    fill: rgba(0, 255, 171, 0.2);
+    animation: glowPulseColor 0.35s ease-in-out infinite;
+  }
+
+  .antenna-tip {
+    fill: #00ffab;
+    animation: antennaPulse 0.35s ease-in-out infinite;
+  }
+
+  .football {
+    animation: footballTuck 0.7s ease-in-out infinite;
+  }
+
+  .ground-shadow {
+    animation: shadowRun 0.35s ease-in-out infinite;
   }
 }
 
 // ==============================
 // Keyframes
 // ==============================
-@keyframes breathe {
-  0%, 100% { transform: translateY(0) scaleY(1); }
-  50% { transform: translateY(-3px) scaleY(1.02); }
-}
 
-@keyframes breatheSlow {
-  0%, 100% { transform: translateY(0) scaleY(1); }
-  50% { transform: translateY(-2px) scaleY(1.01); }
+// Idle movement
+@keyframes idleSway {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  25% { transform: translateX(4px) translateY(-3px); }
+  50% { transform: translateX(0) translateY(-5px); }
+  75% { transform: translateX(-4px) translateY(-3px); }
 }
 
 @keyframes lookAround {
-  0%, 40%, 100% { transform: translateX(0); }
-  10% { transform: translateX(3px); }
-  25% { transform: translateX(-3px); }
+  0%, 35%, 65%, 100% { transform: translateX(0); }
+  15% { transform: translateX(4px) translateY(1px); }
+  50% { transform: translateX(-5px) translateY(-1px); }
+  80% { transform: translateX(2px); }
+}
+
+@keyframes pupilDrift {
+  0%, 30%, 70%, 100% { transform: translateX(0) translateY(0); }
+  15% { transform: translateX(2px) translateY(1px); }
+  50% { transform: translateX(-3px) translateY(-1px); }
+  85% { transform: translateX(1px) translateY(1px); }
 }
 
 @keyframes blink {
-  0%, 92%, 100% { transform: scaleY(0); }
-  95%, 97% { transform: scaleY(1); }
+  0%, 90%, 100% { transform: scaleY(0); }
+  93%, 97% { transform: scaleY(1); }
+}
+
+@keyframes armSwing {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(5deg); }
+}
+
+@keyframes legShift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(2px); }
 }
 
 @keyframes glowPulse {
-  0%, 100% { opacity: 0.6; }
+  0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
 
 @keyframes glowPulseColor {
-  0%, 100% { opacity: 0.6; }
+  0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
 
+@keyframes antennaPulse {
+  0%, 100% { opacity: 0.4; r: 5; }
+  50% { opacity: 0.9; r: 7; }
+}
+
+@keyframes cheekGlow {
+  0%, 100% { opacity: 0.06; }
+  50% { opacity: 0.12; }
+}
+
+// Wave
+@keyframes waveMotion {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg) translateX(5px); }
+  75% { transform: rotate(-10deg) translateX(-3px); }
+}
+
+// Sleep
+@keyframes sleepBreath {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(2px) scaleY(1.015); }
+}
+
 @keyframes floatZ {
-  0% { transform: translate(0, 0); opacity: 0; }
-  50% { opacity: 0.8; }
-  100% { transform: translate(5px, -20px); opacity: 0; }
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  30% { opacity: 0.8; }
+  100% { transform: translate(8px, -25px) scale(0.7); opacity: 0; }
 }
 
+// Headphones
 @keyframes headBob {
-  0%, 100% { transform: translateY(0); }
-  25% { transform: translateY(-5px) rotate(-2deg); }
-  75% { transform: translateY(-5px) rotate(2deg); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-6px) rotate(-2deg); }
+  75% { transform: translateY(-6px) rotate(2deg); }
 }
 
-@keyframes happyEyes {
+@keyframes happySquint {
   0%, 100% { transform: scaleY(1); }
   50% { transform: scaleY(0.85); }
 }
 
-@keyframes scratchLeft {
+@keyframes armBop {
   0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(-15deg); }
+  50% { transform: rotate(-8deg); }
 }
 
-@keyframes scratchRight {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(15deg); }
+@keyframes floatNote {
+  0% { transform: translate(0, 0); opacity: 0; }
+  30% { opacity: 0.8; }
+  100% { transform: translate(-5px, -20px); opacity: 0; }
+}
+
+// DJ
+@keyframes djBounce {
+  0%, 100% { transform: translateY(-20px); }
+  50% { transform: translateY(-26px); }
+}
+
+@keyframes scratchArm {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-18deg); }
 }
 
 @keyframes spin {
@@ -269,35 +447,53 @@
 
 @keyframes crossfade {
   0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(6px); }
+  50% { transform: translateX(8px); }
 }
 
-@keyframes runLegs {
-  0% { transform: rotate(-10deg); }
-  100% { transform: rotate(10deg); }
+// Football
+@keyframes runBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes runLeg {
+  0% { transform: rotate(-15deg); }
+  100% { transform: rotate(15deg); }
 }
 
 @keyframes pumpArm {
   0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(-20deg); }
+  50% { transform: rotate(-25deg); }
 }
 
-@keyframes runBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+@keyframes determinedEyes {
+  0%, 100% { transform: scaleY(1) translateX(0); }
+  50% { transform: scaleY(0.9) translateX(1px); }
 }
 
+@keyframes footballTuck {
+  0%, 100% { transform: rotate(-25deg) translateY(0); }
+  50% { transform: rotate(-25deg) translateY(-2px); }
+}
+
+@keyframes shadowRun {
+  0%, 100% { rx: 50; }
+  50% { rx: 45; }
+}
+
+// ==============================
 // Responsive
+// ==============================
 @media (max-width: 768px) {
   .monster-wrapper {
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 220px;
   }
 }
 
 @media (max-width: 576px) {
   .monster-wrapper {
-    width: 150px;
-    height: 150px;
+    width: 170px;
+    height: 190px;
   }
 }

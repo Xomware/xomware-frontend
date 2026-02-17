@@ -1,51 +1,9 @@
 <div class="landing" (mousemove)="onPageInteraction()">
   <!-- Hero Section -->
   <header class="hero">
-    <!-- Painted X Logo -->
     <div class="logo-container">
-      <svg class="painted-x" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="xGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#00b4d8;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#48cae4;stop-opacity:1" />
-          </linearGradient>
-          <filter id="xGlow">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <filter id="paintTexture">
-            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </defs>
-        <!-- Paint splatter background spots -->
-        <circle cx="35" cy="45" r="8" fill="url(#xGradient)" opacity="0.3" />
-        <circle cx="170" cy="55" r="5" fill="url(#xGradient)" opacity="0.25" />
-        <circle cx="155" cy="160" r="7" fill="url(#xGradient)" opacity="0.2" />
-        <circle cx="50" cy="165" r="4" fill="url(#xGradient)" opacity="0.3" />
-        <circle cx="100" cy="30" r="3" fill="url(#xGradient)" opacity="0.2" />
-        <!-- Drip from top-right stroke -->
-        <path d="M152 148 Q153 158 150 170 Q149 175 151 175 Q154 175 153 168 Q155 155 154 148Z"
-              fill="url(#xGradient)" opacity="0.6" filter="url(#paintTexture)" />
-        <!-- Drip from bottom-left stroke -->
-        <path d="M58 148 Q56 160 57 172 Q57 178 59 178 Q61 177 60 170 Q59 158 60 148Z"
-              fill="url(#xGradient)" opacity="0.5" filter="url(#paintTexture)" />
-        <!-- Main X strokes - brush style -->
-        <path d="M40 40 Q45 38 55 55 Q75 88 95 100 Q115 112 140 155 Q148 168 160 162 Q165 158 155 145 Q130 108 105 95 Q80 82 60 50 Q50 35 40 40Z"
-              fill="url(#xGradient)" filter="url(#xGlow)" />
-        <path d="M160 40 Q155 38 145 55 Q125 88 105 100 Q85 112 60 155 Q52 168 40 162 Q35 158 45 145 Q70 108 95 95 Q120 82 140 50 Q150 35 160 40Z"
-              fill="url(#xGradient)" filter="url(#xGlow)" />
-        <!-- Paint splash accents -->
-        <ellipse cx="38" cy="38" rx="6" ry="4" fill="url(#xGradient)" opacity="0.5" transform="rotate(-30 38 38)" />
-        <ellipse cx="162" cy="38" rx="5" ry="3" fill="url(#xGradient)" opacity="0.4" transform="rotate(30 162 38)" />
-        <ellipse cx="42" cy="165" rx="5" ry="3" fill="url(#xGradient)" opacity="0.4" transform="rotate(-15 42 165)" />
-        <ellipse cx="158" cy="165" rx="6" ry="3" fill="url(#xGradient)" opacity="0.5" transform="rotate(15 158 165)" />
-      </svg>
+      <img src="assets/img/xomware-transparent-background.png" alt="Xomware" class="brand-logo" />
     </div>
-    <h1 class="brand-title">XOMWARE</h1>
     <p class="tagline">Apps built by
       <a href="https://github.com/domgiordano" target="_blank" rel="noopener" class="github-link">
         <svg class="github-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -73,13 +31,10 @@
          rel="noopener"
          (mouseenter)="onCardHover(app.monsterState)"
          (mouseleave)="onCardLeave()">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path [attr.d]="app.icon" [attr.fill]="app.color"/>
-          </svg>
+        <div class="card-logo">
+          <img [src]="app.logo" [alt]="app.name + ' logo'" />
         </div>
         <div class="card-content">
-          <h2 class="card-title">{{ app.name }}</h2>
           <p class="card-description">{{ app.description }}</p>
         </div>
         <div class="card-arrow">

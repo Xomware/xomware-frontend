@@ -22,22 +22,12 @@
   margin-bottom: $spacing-md;
 }
 
-.painted-x {
-  width: 140px;
-  height: 140px;
-  filter: drop-shadow(0 0 20px rgba($brand-cyan, 0.3));
+.brand-logo {
+  max-width: 360px;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 25px rgba($brand-cyan, 0.35));
   animation: float 4s ease-in-out infinite;
-}
-
-.brand-title {
-  font-size: 3rem;
-  font-weight: 700;
-  letter-spacing: 12px;
-  background: $cyan-accent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: $spacing-sm;
 }
 
 .tagline {
@@ -73,7 +63,7 @@
 // App Cards
 .apps-section {
   width: 100%;
-  max-width: 900px;
+  max-width: 960px;
   padding: 0 $spacing-md;
 }
 
@@ -122,8 +112,9 @@
       opacity: 1;
     }
 
-    .card-title {
-      color: var(--app-color);
+    .card-logo img {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 12px color-mix(in srgb, var(--app-color) 40%, transparent));
     }
 
     .card-arrow {
@@ -133,22 +124,20 @@
   }
 }
 
-.card-icon {
-  width: 48px;
-  height: 48px;
+.card-logo {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: $spacing-md;
 
-  svg {
-    width: 100%;
-    height: 100%;
+  img {
+    max-height: 60px;
+    max-width: 180px;
+    width: auto;
+    object-fit: contain;
+    transition: all $transition-base;
   }
-}
-
-.card-title {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: $spacing-sm;
-  transition: color $transition-base;
 }
 
 .card-description {
@@ -231,14 +220,36 @@
     margin: 0 auto;
   }
 
-  .painted-x {
-    width: 100px;
-    height: 100px;
+  .app-card {
+    flex-direction: row;
+    text-align: left;
+    padding: $spacing-lg;
+    gap: $spacing-md;
+
+    .card-logo {
+      height: 45px;
+      margin-bottom: 0;
+      flex-shrink: 0;
+
+      img {
+        max-height: 45px;
+        max-width: 120px;
+      }
+    }
+
+    .card-content {
+      flex: 1;
+    }
+
+    .card-arrow {
+      opacity: 0.5;
+      transform: translateX(0);
+      flex-shrink: 0;
+    }
   }
 
-  .brand-title {
-    font-size: 2.2rem;
-    letter-spacing: 8px;
+  .brand-logo {
+    max-width: 260px;
   }
 
   .hero {
@@ -247,14 +258,8 @@
 }
 
 @media (max-width: $breakpoint-sm) {
-  .painted-x {
-    width: 80px;
-    height: 80px;
-  }
-
-  .brand-title {
-    font-size: 1.8rem;
-    letter-spacing: 6px;
+  .brand-logo {
+    max-width: 200px;
   }
 
   .footer-content {
