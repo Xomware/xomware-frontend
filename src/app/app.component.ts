@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
 
 interface AppCard {
   name: string;
@@ -14,7 +14,7 @@ interface AppCard {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements AfterViewInit, OnDestroy {
   monsterState = 'idle';
   isMobile = false;
 
@@ -52,12 +52,16 @@ export class AppComponent implements OnInit, OnDestroy {
     },
   ];
 
-  ngOnInit(): void {
-    this.checkMobile();
-    this.resetIdleTimer();
-    if (this.isMobile) {
-      this.startMobileCycle();
-    }
+  ngAfterViewInit(): void {
+    // Delay slightly to ensure viewport is fully measured (iOS Safari)
+    setTimeout(() => {
+      this.checkMobile();
+      if (this.isMobile) {
+        this.startMobileCycle();
+      } else {
+        this.resetIdleTimer();
+      }
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -99,7 +103,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private checkMobile(): void {
-    this.isMobile = window.innerWidth <= 768;
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = window.innerWidth <= 1024;
+    this.isMobile = isTouch && isSmallScreen;
   }
 
   private resetIdleTimer(): void {

@@ -1,186 +1,225 @@
-<div class="monster-wrapper" [ngClass]="state">
-  <svg viewBox="0 0 300 320" xmlns="http://www.w3.org/2000/svg" class="monster-svg">
+<div class="robot-wrapper" [ngClass]="state">
+  <svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg" class="robot-svg">
     <defs>
-      <radialGradient id="bodyGrad" cx="45%" cy="40%" r="55%">
-        <stop offset="0%" stop-color="#2a3a4a" />
-        <stop offset="70%" stop-color="#1a2535" />
-        <stop offset="100%" stop-color="#0f1a25" />
-      </radialGradient>
-      <radialGradient id="bellyGrad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#2e4055" stop-opacity="0.6" />
-        <stop offset="100%" stop-color="#1a2535" stop-opacity="0" />
-      </radialGradient>
+      <linearGradient id="bodyMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2a3545" />
+        <stop offset="50%" stop-color="#1e2a38" />
+        <stop offset="100%" stop-color="#15202d" />
+      </linearGradient>
+      <linearGradient id="headMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#303d50" />
+        <stop offset="50%" stop-color="#243040" />
+        <stop offset="100%" stop-color="#1a2535" />
+      </linearGradient>
+      <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#0a1520" />
+        <stop offset="100%" stop-color="#060d15" />
+      </linearGradient>
       <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stop-color="#00b4d8" stop-opacity="0.2" />
         <stop offset="100%" stop-color="#00b4d8" stop-opacity="0" />
       </radialGradient>
-      <filter id="softGlow">
-        <feGaussianBlur stdDeviation="3" result="blur" />
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
-      <filter id="shadow">
-        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3" />
+      <filter id="shadowDrop">
+        <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.3" />
       </filter>
     </defs>
 
     <!-- Ground glow -->
-    <ellipse cx="150" cy="280" rx="90" ry="18" fill="url(#glowGrad)" class="ground-glow" />
+    <ellipse cx="150" cy="305" rx="80" ry="15" fill="url(#glowGrad)" class="ground-glow" />
+    <!-- Ground shadow -->
+    <ellipse cx="150" cy="302" rx="45" ry="7" fill="rgba(0,0,0,0.2)" class="ground-shadow" />
 
-    <!-- Shadow on ground -->
-    <ellipse cx="150" cy="275" rx="50" ry="8" fill="rgba(0,0,0,0.25)" class="ground-shadow" />
+    <g class="character" filter="url(#shadowDrop)">
 
-    <g class="character" filter="url(#shadow)">
       <!-- Left leg -->
       <g class="left-leg">
-        <path d="M118 248 Q116 268 112 278 Q110 284 116 286 Q122 286 120 278 Q122 268 124 250"
-              fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
+        <rect x="115" y="268" width="14" height="24" rx="4" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" />
         <!-- Foot -->
-        <ellipse cx="116" cy="285" rx="10" ry="4" fill="#0f1a25" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.2" />
+        <rect x="109" y="289" width="24" height="10" rx="5" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" />
+        <!-- Knee joint -->
+        <circle cx="122" cy="270" r="4" fill="#1a2535" stroke="#00b4d8" stroke-width="0.6" stroke-opacity="0.3" />
       </g>
 
       <!-- Right leg -->
       <g class="right-leg">
-        <path d="M176 248 Q178 268 182 278 Q184 284 178 286 Q172 286 174 278 Q172 268 170 250"
-              fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
-        <ellipse cx="178" cy="285" rx="10" ry="4" fill="#0f1a25" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.2" />
+        <rect x="171" y="268" width="14" height="24" rx="4" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" />
+        <rect x="167" y="289" width="24" height="10" rx="5" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" />
+        <circle cx="178" cy="270" r="4" fill="#1a2535" stroke="#00b4d8" stroke-width="0.6" stroke-opacity="0.3" />
       </g>
 
       <!-- Left arm -->
       <g class="left-arm">
-        <path d="M88 185 Q68 192 58 210 Q55 218 62 220 Q68 220 66 212 Q72 198 88 192"
-              fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
+        <!-- Shoulder joint -->
+        <circle cx="90" cy="195" r="7" fill="#1a2535" stroke="#00b4d8" stroke-width="0.6" stroke-opacity="0.3" />
+        <!-- Upper arm -->
+        <rect x="76" y="195" width="12" height="30" rx="5" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" />
+        <!-- Elbow -->
+        <circle cx="82" cy="226" r="4" fill="#1a2535" stroke="#00b4d8" stroke-width="0.6" stroke-opacity="0.3" />
+        <!-- Forearm -->
+        <rect x="76" y="226" width="12" height="25" rx="5" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" />
         <!-- Hand -->
-        <circle cx="60" cy="216" r="6" fill="#0f1a25" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.2" />
+        <circle cx="82" cy="255" r="8" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
       </g>
 
       <!-- Right arm -->
       <g class="right-arm">
-        <path d="M212 185 Q232 192 242 210 Q245 218 238 220 Q232 220 234 212 Q228 198 212 192"
-              fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
-        <circle cx="240" cy="216" r="6" fill="#0f1a25" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.2" />
+        <circle cx="210" cy="195" r="7" fill="#1a2535" stroke="#00b4d8" stroke-width="0.6" stroke-opacity="0.3" />
+        <rect x="212" y="195" width="12" height="30" rx="5" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" />
+        <circle cx="218" cy="226" r="4" fill="#1a2535" stroke="#00b4d8" stroke-width="0.6" stroke-opacity="0.3" />
+        <rect x="212" y="226" width="12" height="25" rx="5" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" />
+        <circle cx="218" cy="255" r="8" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
       </g>
 
-      <!-- Main body -->
-      <ellipse cx="150" cy="195" rx="72" ry="78" fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="1.2" stroke-opacity="0.3" />
+      <!-- Body -->
+      <rect x="98" y="185" width="104" height="88" rx="16" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="1" stroke-opacity="0.25" />
+      <!-- Chest panel -->
+      <rect x="118" y="200" width="64" height="40" rx="8" fill="url(#screenGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" />
+      <!-- Chest light -->
+      <circle cx="150" cy="220" r="6" fill="#00b4d8" opacity="0.5" filter="url(#glow)" class="chest-light" />
+      <!-- Chest panel lines -->
+      <line x1="130" y1="230" x2="170" y2="230" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.15" />
+      <line x1="135" y1="236" x2="165" y2="236" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.1" />
+      <!-- Belt/waist -->
+      <rect x="105" y="260" width="90" height="12" rx="4" fill="#15202d" stroke="#00b4d8" stroke-width="0.6" stroke-opacity="0.15" />
+      <circle cx="150" cy="266" r="3" fill="#00b4d8" opacity="0.3" />
 
-      <!-- Belly highlight -->
-      <ellipse cx="150" cy="210" rx="40" ry="35" fill="url(#bellyGrad)" />
+      <!-- Neck -->
+      <rect x="140" y="172" width="20" height="16" rx="4" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.6" stroke-opacity="0.2" />
 
-      <!-- Body shine -->
-      <ellipse cx="130" cy="160" rx="25" ry="18" fill="white" opacity="0.04" transform="rotate(-15 130 160)" />
+      <!-- Head -->
+      <g class="head">
+        <rect x="105" y="110" width="90" height="66" rx="18" fill="url(#headMetal)" stroke="#00b4d8" stroke-width="1.2" stroke-opacity="0.3" />
+        <!-- Screen face -->
+        <rect x="115" y="118" width="70" height="50" rx="12" fill="url(#screenGrad)" stroke="#00b4d8" stroke-width="0.6" stroke-opacity="0.15" />
 
-      <!-- Eyes -->
-      <g class="eyes">
-        <!-- Left eye -->
-        <g class="left-eye">
-          <ellipse cx="125" cy="175" rx="22" ry="24" fill="#eef2f7" />
-          <ellipse cx="125" cy="175" rx="21" ry="23" fill="white" />
-          <g class="left-pupil-group">
-            <circle cx="128" cy="178" r="10" fill="#0a1018" />
-            <circle cx="128" cy="178" r="6" fill="#152030" />
-            <circle cx="131" cy="174" r="3.5" fill="white" opacity="0.9" />
-            <circle cx="125" cy="181" r="1.5" fill="white" opacity="0.4" />
+        <!-- Eyes -->
+        <g class="eyes">
+          <g class="left-eye">
+            <circle cx="137" cy="140" r="10" fill="#00b4d8" opacity="0.9" filter="url(#glow)" class="eye-glow" />
+            <circle cx="137" cy="140" r="6" fill="#fff" opacity="0.95" />
+            <circle cx="137" cy="140" r="3" fill="#00b4d8" class="eye-pupil" />
+          </g>
+          <g class="right-eye">
+            <circle cx="163" cy="140" r="10" fill="#00b4d8" opacity="0.9" filter="url(#glow)" class="eye-glow" />
+            <circle cx="163" cy="140" r="6" fill="#fff" opacity="0.95" />
+            <circle cx="163" cy="140" r="3" fill="#00b4d8" class="eye-pupil" />
           </g>
         </g>
-        <!-- Right eye -->
-        <g class="right-eye">
-          <ellipse cx="175" cy="175" rx="22" ry="24" fill="#eef2f7" />
-          <ellipse cx="175" cy="175" rx="21" ry="23" fill="white" />
-          <g class="right-pupil-group">
-            <circle cx="178" cy="178" r="10" fill="#0a1018" />
-            <circle cx="178" cy="178" r="6" fill="#152030" />
-            <circle cx="181" cy="174" r="3.5" fill="white" opacity="0.9" />
-            <circle cx="175" cy="181" r="1.5" fill="white" opacity="0.4" />
-          </g>
+
+        <!-- Mouth (LED bar) -->
+        <g class="mouth">
+          <rect x="133" y="155" width="34" height="6" rx="3" fill="#00b4d8" opacity="0.4" class="mouth-bar" />
         </g>
+
+        <!-- Eyelids (for blink/sleep) -->
+        <g class="eyelids">
+          <rect x="125" y="128" width="25" height="24" rx="4" fill="url(#screenGrad)" class="left-eyelid" />
+          <rect x="151" y="128" width="25" height="24" rx="4" fill="url(#screenGrad)" class="right-eyelid" />
+        </g>
+
+        <!-- Ear panels -->
+        <rect x="95" y="130" width="14" height="24" rx="5" fill="url(#headMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" class="left-ear" />
+        <rect x="191" y="130" width="14" height="24" rx="5" fill="url(#headMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" class="right-ear" />
       </g>
 
-      <!-- Eyelids -->
-      <g class="eyelids">
-        <ellipse cx="125" cy="175" rx="23" ry="25" fill="url(#bodyGrad)" class="left-eyelid" />
-        <ellipse cx="175" cy="175" rx="23" ry="25" fill="url(#bodyGrad)" class="right-eyelid" />
-      </g>
-
-      <!-- Mouth -->
-      <g class="mouth">
-        <path d="M138 215 Q150 224 162 215" stroke="#3a5068" stroke-width="2.5" fill="none" stroke-linecap="round" class="mouth-line" />
-      </g>
-
-      <!-- Cheek blush -->
-      <ellipse cx="102" cy="198" rx="10" ry="6" fill="#00b4d8" opacity="0.08" class="left-cheek" />
-      <ellipse cx="198" cy="198" rx="10" ry="6" fill="#00b4d8" opacity="0.08" class="right-cheek" />
-
-      <!-- Little antenna/horn -->
+      <!-- Antenna -->
       <g class="antenna">
-        <path d="M150 118 Q148 98 155 85" stroke="#00b4d8" stroke-width="2" fill="none" stroke-linecap="round" stroke-opacity="0.5" />
-        <circle cx="155" cy="83" r="5" fill="#00b4d8" opacity="0.6" filter="url(#softGlow)" class="antenna-tip" />
+        <rect x="147" y="95" width="6" height="18" rx="3" fill="url(#headMetal)" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.3" />
+        <circle cx="150" cy="92" r="6" fill="#00b4d8" opacity="0.6" filter="url(#glow)" class="antenna-tip" />
       </g>
     </g>
 
-    <!-- Headphones accessory (xomify) -->
-    <g class="headphones-accessory">
-      <path d="M90 162 Q90 110 150 105 Q210 110 210 162" stroke="#9c0abf" stroke-width="6" fill="none" stroke-linecap="round" />
-      <rect x="74" y="155" width="24" height="35" rx="10" fill="#9c0abf" />
-      <rect x="202" y="155" width="24" height="35" rx="10" fill="#9c0abf" />
-      <rect x="78" y="159" width="16" height="27" rx="7" fill="#7a0896" />
-      <rect x="206" y="159" width="16" height="27" rx="7" fill="#7a0896" />
-      <!-- Music notes floating -->
-      <text x="60" y="140" fill="#9c0abf" font-size="16" opacity="0.7" class="note1">&#9835;</text>
-      <text x="230" y="130" fill="#9c0abf" font-size="12" opacity="0.5" class="note2">&#9834;</text>
+    <!-- ===== ACCESSORIES ===== -->
+
+    <!-- Headphones (xomify) - sits clearly over the head -->
+    <g class="headphones-acc">
+      <!-- Headband -->
+      <path d="M96 130 Q96 85 150 78 Q204 85 204 130" stroke="#9c0abf" stroke-width="7" fill="none" stroke-linecap="round" />
+      <!-- Left cup - covers left ear panel -->
+      <rect x="82" y="122" width="26" height="36" rx="10" fill="#9c0abf" />
+      <rect x="86" y="126" width="18" height="28" rx="7" fill="#7a0896" />
+      <circle cx="95" cy="140" r="4" fill="#5a0670" />
+      <!-- Right cup - covers right ear panel -->
+      <rect x="192" y="122" width="26" height="36" rx="10" fill="#9c0abf" />
+      <rect x="196" y="126" width="18" height="28" rx="7" fill="#7a0896" />
+      <circle cx="205" cy="140" r="4" fill="#5a0670" />
+      <!-- Music notes -->
+      <text x="70" y="110" fill="#9c0abf" font-size="18" opacity="0.7" class="note1">&#9835;</text>
+      <text x="225" y="100" fill="#9c0abf" font-size="14" opacity="0.5" class="note2">&#9834;</text>
+      <text x="60" y="85" fill="#9c0abf" font-size="11" opacity="0.4" class="note3">&#9833;</text>
     </g>
 
-    <!-- DJ turntable accessory (xomcloud) -->
-    <g class="dj-accessory">
-      <rect x="60" y="252" width="180" height="55" rx="8" fill="#2a1a0a" stroke="#ff6b35" stroke-width="1.5" stroke-opacity="0.4" />
-      <rect x="65" y="255" width="170" height="48" rx="6" fill="#1a1008" />
+    <!-- DJ turntable (xomcloud) -->
+    <g class="dj-acc">
+      <!-- Table -->
+      <rect x="55" y="270" width="190" height="50" rx="6" fill="#2a1a0a" stroke="#ff6b35" stroke-width="1.5" stroke-opacity="0.4" />
+      <rect x="60" y="273" width="180" height="44" rx="4" fill="#1a1008" />
       <!-- Left platter -->
-      <circle cx="110" cy="275" r="20" fill="#1a1a1a" stroke="#ff6b35" stroke-width="1" stroke-opacity="0.3" />
-      <circle cx="110" cy="275" r="13" fill="none" stroke="#282828" stroke-width="0.5" />
-      <circle cx="110" cy="275" r="7" fill="none" stroke="#282828" stroke-width="0.5" />
-      <circle cx="110" cy="275" r="3" fill="#ff6b35" class="platter-left" />
+      <circle cx="110" cy="292" r="18" fill="#1a1a1a" stroke="#ff6b35" stroke-width="1" stroke-opacity="0.3" />
+      <circle cx="110" cy="292" r="12" fill="none" stroke="#282828" stroke-width="0.5" class="vinyl-groove-l" />
+      <circle cx="110" cy="292" r="6" fill="none" stroke="#282828" stroke-width="0.5" />
+      <circle cx="110" cy="292" r="3" fill="#ff6b35" class="platter-dot-l" />
       <!-- Right platter -->
-      <circle cx="190" cy="275" r="20" fill="#1a1a1a" stroke="#ff6b35" stroke-width="1" stroke-opacity="0.3" />
-      <circle cx="190" cy="275" r="13" fill="none" stroke="#282828" stroke-width="0.5" />
-      <circle cx="190" cy="275" r="7" fill="none" stroke="#282828" stroke-width="0.5" />
-      <circle cx="190" cy="275" r="3" fill="#ff6b35" class="platter-right" />
+      <circle cx="190" cy="292" r="18" fill="#1a1a1a" stroke="#ff6b35" stroke-width="1" stroke-opacity="0.3" />
+      <circle cx="190" cy="292" r="12" fill="none" stroke="#282828" stroke-width="0.5" class="vinyl-groove-r" />
+      <circle cx="190" cy="292" r="6" fill="none" stroke="#282828" stroke-width="0.5" />
+      <circle cx="190" cy="292" r="3" fill="#ff6b35" class="platter-dot-r" />
       <!-- Mixer -->
-      <rect x="138" y="268" width="24" height="14" rx="3" fill="#333" />
-      <rect x="146" y="266" width="8" height="6" rx="2" fill="#ff6b35" class="crossfader" />
-      <!-- Headphones on ear (DJ style, one ear) -->
-      <path d="M85 165 Q85 145 100 148" stroke="#ff6b35" stroke-width="4" fill="none" stroke-linecap="round" />
-      <rect x="74" y="160" width="18" height="25" rx="7" fill="#ff6b35" />
-      <rect x="77" y="163" width="12" height="19" rx="5" fill="#cc5520" />
+      <rect x="140" y="284" width="20" height="16" rx="3" fill="#333" />
+      <rect x="146" y="282" width="8" height="6" rx="2" fill="#ff6b35" class="crossfader" />
+      <!-- Tone arm -->
+      <line x1="125" y1="278" x2="115" y2="286" stroke="#666" stroke-width="1.5" stroke-linecap="round" />
+      <line x1="205" y1="278" x2="195" y2="286" stroke="#666" stroke-width="1.5" stroke-linecap="round" />
+      <!-- Single headphone on one ear (DJ style) -->
+      <path d="M90 128 Q88 115 95 112 Q102 110 104 125" stroke="#ff6b35" stroke-width="4" fill="none" stroke-linecap="round" />
+      <rect x="82" y="125" width="18" height="28" rx="7" fill="#ff6b35" />
+      <rect x="85" y="128" width="12" height="22" rx="5" fill="#cc5520" />
     </g>
 
-    <!-- Football helmet accessory (xomper) -->
-    <g class="football-accessory">
-      <path d="M90 163 Q88 108 150 100 Q212 108 210 163 Q210 172 200 172 L100 172 Q90 172 90 163Z"
-            fill="#0d3320" stroke="#00ffab" stroke-width="2" />
-      <path d="M150 100 L150 135" stroke="#00ffab" stroke-width="2.5" stroke-opacity="0.5" />
-      <path d="M115 168 Q120 182 135 185 Q150 188 165 185 Q180 182 185 168"
+    <!-- Football helmet (xomper) -->
+    <g class="football-acc">
+      <!-- Helmet shell - clearly covers the whole head top -->
+      <path d="M90 145 Q88 95 150 85 Q212 95 210 145 Q210 158 198 158 L102 158 Q90 158 90 145Z"
+            fill="#0d3320" stroke="#00ffab" stroke-width="2.5" />
+      <!-- Center stripe -->
+      <line x1="150" y1="87" x2="150" y2="145" stroke="#00ffab" stroke-width="3" stroke-opacity="0.6" />
+      <!-- Side stripes -->
+      <line x1="120" y1="97" x2="115" y2="148" stroke="#00ffab" stroke-width="1.5" stroke-opacity="0.3" />
+      <line x1="180" y1="97" x2="185" y2="148" stroke="#00ffab" stroke-width="1.5" stroke-opacity="0.3" />
+      <!-- Facemask - clearly in front of the face area -->
+      <path d="M112 152 Q115 170 130 175 Q150 180 170 175 Q185 170 188 152"
             stroke="#00ffab" stroke-width="3" fill="none" stroke-linecap="round" />
-      <line x1="135" y1="168" x2="140" y2="183" stroke="#00ffab" stroke-width="2" stroke-linecap="round" />
-      <line x1="165" y1="168" x2="160" y2="183" stroke="#00ffab" stroke-width="2" stroke-linecap="round" />
-      <!-- Football in hand -->
-      <ellipse cx="55" cy="208" rx="14" ry="9" fill="#5c3a1a" stroke="#00ffab" stroke-width="1" transform="rotate(-25 55 208)" class="football" />
-      <line x1="50" y1="204" x2="60" y2="212" stroke="#fff" stroke-width="0.8" opacity="0.5" />
+      <line x1="130" y1="155" x2="135" y2="173" stroke="#00ffab" stroke-width="2" stroke-linecap="round" />
+      <line x1="170" y1="155" x2="165" y2="173" stroke="#00ffab" stroke-width="2" stroke-linecap="round" />
+      <line x1="150" y1="152" x2="150" y2="178" stroke="#00ffab" stroke-width="2" stroke-linecap="round" />
+      <!-- Football held clearly in front, away from body -->
+      <g class="football-held">
+        <ellipse cx="75" cy="240" rx="16" ry="10" fill="#6b3a10" stroke="#00ffab" stroke-width="1.2" transform="rotate(-30 75 240)" />
+        <line x1="70" y1="236" x2="80" y2="244" stroke="#fff" stroke-width="1" opacity="0.5" />
+        <line x1="72" y1="234" x2="68" y2="238" stroke="#fff" stroke-width="0.7" opacity="0.4" />
+        <line x1="78" y1="242" x2="82" y2="246" stroke="#fff" stroke-width="0.7" opacity="0.4" />
+      </g>
     </g>
 
     <!-- Sleep Z's -->
     <g class="sleep-zs">
-      <text x="210" y="140" fill="#00b4d8" font-size="20" font-weight="bold" class="z1">Z</text>
-      <text x="228" y="118" fill="#00b4d8" font-size="15" font-weight="bold" class="z2">z</text>
-      <text x="240" y="100" fill="#00b4d8" font-size="11" font-weight="bold" class="z3">z</text>
+      <text x="215" y="115" fill="#00b4d8" font-size="22" font-weight="bold" class="z1">Z</text>
+      <text x="232" y="92" fill="#00b4d8" font-size="16" font-weight="bold" class="z2">z</text>
+      <text x="245" y="75" fill="#00b4d8" font-size="11" font-weight="bold" class="z3">z</text>
     </g>
 
-    <!-- Wave hand (replaces right arm on wave) -->
+    <!-- Wave hand (replaces right arm) -->
     <g class="wave-hand">
-      <path d="M215 180 Q238 172 245 155 Q248 145 242 143 Q236 143 235 152 Q232 166 215 175"
-            fill="url(#bodyGrad)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.3" />
-      <circle cx="243" cy="148" r="6" fill="#0f1a25" stroke="#00b4d8" stroke-width="0.5" stroke-opacity="0.2" />
+      <circle cx="210" cy="195" r="7" fill="#1a2535" stroke="#00b4d8" stroke-width="0.6" stroke-opacity="0.3" />
+      <rect x="212" y="175" width="12" height="30" rx="5" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.2" />
+      <circle cx="218" cy="170" r="8" fill="url(#bodyMetal)" stroke="#00b4d8" stroke-width="0.8" stroke-opacity="0.25" />
     </g>
   </svg>
 </div>
