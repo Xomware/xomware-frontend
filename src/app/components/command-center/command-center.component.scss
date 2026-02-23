@@ -146,6 +146,9 @@
     order: 3;
     width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
   }
 
   .tab-label {
@@ -154,5 +157,29 @@
 
   .cc-tab {
     padding: $spacing-sm;
+    flex-shrink: 0;
+  }
+
+  .cc-content {
+    padding: $spacing-sm;
+  }
+
+  .cc-status {
+    font-size: 0.7rem;
+  }
+
+  .cc-logout {
+    font-size: 0.7rem;
+    padding: $spacing-xs $spacing-sm;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .cc-header-right {
+    gap: $spacing-sm;
+  }
+
+  .cc-status span:not(.status-dot) {
+    display: none;
   }
 }
