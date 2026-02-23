@@ -1,0 +1,107 @@
+@import 'styles/variables';
+
+.pixel-office {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.office-header {
+  margin-bottom: $spacing-xl;
+
+  h2 {
+    font-size: 1.3rem;
+    color: $text-primary;
+  }
+
+  .office-subtitle {
+    font-size: 0.85rem;
+    color: $text-muted;
+    margin-top: $spacing-xs;
+  }
+}
+
+.canvas-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $spacing-xl;
+
+  canvas {
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: $radius-lg;
+    image-rendering: pixelated;
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+  }
+}
+
+.agent-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $spacing-md;
+}
+
+.agent-info-card {
+  background: $card-gradient;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left: 3px solid;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.agent-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.agent-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: 'SF Mono', monospace;
+}
+
+.agent-badge {
+  font-size: 0.65rem;
+  padding: 1px 8px;
+  border-radius: $radius-xl;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &[data-status='working'] {
+    background: rgba(0, 255, 171, 0.15);
+    color: #00ffab;
+  }
+  &[data-status='thinking'] {
+    background: rgba(255, 190, 11, 0.15);
+    color: #ffbe0b;
+  }
+  &[data-status='idle'] {
+    background: rgba(255, 255, 255, 0.05);
+    color: $text-muted;
+  }
+  &[data-status='done'] {
+    background: rgba(0, 180, 216, 0.15);
+    color: $brand-cyan;
+  }
+}
+
+.agent-role {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.agent-desc {
+  font-size: 0.72rem;
+  color: $text-secondary;
+  line-height: 1.4;
+}
+
+.agent-task {
+  font-size: 0.75rem;
+  color: $text-secondary;
+  font-style: italic;
+}

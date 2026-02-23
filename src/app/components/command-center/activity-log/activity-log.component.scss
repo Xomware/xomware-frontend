@@ -1,0 +1,140 @@
+@import 'styles/variables';
+
+.activity-log {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xl;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+
+  h2 {
+    font-size: 1.3rem;
+    color: $text-primary;
+  }
+}
+
+.log-filters {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.filter-btn {
+  padding: $spacing-xs $spacing-md;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $radius-xl;
+  color: $text-muted;
+  font-size: 0.75rem;
+  font-family: $font-stack;
+  cursor: pointer;
+  text-transform: capitalize;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    color: $text-secondary;
+  }
+
+  &.active {
+    background: rgba($brand-cyan, 0.1);
+    border-color: rgba($brand-cyan, 0.3);
+    color: $brand-cyan;
+  }
+}
+
+.log-timeline {
+  position: relative;
+  padding-left: 24px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.log-entry {
+  position: relative;
+  margin-bottom: $spacing-lg;
+  animation: fadeIn 0.3s ease-out;
+
+  &[data-type='task'] .entry-dot { background: $brand-cyan; box-shadow: 0 0 8px rgba($brand-cyan, 0.4); }
+  &[data-type='lesson'] .entry-dot { background: #ff6b35; box-shadow: 0 0 8px rgba(255, 107, 53, 0.4); }
+  &[data-type='error'] .entry-dot { background: #ff5252; box-shadow: 0 0 8px rgba(255, 82, 82, 0.4); }
+  &[data-type='info'] .entry-dot { background: #8a8a9a; }
+}
+
+.entry-dot {
+  position: absolute;
+  left: -20px;
+  top: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: $text-muted;
+}
+
+.entry-content {
+  background: $card-gradient;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: $radius-md;
+  padding: $spacing-md $spacing-lg;
+}
+
+.entry-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.entry-icon {
+  font-size: 1rem;
+}
+
+.entry-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $text-primary;
+  flex: 1;
+}
+
+.entry-time {
+  font-size: 0.75rem;
+  color: $text-muted;
+  font-family: 'SF Mono', monospace;
+}
+
+.entry-detail {
+  font-size: 0.8rem;
+  color: $text-secondary;
+  margin-top: $spacing-sm;
+  line-height: 1.5;
+}
+
+.entry-type-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  padding: 1px 8px;
+  border-radius: $radius-xl;
+  background: rgba(255, 255, 255, 0.05);
+  color: $text-muted;
+  margin-top: $spacing-sm;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}

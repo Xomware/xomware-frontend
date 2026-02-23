@@ -1,0 +1,39 @@
+<div class="command-center">
+  <!-- Header -->
+  <header class="cc-header">
+    <div class="cc-header-left">
+      <a routerLink="/" class="cc-logo">
+        <img src="assets/img/xomware-icon-transparent-background.png" alt="Xomware" />
+      </a>
+      <h1 class="cc-title">Command Center</h1>
+    </div>
+
+    <nav class="cc-tabs">
+      <button
+        *ngFor="let tab of tabs"
+        class="cc-tab"
+        [class.active]="activeTab === tab.id"
+        (click)="setTab(tab.id)"
+      >
+        <span class="tab-icon">{{ tab.icon }}</span>
+        <span class="tab-label">{{ tab.label }}</span>
+      </button>
+    </nav>
+
+    <div class="cc-header-right">
+      <span class="cc-status">
+        <span class="status-dot"></span>
+        Jarvis Online
+      </span>
+      <button class="cc-logout" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="cc-content">
+    <app-kanban *ngIf="activeTab === 'kanban'"></app-kanban>
+    <app-config-viewer *ngIf="activeTab === 'config'"></app-config-viewer>
+    <app-activity-log *ngIf="activeTab === 'activity'"></app-activity-log>
+    <app-pixel-office *ngIf="activeTab === 'office'"></app-pixel-office>
+  </main>
+</div>

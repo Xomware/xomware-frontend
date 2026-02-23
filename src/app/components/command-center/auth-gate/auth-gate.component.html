@@ -1,0 +1,33 @@
+<div class="auth-gate">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="assets/img/xomware-icon-transparent-background.png" alt="Xomware" />
+    </div>
+    <h2 class="auth-title">Command Center</h2>
+    <p class="auth-subtitle">Restricted access</p>
+
+    <form (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="input-group">
+        <input
+          type="password"
+          [(ngModel)]="passphrase"
+          name="passphrase"
+          placeholder="Enter passphrase"
+          autocomplete="off"
+          [disabled]="loading"
+          autofocus
+        />
+        <div class="input-glow"></div>
+      </div>
+
+      <p *ngIf="error" class="auth-error">{{ error }}</p>
+
+      <button type="submit" [disabled]="loading || !passphrase" class="auth-btn">
+        <span *ngIf="!loading">Access</span>
+        <span *ngIf="loading" class="spinner"></span>
+      </button>
+    </form>
+
+    <a routerLink="/" class="back-link">← Back to xomware.com</a>
+  </div>
+</div>

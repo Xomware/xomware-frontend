@@ -1,0 +1,158 @@
+@import 'styles/variables';
+
+.command-center {
+  min-height: 100vh;
+  background: $bg-dark;
+  display: flex;
+  flex-direction: column;
+}
+
+// Header
+.cc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm $spacing-lg;
+  background: rgba($bg-card, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.cc-header-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.cc-logo img {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 0 8px $brand-cyan-glow);
+}
+
+.cc-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $text-primary;
+  white-space: nowrap;
+}
+
+// Tabs
+.cc-tabs {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.cc-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: $spacing-sm $spacing-md;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  color: $text-secondary;
+  font-size: 0.85rem;
+  font-family: $font-stack;
+  cursor: pointer;
+  transition: all $transition-base;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $text-primary;
+  }
+
+  &.active {
+    background: rgba($brand-cyan, 0.1);
+    border-color: rgba($brand-cyan, 0.3);
+    color: $brand-cyan;
+  }
+}
+
+.tab-icon {
+  font-size: 1rem;
+}
+
+// Header right
+.cc-header-right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.cc-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: $text-secondary;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00ffab;
+  box-shadow: 0 0 8px rgba(0, 255, 171, 0.5);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.cc-logout {
+  padding: $spacing-xs $spacing-md;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $radius-md;
+  color: $text-muted;
+  font-size: 0.8rem;
+  font-family: $font-stack;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: rgba(255, 82, 82, 0.4);
+    color: #ff5252;
+  }
+}
+
+// Content
+.cc-content {
+  flex: 1;
+  padding: $spacing-lg;
+  overflow-y: auto;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .cc-header {
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+    padding: $spacing-sm;
+  }
+
+  .cc-title {
+    display: none;
+  }
+
+  .cc-tabs {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .tab-label {
+    display: none;
+  }
+
+  .cc-tab {
+    padding: $spacing-sm;
+  }
+}

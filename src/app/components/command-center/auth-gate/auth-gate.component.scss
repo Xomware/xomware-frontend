@@ -1,0 +1,134 @@
+@import 'styles/variables';
+
+.auth-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg-gradient;
+  padding: $spacing-md;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  padding: $spacing-2xl;
+  background: $card-gradient;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: $radius-lg;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.auth-logo {
+  margin-bottom: $spacing-lg;
+
+  img {
+    width: 64px;
+    height: 64px;
+    filter: drop-shadow(0 0 15px $brand-cyan-glow);
+  }
+}
+
+.auth-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.auth-subtitle {
+  font-size: 0.85rem;
+  color: $text-muted;
+  margin-bottom: $spacing-xl;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.input-group {
+  position: relative;
+
+  input {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-size: 1rem;
+    font-family: $font-stack;
+    outline: none;
+    transition: border-color $transition-base;
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: $brand-cyan;
+    }
+
+    &::placeholder {
+      color: $text-muted;
+    }
+  }
+}
+
+.auth-error {
+  color: #ff5252;
+  font-size: 0.85rem;
+}
+
+.auth-btn {
+  padding: 14px;
+  background: linear-gradient(135deg, $brand-cyan-dark, $brand-cyan);
+  border: none;
+  border-radius: $radius-md;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px $brand-cyan-glow;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: $spacing-lg;
+  color: $text-muted;
+  font-size: 0.85rem;
+  text-decoration: none;
+
+  &:hover {
+    color: $brand-cyan;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

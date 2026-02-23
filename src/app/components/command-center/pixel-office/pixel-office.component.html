@@ -1,0 +1,22 @@
+<div class="pixel-office">
+  <div class="office-header">
+    <h2>🏢 Agent Office</h2>
+    <p class="office-subtitle">Live view of Jarvis and sub-agents</p>
+  </div>
+
+  <div class="canvas-wrapper">
+    <canvas #officeCanvas></canvas>
+  </div>
+
+  <div class="agent-cards">
+    <div *ngFor="let agent of agents" class="agent-info-card" [style.border-color]="agent.color">
+      <div class="agent-status-row">
+        <span class="agent-name" [style.color]="agent.color">{{ agent.name }}</span>
+        <span class="agent-badge" [attr.data-status]="agent.status">{{ agent.status }}</span>
+      </div>
+      <span class="agent-role">{{ agent.role }}</span>
+      <span class="agent-desc">{{ agentDescriptions[agent.name] }}</span>
+      <span *ngIf="agent.task" class="agent-task">📌 {{ agent.task }}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,84 @@
+<div class="kanban">
+  <div class="kanban-header">
+    <h2>📋 XomBoard</h2>
+    <span class="card-count">{{ filteredCount }} / {{ cards.length }} items</span>
+    <div class="repo-filters">
+      <button class="repo-btn" [class.active]="!repoFilter" (click)="repoFilter = ''">All</button>
+      <button
+        *ngFor="let r of repos"
+        class="repo-btn"
+        [class.active]="repoFilter === r"
+        (click)="repoFilter = r"
+      >{{ r }}</button>
+    </div>
+  </div>
+
+  <div class="kanban-board">
+    <div
+      *ngFor="let col of columns"
+      class="kanban-column"
+      (dragover)="onDragOver($event)"
+      (drop)="onDrop($event, col.id)"
+    >
+      <div class="column-header" [style.border-bottom-color]="col.color">
+        <span class="column-icon">{{ col.icon }}</span>
+        <span class="column-title">{{ col.title }}</span>
+        <span class="column-count">{{ getColumnCards(col.id).length }}</span>
+      </div>
+
+      <div class="column-cards">
+        <div
+          *ngFor="let card of getColumnCards(col.id)"
+          class="kanban-card"
+          draggable="true"
+          (dragstart)="onDragStart(card)"
+        >
+          <div class="card-header">
+            <span class="card-title">{{ card.title }}</span>
+            <button class="card-delete" (click)="deleteCard(card)" title="Delete">×</button>
+          </div>
+          <p *ngIf="card.description" class="card-desc">{{ card.description }}</p>
+          <div class="card-meta">
+            <span *ngFor="let label of card.labels" class="card-label">{{ label }}</span>
+            <a *ngIf="card.prUrl" [href]="card.prUrl" target="_blank" class="card-pr">PR ↗</a>
+          </div>
+          <span *ngIf="card.repo" class="card-repo">{{ card.repo }}</span>
+        </div>
+
+        <button class="add-card-btn" (click)="openAddForm(col.id)">+ Add card</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Card Modal -->
+  <div *ngIf="showAddForm" class="modal-overlay" (click)="showAddForm = false">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <h3>Add Card</h3>
+      <form (ngSubmit)="addCard()">
+        <input
+          type="text"
+          [(ngModel)]="newCard.title"
+          name="title"
+          placeholder="Card title"
+          autofocus
+        />
+        <textarea
+          [(ngModel)]="newCard.description"
+          name="description"
+          placeholder="Description (optional)"
+          rows="3"
+        ></textarea>
+        <input
+          type="text"
+          [(ngModel)]="newCard.labels"
+          name="labels"
+          placeholder="Labels (comma separated)"
+        />
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="showAddForm = false">Cancel</button>
+          <button type="submit" class="btn-add" [disabled]="!newCard.title.trim()">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
