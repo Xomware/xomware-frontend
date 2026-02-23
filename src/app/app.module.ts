@@ -11,6 +11,7 @@ import { CommandCenterComponent } from './components/command-center/command-cent
 import { AuthGateComponent } from './components/command-center/auth-gate/auth-gate.component';
 import { KanbanComponent } from './components/command-center/kanban/kanban.component';
 import { ConfigViewerComponent } from './components/command-center/config-viewer/config-viewer.component';
+import { FileEditorComponent } from './components/command-center/file-editor/file-editor.component';
 import { ActivityLogComponent } from './components/command-center/activity-log/activity-log.component';
 import { PixelOfficeComponent } from './components/command-center/pixel-office/pixel-office.component';
 
@@ -23,6 +24,7 @@ import { PixelOfficeComponent } from './components/command-center/pixel-office/p
     AuthGateComponent,
     KanbanComponent,
     ConfigViewerComponent,
+    FileEditorComponent,
     ActivityLogComponent,
     PixelOfficeComponent,
   ],

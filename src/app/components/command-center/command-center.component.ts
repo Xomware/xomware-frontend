@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
-export type TabId = 'kanban' | 'config' | 'activity' | 'office';
+export type TabId = 'kanban' | 'files' | 'activity' | 'office';
 
 interface Tab {
   id: TabId;
@@ -20,7 +20,7 @@ export class CommandCenterComponent {
 
   tabs: Tab[] = [
     { id: 'kanban', label: 'XomBoard', icon: '📋' },
-    { id: 'config', label: 'Config', icon: '⚙️' },
+    { id: 'files', label: 'Files', icon: '📝' },
     { id: 'activity', label: 'Activity', icon: '📊' },
     { id: 'office', label: 'Office', icon: '🏢' },
   ];

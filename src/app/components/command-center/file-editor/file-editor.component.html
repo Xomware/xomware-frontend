@@ -1,0 +1,127 @@
+<div class="file-editor" (keydown)="handleSaveShortcut($event)">
+  <!-- Error banner -->
+  <div *ngIf="loadError" class="error-banner">
+    <span>⚠️ {{ loadError }}</span>
+    <button class="retry-btn" (click)="loadFiles()">Retry</button>
+  </div>
+
+  <div class="editor-layout">
+    <!-- File sidebar -->
+    <aside class="file-sidebar">
+      <div class="sidebar-header">
+        <h3>📂 Files</h3>
+        <button class="refresh-btn" (click)="loadFiles()" [disabled]="loading" title="Refresh">
+          ↻
+        </button>
+      </div>
+
+      <!-- Mobile dropdown -->
+      <select
+        class="file-dropdown"
+        [value]="selectedFile?.name || ''"
+        (change)="selectFile({ name: $any($event.target).value })"
+      >
+        <option value="" disabled>Select a file…</option>
+        <option *ngFor="let file of files" [value]="file.name">
+          {{ getIcon(file.name) }} {{ file.name }}
+        </option>
+      </select>
+
+      <!-- Desktop list -->
+      <div class="file-list">
+        <div *ngIf="loading && files.length === 0" class="loading-indicator">
+          Loading…
+        </div>
+        <button
+          *ngFor="let file of files"
+          class="file-item"
+          [class.active]="selectedFile?.name === file.name"
+          [class.modified]="selectedFile?.name === file.name && hasChanges"
+          (click)="selectFile(file)"
+        >
+          <span class="file-icon">{{ getIcon(file.name) }}</span>
+          <span class="file-name">{{ file.name }}</span>
+          <span *ngIf="selectedFile?.name === file.name && hasChanges" class="modified-dot" title="Unsaved changes">●</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Editor panel -->
+    <main class="editor-panel">
+      <div *ngIf="!selectedFile && !loading" class="empty-state">
+        <span class="empty-icon">📝</span>
+        <p>Select a file to edit</p>
+        <p class="empty-hint">⌘+S to save</p>
+      </div>
+
+      <div *ngIf="selectedFile" class="editor-container">
+        <!-- Toolbar -->
+        <div class="editor-toolbar">
+          <div class="toolbar-left">
+            <span class="toolbar-filename">{{ getIcon(selectedFile.name) }} {{ selectedFile.name }}</span>
+            <span class="toolbar-meta">{{ lineCount }} lines</span>
+            <span *ngIf="hasChanges" class="toolbar-modified">Modified</span>
+          </div>
+          <div class="toolbar-right">
+            <button
+              class="toolbar-btn"
+              [class.active]="previewMode"
+              (click)="togglePreview()"
+              title="Toggle preview"
+            >
+              {{ previewMode ? '✏️ Edit' : '👁️ Preview' }}
+            </button>
+            <button
+              class="toolbar-btn revert-btn"
+              (click)="revert()"
+              [disabled]="!hasChanges"
+              title="Revert changes"
+            >
+              ↩ Revert
+            </button>
+            <button
+              class="toolbar-btn save-btn"
+              [class.success]="saveSuccess"
+              [class.error]="saveError"
+              (click)="save()"
+              [disabled]="saving || !hasChanges"
+            >
+              {{ saving ? 'Saving…' : saveSuccess ? '✓ Saved' : '💾 Save' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Save error -->
+        <div *ngIf="saveError" class="save-error">
+          ⚠️ {{ saveError }}
+        </div>
+
+        <!-- Loading overlay -->
+        <div *ngIf="loading" class="editor-loading">
+          Loading file…
+        </div>
+
+        <!-- Editor textarea -->
+        <div *ngIf="!previewMode && !loading" class="editor-wrapper">
+          <div class="line-numbers" aria-hidden="true">
+            <span *ngFor="let line of editorContent.split('\n'); let i = index">{{ i + 1 }}</span>
+          </div>
+          <textarea
+            class="editor-textarea"
+            [(ngModel)]="editorContent"
+            (keydown)="handleTab($event)"
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+          ></textarea>
+        </div>
+
+        <!-- Preview -->
+        <div *ngIf="previewMode && !loading" class="editor-preview">
+          <pre class="preview-content">{{ editorContent }}</pre>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

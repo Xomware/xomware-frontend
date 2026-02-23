@@ -1,0 +1,441 @@
+@import 'styles/variables';
+
+.file-editor {
+  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm $spacing-md;
+  background: rgba(255, 82, 82, 0.1);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  border-radius: $radius-md;
+  color: #ff5252;
+  font-size: 0.85rem;
+  margin-bottom: $spacing-md;
+}
+
+.retry-btn {
+  padding: $spacing-xs $spacing-md;
+  background: rgba(255, 82, 82, 0.2);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  border-radius: $radius-sm;
+  color: #ff5252;
+  cursor: pointer;
+  font-family: $font-stack;
+  font-size: 0.8rem;
+
+  &:hover {
+    background: rgba(255, 82, 82, 0.3);
+  }
+}
+
+// Layout
+.editor-layout {
+  flex: 1;
+  display: flex;
+  gap: $spacing-md;
+  min-height: 0;
+}
+
+// Sidebar
+.file-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: $card-gradient;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+
+  h3 {
+    font-size: 0.9rem;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.refresh-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $radius-sm;
+  color: $text-secondary;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $text-primary;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.file-dropdown {
+  display: none;
+}
+
+.file-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-xs;
+}
+
+.loading-indicator {
+  padding: $spacing-lg;
+  text-align: center;
+  color: $text-muted;
+  font-size: 0.85rem;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-sm;
+  color: $text-secondary;
+  font-size: 0.82rem;
+  font-family: $font-stack;
+  cursor: pointer;
+  transition: all $transition-fast;
+  text-align: left;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: $text-primary;
+  }
+
+  &.active {
+    background: rgba($brand-cyan, 0.08);
+    border-color: rgba($brand-cyan, 0.2);
+    color: $brand-cyan;
+  }
+
+  &.modified .file-name {
+    font-style: italic;
+  }
+}
+
+.file-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+}
+
+.modified-dot {
+  color: $brand-cyan;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+// Editor panel
+.editor-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: $card-gradient;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: $spacing-md;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: $spacing-xs 0;
+    font-size: 0.9rem;
+  }
+
+  .empty-hint {
+    font-size: 0.75rem;
+    opacity: 0.6;
+  }
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+// Toolbar
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm $spacing-md;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.toolbar-filename {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  color: $text-primary;
+  font-weight: 600;
+}
+
+.toolbar-meta {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.toolbar-modified {
+  font-size: 0.72rem;
+  color: $brand-cyan;
+  padding: 2px 8px;
+  background: rgba($brand-cyan, 0.1);
+  border-radius: $radius-sm;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.toolbar-btn {
+  padding: $spacing-xs $spacing-md;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $radius-sm;
+  color: $text-secondary;
+  font-size: 0.78rem;
+  font-family: $font-stack;
+  cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.05);
+    color: $text-primary;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  &.active {
+    background: rgba($brand-cyan, 0.1);
+    border-color: rgba($brand-cyan, 0.3);
+    color: $brand-cyan;
+  }
+}
+
+.save-btn {
+  border-color: rgba($brand-cyan, 0.3);
+  color: $brand-cyan;
+
+  &:hover:not(:disabled) {
+    background: rgba($brand-cyan, 0.15);
+  }
+
+  &.success {
+    border-color: rgba(0, 255, 171, 0.5);
+    background: rgba(0, 255, 171, 0.15);
+    color: #00ffab;
+    animation: saveFlash 0.3s ease;
+  }
+
+  &.error {
+    border-color: rgba(255, 82, 82, 0.5);
+    color: #ff5252;
+  }
+}
+
+@keyframes saveFlash {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.save-error {
+  padding: $spacing-xs $spacing-md;
+  background: rgba(255, 82, 82, 0.08);
+  color: #ff5252;
+  font-size: 0.78rem;
+  border-bottom: 1px solid rgba(255, 82, 82, 0.15);
+}
+
+.editor-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+  font-size: 0.85rem;
+}
+
+// Editor with line numbers
+.editor-wrapper {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.line-numbers {
+  display: flex;
+  flex-direction: column;
+  padding: $spacing-md $spacing-sm $spacing-md $spacing-md;
+  background: rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  user-select: none;
+  overflow-y: hidden;
+  min-width: 40px;
+  text-align: right;
+
+  span {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.78rem;
+    line-height: 1.65;
+    color: $text-muted;
+    opacity: 0.5;
+  }
+}
+
+.editor-textarea {
+  flex: 1;
+  padding: $spacing-md;
+  background: transparent;
+  border: none;
+  color: $text-secondary;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.78rem;
+  line-height: 1.65;
+  resize: none;
+  outline: none;
+  tab-size: 2;
+  overflow-y: auto;
+  white-space: pre;
+  min-height: 0;
+
+  &:focus {
+    color: $text-primary;
+  }
+
+  &::placeholder {
+    color: $text-muted;
+    opacity: 0.5;
+  }
+}
+
+// Preview
+.editor-preview {
+  flex: 1;
+  padding: $spacing-lg;
+  overflow-y: auto;
+}
+
+.preview-content {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  color: $text-secondary;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .file-sidebar {
+    display: none;
+  }
+
+  .file-dropdown {
+    display: block;
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    background: rgba($bg-card, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-family: $font-stack;
+    font-size: 0.85rem;
+    margin-bottom: $spacing-sm;
+    outline: none;
+
+    option {
+      background: $bg-dark;
+      color: $text-primary;
+    }
+  }
+
+  .editor-layout {
+    flex-direction: column;
+  }
+
+  .editor-toolbar {
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+  }
+
+  .toolbar-meta,
+  .toolbar-modified {
+    display: none;
+  }
+
+  .line-numbers {
+    display: none;
+  }
+
+  .revert-btn {
+    display: none;
+  }
+}

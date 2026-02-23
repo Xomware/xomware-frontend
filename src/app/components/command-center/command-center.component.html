@@ -32,7 +32,7 @@
   <!-- Content -->
   <main class="cc-content">
     <app-kanban *ngIf="activeTab === 'kanban'"></app-kanban>
-    <app-config-viewer *ngIf="activeTab === 'config'"></app-config-viewer>
+    <app-file-editor *ngIf="activeTab === 'files'"></app-file-editor>
     <app-activity-log *ngIf="activeTab === 'activity'"></app-activity-log>
     <app-pixel-office *ngIf="activeTab === 'office'"></app-pixel-office>
   </main>

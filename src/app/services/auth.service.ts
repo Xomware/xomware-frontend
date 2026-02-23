@@ -28,11 +28,22 @@ export class AuthService {
     if (hash === this.PASSPHRASE_HASH) {
       localStorage.setItem(
         this.STORAGE_KEY,
-        JSON.stringify({ expiry: Date.now() + this.SESSION_DURATION })
+        JSON.stringify({ expiry: Date.now() + this.SESSION_DURATION, hash })
       );
       return true;
     }
     return false;
+  }
+
+  getPassphraseHash(): string {
+    const session = localStorage.getItem(this.STORAGE_KEY);
+    if (!session) return '';
+    try {
+      const { hash } = JSON.parse(session);
+      return hash || '';
+    } catch {
+      return '';
+    }
   }
 
   logout(): void {
