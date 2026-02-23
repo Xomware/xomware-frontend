@@ -47,9 +47,9 @@ export class PixelOfficeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   agents: Agent[] = [
     {
-      name: 'Jarvis', role: 'Lead Orchestrator', status: 'working',
+      name: 'Jarvis', role: 'Lead Orchestrator', status: 'idle',
       x: 100, y: 90, color: '#00b4d8', skinTone: '#d4a574', hairColor: '#2c1810', hairStyle: 'short',
-      task: 'Orchestrating agents', frame: 0,
+      frame: 0,
     },
     {
       name: 'Forge', role: 'Code & Build', status: 'idle',
@@ -57,9 +57,9 @@ export class PixelOfficeComponent implements OnInit, AfterViewInit, OnDestroy {
       frame: 0,
     },
     {
-      name: 'Recon', role: 'Research & Analysis', status: 'thinking',
+      name: 'Recon', role: 'Research & Analysis', status: 'idle',
       x: 500, y: 90, color: '#ff6b35', skinTone: '#c68642', hairColor: '#4a2c0a', hairStyle: 'long',
-      task: 'Analyzing best practices', frame: 0,
+      frame: 0,
     },
     {
       name: 'Watchtower', role: 'Monitor & Alerting', status: 'idle',

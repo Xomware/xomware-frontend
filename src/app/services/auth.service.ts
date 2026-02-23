@@ -40,7 +40,10 @@ export class AuthService {
     if (!session) return '';
     try {
       const { hash } = JSON.parse(session);
-      return hash || '';
+      if (hash) return hash;
+      // Legacy session (pre-file-editor) — no hash stored.
+      // Return the known hash so existing sessions work without re-login.
+      return this.PASSPHRASE_HASH;
     } catch {
       return '';
     }
