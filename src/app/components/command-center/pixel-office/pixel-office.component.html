@@ -1,7 +1,12 @@
 <div class="pixel-office">
   <div class="office-header">
     <h2>🏢 Agent Office</h2>
-    <p class="office-subtitle">Live view of Jarvis and sub-agents</p>
+    <p class="office-subtitle">
+      Live view of Jarvis and sub-agents
+      <span *ngIf="lastUpdated" class="last-updated">
+        · Updated {{ lastUpdated | date:'shortTime' }}
+      </span>
+    </p>
   </div>
 
   <div class="canvas-wrapper">

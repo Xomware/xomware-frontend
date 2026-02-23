@@ -17,6 +17,11 @@
     font-size: 0.85rem;
     color: $text-muted;
     margin-top: $spacing-xs;
+
+    .last-updated {
+      color: $text-muted;
+      font-size: 0.75rem;
+    }
   }
 }
 
