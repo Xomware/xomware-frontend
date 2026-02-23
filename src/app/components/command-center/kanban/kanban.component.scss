@@ -315,8 +315,33 @@
   }
 }
 
+@media (max-width: $breakpoint-lg) {
+  .kanban-board {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .kanban-header {
+    flex-wrap: wrap;
+  }
+
+  .repo-filters {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
 @media (max-width: $breakpoint-md) {
   .kanban-board {
     grid-template-columns: 1fr;
+  }
+
+  .kanban-column {
+    min-width: unset;
+    max-height: 400px;
+  }
+
+  .modal-card {
+    margin: $spacing-md;
+    max-width: calc(100% - #{$spacing-lg * 2});
   }
 }

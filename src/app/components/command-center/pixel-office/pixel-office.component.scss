@@ -6,7 +6,7 @@
 }
 
 .office-header {
-  margin-bottom: $spacing-xl;
+  margin-bottom: $spacing-lg;
 
   h2 {
     font-size: 1.3rem;
@@ -23,21 +23,19 @@
 .canvas-wrapper {
   display: flex;
   justify-content: center;
-  margin-bottom: $spacing-xl;
+  margin-bottom: $spacing-lg;
 
   canvas {
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: $radius-lg;
-    image-rendering: pixelated;
-    width: 100%;
-    max-width: 600px;
+    max-width: 100%;
     height: auto;
   }
 }
 
 .agent-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: $spacing-md;
 }
 
@@ -101,7 +99,24 @@
 }
 
 .agent-task {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: $text-secondary;
   font-style: italic;
+}
+
+// Mobile responsive
+@media (max-width: $breakpoint-md) {
+  .agent-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .office-header h2 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .agent-cards {
+    grid-template-columns: 1fr;
+  }
 }
