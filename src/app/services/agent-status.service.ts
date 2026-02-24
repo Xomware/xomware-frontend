@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 
 export interface AgentStatus {
   name: string;
-  status: 'idle' | 'working' | 'thinking' | 'done';
+  status: 'idle' | 'working' | 'thinking' | 'done' | 'online';
   task: string | null;
 }
 
@@ -53,8 +53,8 @@ export class AgentStatusService implements OnDestroy {
       if (!res.ok) return;
       const data: AgentStatusResponse = await res.json();
       this.status$.next(data);
-    } catch {
-      // silent fail — office just shows stale data
+    } catch (err) {
+      console.warn('[AgentStatus] fetch failed:', err);
     }
   }
 }
