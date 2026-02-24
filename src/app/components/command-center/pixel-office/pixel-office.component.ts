@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 interface Agent {
   name: string;
   role: string;
-  status: 'idle' | 'working' | 'thinking' | 'done';
+  status: 'idle' | 'working' | 'thinking' | 'done' | 'online';
   x: number;
   y: number;
   color: string;
@@ -38,42 +38,48 @@ export class PixelOfficeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   agentDescriptions: Record<string, string> = {
     'Jarvis': 'Main brain. Orchestrates all other agents, talks to Dom, manages priorities.',
-    'Forge': 'Spawned for coding tasks — builds features, fixes bugs, opens PRs across repos.',
-    'Recon': 'Web research, docs analysis, best practice scouting. Feeds intel back to Jarvis.',
-    'Watchtower': 'Monitors GitHub PRs, CI/CD status, email, calendar. Alerts on anything urgent.',
-    'Scribe': 'Maintains MEMORY.md, LESSONS.md, daily logs. Keeps institutional knowledge alive.',
-    'Deployer': 'Handles Terraform plans, CI/CD pipelines, infrastructure changes. Reviews before apply.',
+    'Boris': 'iMessage dispatcher. Triages inbound messages, responds fast, delegates to the right agent.',
+    'Freddy': 'Spawned for coding tasks — builds features, fixes bugs, opens PRs across repos.',
+    'Rocco': 'Web research, docs analysis, best practice scouting. Feeds intel back to Jarvis.',
+    'Winston': 'Monitors GitHub PRs, CI/CD status, email, calendar. Alerts on anything urgent.',
+    'Stormy': 'Maintains MEMORY.md, LESSONS.md, daily logs. Keeps institutional knowledge alive.',
+    'Debo': 'Handles Terraform plans, CI/CD pipelines, infrastructure changes. Reviews before apply.',
   };
 
   agents: Agent[] = [
     {
       name: 'Jarvis', role: 'Lead Orchestrator', status: 'idle',
-      x: 100, y: 90, color: '#00b4d8', skinTone: '#d4a574', hairColor: '#2c1810', hairStyle: 'short',
+      x: 80, y: 90, color: '#00b4d8', skinTone: '#d4a574', hairColor: '#2c1810', hairStyle: 'short',
       frame: 0,
     },
     {
-      name: 'Forge', role: 'Code & Build', status: 'idle',
-      x: 300, y: 90, color: '#9c0abf', skinTone: '#8d5524', hairColor: '#1a1a1a', hairStyle: 'spiky',
+      name: 'Boris', role: 'iMessage Dispatcher', status: 'idle',
+      x: 220, y: 90, color: '#e63946', skinTone: '#f1c27d', hairColor: '#2c1810', hairStyle: 'short',
       frame: 0,
     },
     {
-      name: 'Recon', role: 'Research & Analysis', status: 'idle',
+      name: 'Freddy', role: 'Code & Build', status: 'idle',
+      x: 360, y: 90, color: '#9c0abf', skinTone: '#8d5524', hairColor: '#1a1a1a', hairStyle: 'spiky',
+      frame: 0,
+    },
+    {
+      name: 'Rocco', role: 'Research & Analysis', status: 'idle',
       x: 500, y: 90, color: '#ff6b35', skinTone: '#c68642', hairColor: '#4a2c0a', hairStyle: 'long',
       frame: 0,
     },
     {
-      name: 'Watchtower', role: 'Monitor & Alerting', status: 'idle',
-      x: 100, y: 270, color: '#00ffab', skinTone: '#f1c27d', hairColor: '#b55239', hairStyle: 'mohawk',
+      name: 'Winston', role: 'Monitor & Alerting', status: 'idle',
+      x: 140, y: 270, color: '#00ffab', skinTone: '#f1c27d', hairColor: '#b55239', hairStyle: 'mohawk',
       frame: 0,
     },
     {
-      name: 'Scribe', role: 'Docs & Memory', status: 'idle',
+      name: 'Stormy', role: 'Docs & Memory', status: 'idle',
       x: 300, y: 270, color: '#ffbe0b', skinTone: '#e0ac69', hairColor: '#555555', hairStyle: 'bun',
       frame: 0,
     },
     {
-      name: 'Deployer', role: 'CI/CD & Infra', status: 'idle',
-      x: 500, y: 270, color: '#ff5252', skinTone: '#d4a574', hairColor: '#1a1a1a', hairStyle: 'bald',
+      name: 'Debo', role: 'CI/CD & Infra', status: 'idle',
+      x: 460, y: 270, color: '#ff5252', skinTone: '#d4a574', hairColor: '#1a1a1a', hairStyle: 'bald',
       frame: 0,
     },
   ];
@@ -207,8 +213,8 @@ export class PixelOfficeComponent implements OnInit, AfterViewInit, OnDestroy {
     const legends = [
       { color: '#00ffab', label: 'Working' },
       { color: '#ffbe0b', label: 'Thinking' },
+      { color: '#00b4d8', label: 'Online' },
       { color: '#6a6a7a', label: 'Idle' },
-      { color: '#00b4d8', label: 'Done' },
     ];
     ctx.font = '8px monospace';
     ctx.textAlign = 'right';
@@ -499,6 +505,7 @@ export class PixelOfficeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (agent.status === 'working') statusColor = '#00ffab';
     else if (agent.status === 'thinking') statusColor = '#ffbe0b';
     else if (agent.status === 'done') statusColor = '#00b4d8';
+    else if (agent.status === 'online') statusColor = '#00b4d8';
 
     const indicatorY = py - 28 + breathe;
     ctx.fillStyle = statusColor;
