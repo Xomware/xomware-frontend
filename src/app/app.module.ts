@@ -14,6 +14,7 @@ import { ConfigViewerComponent } from './components/command-center/config-viewer
 import { FileEditorComponent } from './components/command-center/file-editor/file-editor.component';
 import { ActivityLogComponent } from './components/command-center/activity-log/activity-log.component';
 import { PixelOfficeComponent } from './components/command-center/pixel-office/pixel-office.component';
+import { InfraDashboardComponent } from './components/command-center/infra-dashboard/infra-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { PixelOfficeComponent } from './components/command-center/pixel-office/p
     FileEditorComponent,
     ActivityLogComponent,
     PixelOfficeComponent,
+    InfraDashboardComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,181 @@
+<div class="infra-dashboard">
+  <!-- OVERVIEW VIEW -->
+  <div *ngIf="view === 'overview'" class="overview">
+    <div class="section-header">
+      <h2>🏗️ Infrastructure</h2>
+      <button class="refresh-btn" (click)="loadWorkspaces()" [disabled]="loading">
+        ↻ Refresh
+      </button>
+    </div>
+    <p class="section-subtitle">Terraform workspaces across Xomware apps</p>
+
+    <div *ngIf="error" class="error-banner">
+      <span>⚠️ {{ error }}</span>
+      <button class="retry-btn" (click)="loadWorkspaces()">Retry</button>
+    </div>
+
+    <div *ngIf="loading && workspaces.length === 0" class="loading-state">
+      Loading workspaces…
+    </div>
+
+    <div class="workspace-grid">
+      <div
+        *ngFor="let ws of workspaces"
+        class="workspace-card"
+        [style.border-left-color]="getColor(ws.name)"
+        (click)="openWorkspace(ws)"
+      >
+        <div class="card-header">
+          <span class="card-icon">{{ getIcon(ws.name) }}</span>
+          <span class="card-name">{{ ws.name }}</span>
+          <span class="card-version">TF {{ ws.terraformVersion }}</span>
+        </div>
+        <div class="card-stats">
+          <div class="stat">
+            <span class="stat-value">{{ ws.resourceCount }}</span>
+            <span class="stat-label">Resources</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ ws.serial }}</span>
+            <span class="stat-label">Serial</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ formatBytes(ws.fileSize) }}</span>
+            <span class="stat-label">State Size</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="card-modified">Last apply: {{ formatDate(ws.lastModified) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div *ngIf="view === 'detail'" class="detail">
+    <div class="detail-header">
+      <button class="back-btn" (click)="backToOverview()">← Back</button>
+      <span class="detail-icon">{{ getIcon(selectedWorkspace) }}</span>
+      <h2 [style.color]="getColor(selectedWorkspace)">{{ selectedWorkspace }}</h2>
+      <span class="detail-meta" *ngIf="workspaceState">
+        TF {{ workspaceState.terraformVersion }} · Serial {{ workspaceState.serial }}
+      </span>
+    </div>
+
+    <div *ngIf="detailError" class="error-banner">
+      <span>⚠️ {{ detailError }}</span>
+    </div>
+
+    <div *ngIf="detailLoading" class="loading-state">Loading state…</div>
+
+    <div *ngIf="workspaceState && !detailLoading" class="detail-content">
+      <!-- Summary cards -->
+      <div class="summary-row">
+        <div class="summary-card">
+          <span class="summary-value">{{ workspaceState.resourceCount }}</span>
+          <span class="summary-label">Managed Resources</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-value">{{ workspaceState.dataSourceCount }}</span>
+          <span class="summary-label">Data Sources</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-value">{{ outputEntries.length }}</span>
+          <span class="summary-label">Outputs</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-value monospace">{{ workspaceState.lineage.substring(0, 8) }}…</span>
+          <span class="summary-label">Lineage</span>
+        </div>
+      </div>
+
+      <!-- Tabs: Resources / Outputs -->
+      <div class="detail-tabs">
+        <button
+          class="detail-tab"
+          [class.active]="!showOutputs"
+          (click)="showOutputs = false"
+        >
+          Resources ({{ workspaceState.resourceCount }})
+        </button>
+        <button
+          class="detail-tab"
+          [class.active]="showOutputs"
+          (click)="showOutputs = true"
+        >
+          Outputs ({{ outputEntries.length }})
+        </button>
+      </div>
+
+      <!-- Resources Table -->
+      <div *ngIf="!showOutputs" class="resources-section">
+        <div class="filter-bar">
+          <input
+            type="text"
+            class="filter-input"
+            placeholder="Filter resources…"
+            [(ngModel)]="resourceFilter"
+          />
+          <span class="filter-count">{{ filteredResources.length }} resources</span>
+        </div>
+
+        <div class="resource-table">
+          <div class="table-header">
+            <span class="col-type">Type</span>
+            <span class="col-name">Name</span>
+            <span class="col-module">Module</span>
+          </div>
+          <div
+            *ngFor="let r of filteredResources"
+            class="table-row"
+            [class.selected]="selectedResource === r"
+            (click)="selectResource(r)"
+          >
+            <span class="col-type">
+              <span class="resource-provider">aws</span>
+              {{ getResourceTypeShort(r.type) }}
+            </span>
+            <span class="col-name">{{ r.name }}</span>
+            <span class="col-module">{{ r.module || '—' }}</span>
+          </div>
+        </div>
+
+        <!-- Resource detail panel -->
+        <div *ngIf="selectedResource" class="resource-detail">
+          <div class="resource-detail-header">
+            <h3>{{ selectedResource.type }}.{{ selectedResource.name }}</h3>
+            <button class="close-btn" (click)="selectedResource = null">✕</button>
+          </div>
+          <div class="attr-list">
+            <div
+              *ngFor="let attr of getAttrEntries(selectedResource.attributes)"
+              class="attr-row"
+            >
+              <span class="attr-key">{{ attr[0] }}</span>
+              <span
+                class="attr-value"
+                [class.redacted]="attr[1] === '**REDACTED**'"
+              >{{ formatAttrValue(attr[1]) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outputs Table -->
+      <div *ngIf="showOutputs" class="outputs-section">
+        <div class="output-list">
+          <div *ngFor="let entry of outputEntries" class="output-row">
+            <span class="output-key">{{ entry[0] }}</span>
+            <span
+              class="output-value"
+              [class.redacted]="entry[1].value === '**REDACTED**'"
+            >{{ entry[1].value }}</span>
+          </div>
+          <div *ngIf="outputEntries.length === 0" class="empty-state-small">
+            No outputs defined
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
