@@ -113,7 +113,7 @@ export class KanbanComponent implements OnInit {
       try {
         const parsed = JSON.parse(saved);
         // If saved data is stale (fewer than the synced set), refresh
-        if (parsed.length < 20) {
+        if (parsed.length < 35) {
           this.cards = this.getDefaultCards();
           this.saveCards();
         } else {
@@ -142,7 +142,12 @@ export class KanbanComponent implements OnInit {
         id: 'xw-cmd', title: 'Command Center Dashboard', description: 'Kanban, config viewer, activity log, pixel office',
         labels: ['feature', 'dashboard'], repo: 'xomware-frontend',
         prUrl: 'https://github.com/Xomware/xomware-frontend/pull/3',
-        column: 'in-review', createdAt: '2026-02-22T00:00:00Z',
+        column: 'done', createdAt: '2026-02-22T00:00:00Z',
+      },
+      {
+        id: 'xw-infra', title: 'Infra Dashboard', description: 'Infrastructure status and monitoring dashboard',
+        labels: ['feature', 'dashboard'], repo: 'xomware-frontend',
+        column: 'done', createdAt: '2026-02-24T00:00:00Z',
       },
 
       // === XOMIFY-FRONTEND ===
@@ -151,21 +156,28 @@ export class KanbanComponent implements OnInit {
         labels: ['angular', 'upgrade'], repo: 'xomify-frontend',
         issueUrl: 'https://github.com/Xomware/xomify-frontend/issues/143',
         prUrl: 'https://github.com/Xomware/xomify-frontend/pull/146',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
       {
         id: 'xf-144', title: 'Remove hardcoded base64 logo from env example', description: '',
         labels: ['security', 'cleanup'], repo: 'xomify-frontend',
         issueUrl: 'https://github.com/Xomware/xomify-frontend/issues/144',
         prUrl: 'https://github.com/Xomware/xomify-frontend/pull/147',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
       {
         id: 'xf-145', title: 'Add CI/CD pipeline (GitHub Actions)', description: '',
         labels: ['devops', 'ci-cd'], repo: 'xomify-frontend',
         issueUrl: 'https://github.com/Xomware/xomify-frontend/issues/145',
         prUrl: 'https://github.com/Xomware/xomify-frontend/pull/148',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
+      },
+      {
+        id: 'xf-162', title: 'Fix broken logo after base64 removal', description: '',
+        labels: ['bug'], repo: 'xomify-frontend',
+        issueUrl: 'https://github.com/Xomware/xomify-frontend/issues/162',
+        prUrl: 'https://github.com/Xomware/xomify-frontend/pull/163',
+        column: 'in-progress', createdAt: '2026-02-24T00:00:00Z',
       },
 
       // === XOMPER-FRONT-END ===
@@ -174,14 +186,14 @@ export class KanbanComponent implements OnInit {
         labels: ['angular', 'upgrade'], repo: 'xomper-front-end',
         issueUrl: 'https://github.com/Xomware/xomper-front-end/issues/45',
         prUrl: 'https://github.com/Xomware/xomper-front-end/pull/47',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
       {
         id: 'xp-46', title: "Rename package from 'angular-sleeper' to 'xomper-frontend'", description: '',
         labels: ['cleanup'], repo: 'xomper-front-end',
         issueUrl: 'https://github.com/Xomware/xomper-front-end/issues/46',
         prUrl: 'https://github.com/Xomware/xomper-front-end/pull/48',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
 
       // === XOMCLOUD-FRONTEND ===
@@ -190,14 +202,14 @@ export class KanbanComponent implements OnInit {
         labels: ['angular', 'upgrade'], repo: 'xomcloud-frontend',
         issueUrl: 'https://github.com/Xomware/xomcloud-frontend/issues/3',
         prUrl: 'https://github.com/Xomware/xomcloud-frontend/pull/5',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
       {
         id: 'xc-4', title: 'Security: environment.ts placeholder secrets pattern', description: '',
         labels: ['security'], repo: 'xomcloud-frontend',
         issueUrl: 'https://github.com/Xomware/xomcloud-frontend/issues/4',
         prUrl: 'https://github.com/Xomware/xomcloud-frontend/pull/6',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
 
       // === INFRASTRUCTURE ===
@@ -206,28 +218,33 @@ export class KanbanComponent implements OnInit {
         labels: ['terraform', 'infra'], repo: 'xomify-infrastructure',
         issueUrl: 'https://github.com/Xomware/xomify-infrastructure/issues/32',
         prUrl: 'https://github.com/Xomware/xomify-infrastructure/pull/35',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
       {
         id: 'xi-33', title: 'Migrate from static AWS creds to OIDC', description: '',
         labels: ['security', 'infra'], repo: 'xomify-infrastructure',
         issueUrl: 'https://github.com/Xomware/xomify-infrastructure/issues/33',
         prUrl: 'https://github.com/Xomware/xomify-infrastructure/pull/34',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
+      },
+      {
+        id: 'xi-s3', title: 'S3 backend migration', description: 'Migrate Terraform state to S3 backend',
+        labels: ['terraform', 'infra'], repo: 'xomify-infrastructure',
+        column: 'done', createdAt: '2026-02-24T00:00:00Z',
       },
       {
         id: 'xci-23', title: 'Upgrade AWS provider 4.38 → 5.x', description: '',
         labels: ['terraform', 'infra'], repo: 'xomcloud-infrastructure',
         issueUrl: 'https://github.com/Xomware/xomcloud-infrastructure/issues/23',
         prUrl: 'https://github.com/Xomware/xomcloud-infrastructure/pull/24',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
       {
         id: 'xpi-64', title: 'Fix typo: lamdba → lambda', description: '',
         labels: ['bugfix', 'infra'], repo: 'xomper-infrastructure',
         issueUrl: 'https://github.com/Xomware/xomper-infrastructure/issues/64',
         prUrl: 'https://github.com/Xomware/xomper-infrastructure/pull/65',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
 
       // === XOMIFY-IOS ===
@@ -236,14 +253,14 @@ export class KanbanComponent implements OnInit {
         labels: ['devops', 'ios'], repo: 'xomify-ios',
         issueUrl: 'https://github.com/domgiordano/xomify-ios/issues/3',
         prUrl: 'https://github.com/domgiordano/xomify-ios/pull/5',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
       {
         id: 'xios-4', title: 'Add app icon', description: '',
         labels: ['design', 'ios'], repo: 'xomify-ios',
         issueUrl: 'https://github.com/domgiordano/xomify-ios/issues/4',
         prUrl: 'https://github.com/domgiordano/xomify-ios/pull/6',
-        column: 'in-review', createdAt: '2026-02-21T00:00:00Z',
+        column: 'done', createdAt: '2026-02-21T00:00:00Z',
       },
 
       // === XOMFIT-IOS ===
@@ -257,7 +274,7 @@ export class KanbanComponent implements OnInit {
         id: 'xfit-2', title: 'Auth — Sign up / Login (Apple, Google, Email)', description: '',
         labels: ['auth', 'ios'], repo: 'xomfit-ios',
         issueUrl: 'https://github.com/Xomware/xomfit-ios/issues/2',
-        column: 'todo', createdAt: '2026-02-21T00:00:00Z',
+        column: 'in-progress', createdAt: '2026-02-21T00:00:00Z',
       },
       {
         id: 'xfit-3', title: 'User Profile — Setup, avatar, bio, stats', description: '',
@@ -340,9 +357,9 @@ export class KanbanComponent implements OnInit {
 
       // === COMMAND CENTER META TASKS ===
       {
-        id: 'meta-1', title: 'Set up Watchtower cron monitoring', description: 'PR status, CI/CD, email checks on schedule',
-        labels: ['agent', 'infra'], repo: 'xomware-frontend',
-        column: 'in-progress', createdAt: '2026-02-22T00:00:00Z',
+        id: 'meta-office-view', title: 'Office View agent update', description: 'Agent status updates for Pixel Office view',
+        labels: ['agent', 'feature'], repo: 'xomware-frontend',
+        column: 'done', createdAt: '2026-02-24T00:00:00Z',
       },
       {
         id: 'meta-2', title: 'Supabase backend for Kanban + activity data', description: 'Persistent storage, real-time sync',
