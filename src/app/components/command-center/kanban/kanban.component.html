@@ -18,6 +18,10 @@
     <div
       *ngFor="let col of columns"
       class="kanban-column"
+      (dragover)="onDragOver($event)"
+      (dragenter)="onDragEnter($event, col.id)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event, col.id)"
     >
       <div class="column-header" [style.border-bottom-color]="col.color">
         <span class="column-icon">{{ col.icon }}</span>
@@ -29,6 +33,10 @@
         <div
           *ngFor="let card of getColumnCards(col.id)"
           class="kanban-card"
+          draggable="true"
+          [class.dragging]="dragCardId === card.id"
+          (dragstart)="onDragStart($event, card)"
+          (dragend)="onDragEnd()"
         >
           <div class="card-header">
             <span class="card-title">{{ card.title }}</span>

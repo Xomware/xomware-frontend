@@ -65,6 +65,57 @@ export class KanbanComponent implements OnInit, OnDestroy {
       .filter(c => !this.repoFilter || c.repo === this.repoFilter);
   }
 
+  dragCardId: string | null = null;
+
+  onDragStart(event: DragEvent, card: BoardCard): void {
+    this.dragCardId = card.id;
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', card.id);
+    }
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  onDragEnter(event: DragEvent, columnId: string): void {
+    event.preventDefault();
+    const el = (event.currentTarget as HTMLElement);
+    el.classList.add('drag-over');
+  }
+
+  onDragLeave(event: DragEvent): void {
+    const el = (event.currentTarget as HTMLElement);
+    el.classList.remove('drag-over');
+  }
+
+  async onDrop(event: DragEvent, columnId: string): Promise<void> {
+    event.preventDefault();
+    const el = (event.currentTarget as HTMLElement);
+    el.classList.remove('drag-over');
+
+    const cardId = event.dataTransfer?.getData('text/plain') || this.dragCardId;
+    if (!cardId) return;
+
+    // Don't do anything if dropped in same column
+    const card = this.cards.find(c => c.id === cardId);
+    if (card && card.column === columnId) return;
+
+    const success = await this.boardService.moveCard(cardId, columnId);
+    if (!success) {
+      console.error('Failed to move card');
+    }
+    this.dragCardId = null;
+  }
+
+  onDragEnd(): void {
+    this.dragCardId = null;
+  }
+
   get liveStatus(): string {
     if (!this.lastUpdated) return 'Connecting...';
     const ago = Math.round((Date.now() - new Date(this.lastUpdated).getTime()) / 1000);

@@ -60,6 +60,29 @@ export class BoardService implements OnDestroy {
     this.stopPolling();
   }
 
+  async moveCard(cardId: string, targetColumn: string): Promise<boolean> {
+    try {
+      const res = await fetch(environment.apiBaseUrl + '/status/board/move', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Hash': this.auth.getPassphraseHash(),
+        },
+        body: JSON.stringify({ cardId, targetColumn }),
+      });
+      if (!res.ok) return false;
+      // Optimistically update local state
+      const current = this.board$.value;
+      const updatedCards = current.cards.map(c =>
+        c.id === cardId ? { ...c, column: targetColumn } : c
+      );
+      this.board$.next({ ...current, cards: updatedCards, updatedAt: new Date().toISOString() });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   private async fetch(): Promise<void> {
     try {
       const res = await fetch(this.url, {

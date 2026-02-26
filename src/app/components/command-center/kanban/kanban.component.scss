@@ -148,6 +148,20 @@
     cursor: grabbing;
     opacity: 0.8;
   }
+
+  &.dragging {
+    opacity: 0.3;
+    border: 1px dashed rgba($brand-cyan, 0.4);
+  }
+}
+
+.kanban-column.drag-over {
+  background: rgba($brand-cyan, 0.04);
+  border-color: rgba($brand-cyan, 0.2);
+
+  .column-header {
+    background: rgba($brand-cyan, 0.06);
+  }
 }
 
 .card-header {
