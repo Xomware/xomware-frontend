@@ -3,10 +3,17 @@ import { BehaviorSubject } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 
+export interface AgentSubAgent {
+  name: string;
+  task: string;
+}
+
 export interface AgentStatus {
   name: string;
   status: 'idle' | 'working' | 'thinking' | 'done' | 'online';
   task: string | null;
+  /** Future field: multiple active sub-agent instances for this agent category */
+  subagents?: AgentSubAgent[];
 }
 
 export interface AgentStatusResponse {

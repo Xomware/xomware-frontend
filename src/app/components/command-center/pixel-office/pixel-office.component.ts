@@ -2,6 +2,11 @@ import { Component, OnDestroy, ViewChild, ElementRef, AfterViewInit, HostListene
 import { AgentStatusService, AgentStatus } from '../../../services/agent-status.service';
 import { Subscription } from 'rxjs';
 
+interface SubAgentInstance {
+  name: string;
+  task: string;
+}
+
 interface Agent {
   name: string;
   role: string;
@@ -13,6 +18,7 @@ interface Agent {
   hairColor: string;
   hairStyle: 'short' | 'spiky' | 'long' | 'bun' | 'mohawk' | 'bald';
   task?: string;
+  subagents?: SubAgentInstance[];
   frame: number;
 }
 
@@ -35,6 +41,17 @@ export class PixelOfficeComponent implements OnInit, AfterViewInit, OnDestroy {
   lastUpdated: string | null = null;
 
   constructor(private agentStatusService: AgentStatusService) {}
+
+  /** Name pools for sub-agent instances — names start with same letter as parent */
+  private readonly namePool: Record<string, string[]> = {
+    'Jarvis': ['Jack', 'Jasper', 'Jules', 'Juno', 'Jade', 'Jesse'],
+    'Boris': ['Blake', 'Brody', 'Bex', 'Bianca', 'Bram', 'Blythe'],
+    'Freddy': ['Felix', 'Fiona', 'Franco', 'Fritz', 'Finn', 'Fallon'],
+    'Rocco': ['Riley', 'Rosa', 'Rex', 'Raven', 'River', 'Remy'],
+    'Winston': ['Wade', 'Wren', 'Wyatt', 'Willa', 'Webb', 'Wes'],
+    'Stormy': ['Sasha', 'Scout', 'Sierra', 'Sadie', 'Skylar', 'Sol'],
+    'Debo': ['Drake', 'Diana', 'Dexter', 'Dash', 'Dex', 'Delta'],
+  };
 
   agentDescriptions: Record<string, string> = {
     'Jarvis': 'Main brain. Orchestrates all other agents, talks to Dom, manages priorities.',
@@ -84,6 +101,33 @@ export class PixelOfficeComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
 
+  /** Agents that are currently active (working or thinking) with at least one sub-agent */
+  get activeAgentTasks(): Array<{ agent: Agent; subagents: SubAgentInstance[] }> {
+    return this.agents
+      .filter(a => a.status === 'working' || a.status === 'thinking')
+      .map(a => {
+        let subs: SubAgentInstance[];
+        if (a.subagents && a.subagents.length > 0) {
+          subs = a.subagents;
+        } else if (a.task) {
+          // Single task — synthesize a sub-agent name from the pool
+          const pool = this.namePool[a.name] ?? [a.name + '-1'];
+          subs = [{ name: pool[0], task: a.task }];
+        } else {
+          subs = [];
+        }
+        return { agent: a, subagents: subs };
+      })
+      .filter(x => x.subagents.length > 0);
+  }
+
+  /** Count of active sub-agents for a given agent */
+  private subCount(agent: Agent): number {
+    if (agent.subagents && agent.subagents.length > 0) return agent.subagents.length;
+    if (agent.task && (agent.status === 'working' || agent.status === 'thinking')) return 1;
+    return 0;
+  }
+
   ngOnInit(): void {
     // Start polling agent status from the API
     this.agentStatusService.startPolling(10_000);
@@ -113,6 +157,15 @@ export class PixelOfficeComponent implements OnInit, AfterViewInit, OnDestroy {
       if (agent) {
         agent.status = s.status;
         agent.task = s.task ?? undefined;
+        // Map API subagents (if provided) to internal SubAgentInstance[]
+        if (s.subagents && s.subagents.length > 0) {
+          agent.subagents = s.subagents.map((sa, i) => {
+            const pool = this.namePool[agent.name] ?? [];
+            return { name: sa.name || pool[i] || (agent.name + '-' + (i + 1)), task: sa.task };
+          });
+        } else {
+          agent.subagents = undefined;
+        }
       }
     }
   }
@@ -540,26 +593,36 @@ export class PixelOfficeComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    // Name plate
+    // === NAME PLATE (improved clarity) ===
+    // Agent name — larger, full color
     ctx.fillStyle = agent.color;
-    ctx.font = 'bold 9px monospace';
+    ctx.font = 'bold 10px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(agent.name, x, y + 82);
-    ctx.fillStyle = '#6a6a7a';
-    ctx.font = '7px monospace';
-    ctx.fillText(agent.role, x, y + 92);
+    ctx.fillText(agent.name, x, y + 83);
 
-    // Task label
-    if (agent.task && (agent.status === 'working' || agent.status === 'thinking')) {
-      const tw = ctx.measureText(agent.task).width + 10;
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(x - tw / 2, y + 95, tw, 12);
-      ctx.strokeStyle = agent.color + '40';
+    // Role — slightly larger, better contrast
+    ctx.fillStyle = '#9a9ab0';
+    ctx.font = '8px monospace';
+    ctx.fillText(agent.role, x, y + 94);
+
+    // === SUB-AGENT COUNT BADGE (replaces task text) ===
+    const count = this.subCount(agent);
+    if (count > 0) {
+      const badgeText = '\u00d7' + count; // ×N
+      ctx.font = 'bold 8px monospace';
+      const btw = ctx.measureText(badgeText).width + 10;
+      const bx = x - btw / 2;
+      const by = y + 97;
+      // Badge background
+      ctx.fillStyle = agent.color + '28';
+      ctx.fillRect(bx, by, btw, 12);
+      // Badge border
+      ctx.strokeStyle = agent.color + '70';
       ctx.lineWidth = 0.5;
-      ctx.strokeRect(x - tw / 2, y + 95, tw, 12);
-      ctx.fillStyle = agent.color + 'bb';
-      ctx.font = '7px monospace';
-      ctx.fillText(agent.task, x, y + 104);
+      ctx.strokeRect(bx, by, btw, 12);
+      // Badge text
+      ctx.fillStyle = agent.color;
+      ctx.fillText(badgeText, x, by + 9);
     }
 
     ctx.textAlign = 'left';

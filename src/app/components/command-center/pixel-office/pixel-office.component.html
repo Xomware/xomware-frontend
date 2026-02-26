@@ -13,6 +13,56 @@
     <canvas #officeCanvas></canvas>
   </div>
 
+  <!-- Active Tasks Panel -->
+  <div class="tasks-section">
+    <div class="tasks-header">
+      <span class="tasks-title">⚡ Active Tasks</span>
+      <span class="tasks-count" *ngIf="activeAgentTasks.length > 0">
+        {{ activeAgentTasks.length }} agent{{ activeAgentTasks.length !== 1 ? 's' : '' }} active
+      </span>
+    </div>
+
+    <div *ngIf="activeAgentTasks.length === 0" class="tasks-empty">
+      <span class="tasks-empty-icon">😴</span>
+      <span>All agents are idle — nothing running right now.</span>
+    </div>
+
+    <div *ngIf="activeAgentTasks.length > 0" class="tasks-grid">
+      <div
+        *ngFor="let entry of activeAgentTasks"
+        class="task-card"
+        [style.--agent-color]="entry.agent.color"
+      >
+        <!-- Card header -->
+        <div class="task-card-header">
+          <div class="task-card-identity">
+            <span class="task-card-dot" [style.background]="entry.agent.color"></span>
+            <span class="task-card-name" [style.color]="entry.agent.color">{{ entry.agent.name }}</span>
+            <span class="task-card-role">{{ entry.agent.role }}</span>
+          </div>
+          <div class="task-card-badge" [style.border-color]="entry.agent.color" [style.color]="entry.agent.color">
+            ×{{ entry.subagents.length }}
+          </div>
+        </div>
+
+        <!-- Sub-agent task list -->
+        <ul class="task-list">
+          <li *ngFor="let sub of entry.subagents" class="task-item">
+            <span class="sub-agent-name" [style.color]="entry.agent.color">{{ sub.name }}</span>
+            <span class="sub-agent-task">{{ sub.task }}</span>
+          </li>
+        </ul>
+
+        <!-- Status pill -->
+        <div class="task-status-pill" [attr.data-status]="entry.agent.status">
+          <span class="pill-dot"></span>
+          {{ entry.agent.status }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Roster (collapsed detail cards) -->
   <div class="agent-cards">
     <div *ngFor="let agent of agents" class="agent-info-card" [style.border-color]="agent.color">
       <div class="agent-status-row">
@@ -21,7 +71,6 @@
       </div>
       <span class="agent-role">{{ agent.role }}</span>
       <span class="agent-desc">{{ agentDescriptions[agent.name] }}</span>
-      <span *ngIf="agent.task" class="agent-task">📌 {{ agent.task }}</span>
     </div>
   </div>
 </div>
