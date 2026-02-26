@@ -13,7 +13,6 @@ export class KanbanComponent implements OnInit, OnDestroy {
     { id: 'dom-todo', title: 'Dom Todo', icon: '👤', color: '#3b82f6' },
     { id: 'dom-done', title: 'Dom Done', icon: '👍', color: '#22c55e' },
     { id: 'blocked-by-dom', title: 'Blocked by Dom', icon: '🚫', color: '#ef4444' },
-    { id: 'planning', title: 'Planning', icon: '💡', color: '#8b5cf6' },
     { id: 'todo', title: 'Agent Todo', icon: '📋', color: '#8a8a9a' },
     { id: 'in-progress', title: 'In Progress', icon: '🔨', color: '#00b4d8' },
     { id: 'in-review', title: 'In Review', icon: '👀', color: '#ff6b35' },
