@@ -149,6 +149,10 @@ export class KanbanComponent implements OnInit, OnDestroy {
     }
   }
 
+  refreshBoard(): void {
+    this.boardService.fetch();
+  }
+
   onDragEnd(): void {
     this.dragCardId = null;
   }
