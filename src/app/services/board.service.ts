@@ -83,7 +83,7 @@ export class BoardService implements OnDestroy {
     }
   }
 
-  private async fetch(): Promise<void> {
+  async fetch(): Promise<void> {
     try {
       const res = await fetch(this.url, {
         headers: {
