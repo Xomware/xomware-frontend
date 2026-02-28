@@ -35,24 +35,29 @@
   margin: 0;
 }
 
-.scene-container {
+// The stage: fixed height, overflow visible for arms/accessories
+.scene-stage {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 580px;
+  height: 160px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.015);
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: $radius-xl;
-  overflow: hidden;
+  overflow: visible;
 }
 
-.scene-svg {
-  width: 100%;
-  height: auto;
-  display: block;
-  min-height: 160px;
+.scene-ground {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
 }
 
+// Agent pills row
 .agent-pills {
   display: flex;
   justify-content: center;
@@ -66,7 +71,7 @@
   align-items: center;
   gap: 6px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(var(--agent-color, 255, 255, 255), 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 13px;
@@ -79,7 +84,7 @@
   &:hover {
     background: rgba(255, 255, 255, 0.07);
     color: $text-primary;
-    border-color: var(--agent-color);
+    border-color: var(--agent-color, $brand-cyan);
   }
 }
 
@@ -92,13 +97,14 @@
 }
 
 @media (max-width: $breakpoint-md) {
-  .scene-container {
+  .scene-stage {
+    height: 140px;
     max-width: 100%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .agent-blob {
+  app-agent-blob {
     animation: none !important;
   }
 }

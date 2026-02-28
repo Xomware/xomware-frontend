@@ -1,136 +1,129 @@
-<!-- Agent blob group — rendered inside parent SVG via <svg:g> projection -->
-<svg:g
-  #blobGroup
-  class="agent-blob"
-  [attr.data-agent]="agent.name"
-  style="cursor: pointer;"
-  (mouseenter)="onMouseEnter()"
-  (mouseleave)="onMouseLeave()"
-  (click)="onClick()"
->
-  <!-- Drop shadow -->
-  <svg:ellipse cy="22" rx="16" ry="4" [attr.fill]="'rgba(0,0,0,0.15)'" class="b-shadow"/>
+<div class="blob-container" [style.width.px]="60" [style.height.px]="70">
+  <svg
+    #blobSvg
+    class="agent-blob-svg"
+    [attr.viewBox]="'-30 -40 60 70'"
+    xmlns="http://www.w3.org/2000/svg"
+    [attr.aria-label]="agent.displayName + ' agent blob'"
+    role="img"
+    (mouseenter)="onMouseEnter()"
+    (mouseleave)="onMouseLeave()"
+    (click)="onClick()"
+  >
+    <defs>
+      <radialGradient [attr.id]="'shine-' + agent.name" cx="35%" cy="30%">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+      </radialGradient>
+    </defs>
 
-  <!-- Body -->
-  <svg:ellipse rx="18" ry="15" [attr.fill]="agent.color" class="b-body"/>
+    <!-- Body -->
+    <ellipse #blobBody rx="18" ry="15" [attr.fill]="agent.color" class="b-body"/>
 
-  <!-- Shine -->
-  <svg:ellipse cx="-5" cy="-6" rx="7" ry="4" fill="url(#blobShine)" opacity="0.6"/>
+    <!-- Shine -->
+    <ellipse cx="-5" cy="-6" rx="7" ry="4" [attr.fill]="'url(#shine-' + agent.name + ')'" opacity="0.6"/>
 
-  <!-- Eyes -->
-  <svg:g class="b-eyes">
-    <svg:circle cx="-6" cy="-3" r="4.5" fill="white"/>
-    <svg:circle cx="-4.5" cy="-3" r="2" fill="#111" class="b-pupil"/>
-    <svg:circle cx="6" cy="-3" r="4.5" fill="white"/>
-    <svg:circle cx="7.5" cy="-3" r="2" fill="#111" class="b-pupil"/>
-  </svg:g>
+    <!-- Eyes -->
+    <g class="b-eyes">
+      <circle cx="-6" cy="-3" r="4.5" fill="white"/>
+      <circle cx="-4.5" cy="-3" r="2" fill="#111" class="b-pupil"/>
+      <circle cx="6" cy="-3" r="4.5" fill="white"/>
+      <circle cx="7.5" cy="-3" r="2" fill="#111" class="b-pupil"/>
+    </g>
 
-  <!-- Mouth -->
-  <svg:path class="b-mouth" d="M-3,5 Q0,7 3,5" stroke="#111" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <!-- Mouth -->
+    <path class="b-mouth" d="M-3,5 Q0,7 3,5" stroke="#111" stroke-width="1.2" fill="none" stroke-linecap="round"/>
 
-  <!-- Arms (nubs) -->
-  <svg:ellipse class="arm-left"  cx="-20" cy="2" rx="7" ry="4" [attr.fill]="agent.color" opacity="0.9"/>
-  <svg:ellipse class="arm-right" cx="20"  cy="2" rx="7" ry="4" [attr.fill]="agent.color" opacity="0.9"/>
+    <!-- Arms -->
+    <ellipse class="arm-left"  cx="-20" cy="2" rx="7" ry="4" [attr.fill]="agent.color" opacity="0.9"/>
+    <ellipse class="arm-right" cx="20"  cy="2" rx="7" ry="4" [attr.fill]="agent.color" opacity="0.9"/>
 
-  <!-- ─── Boris accessories ─────────────────────── -->
-  <svg:g class="accessory-group accessory-boris" *ngIf="agent.name === 'boris'">
-    <svg:rect x="12" y="-28" width="18" height="12" rx="4" [attr.fill]="agent.color" opacity="0.9"/>
-    <svg:polygon points="14,-16 18,-16 16,-12" [attr.fill]="agent.color" opacity="0.9"/>
-    <svg:text x="21" y="-19" text-anchor="middle" font-size="6" fill="white">💬</svg:text>
-    <svg:rect class="phone-nub" x="17" y="-2" width="6" height="9" rx="2" fill="#1a1a2e" [attr.stroke]="agent.color" stroke-width="0.7"/>
-  </svg:g>
+    <!-- Boris accessories -->
+    <g *ngIf="agent.name === 'boris'">
+      <rect x="12" y="-28" width="18" height="12" rx="4" [attr.fill]="agent.color" opacity="0.9"/>
+      <polygon points="14,-16 18,-16 16,-12" [attr.fill]="agent.color" opacity="0.9"/>
+      <text x="21" y="-19" text-anchor="middle" font-size="6" fill="white">💬</text>
+      <rect class="phone-nub" x="17" y="-2" width="6" height="9" rx="2" fill="#1a1a2e" [attr.stroke]="agent.color" stroke-width="0.7"/>
+      <!-- Signature: status bubble -->
+      <g class="status-bubble" opacity="0">
+        <rect x="-10" y="-42" width="20" height="12" rx="4" fill="rgba(10,10,20,0.9)" [attr.stroke]="agent.color" stroke-width="0.5"/>
+        <text class="status-text" x="0" y="-33" text-anchor="middle" font-size="8">📨</text>
+      </g>
+    </g>
 
-  <!-- ─── Forge accessories ─────────────────────── -->
-  <svg:g class="accessory-group accessory-forge" *ngIf="agent.name === 'forge'">
-    <!-- Hard hat -->
-    <svg:ellipse cx="0" cy="-22" rx="16" ry="7" [attr.fill]="agent.color"/>
-    <svg:rect x="-12" y="-19" width="24" height="4" rx="2" [attr.fill]="agent.color"/>
-    <svg:rect x="-14" y="-17" width="28" height="2" rx="1" fill="#e05a28"/>
-    <!-- Wrench right arm -->
-    <svg:g class="wrench" transform="translate(18, 0) rotate(45)">
-      <svg:rect x="-2" y="-8" width="4" height="12" rx="1" fill="#aaa"/>
-      <svg:rect x="-4" y="-10" width="8" height="3" rx="1" fill="#aaa"/>
-    </svg:g>
-    <!-- PR badge (signature anim target) -->
-    <svg:g class="pr-badge" opacity="0">
-      <svg:rect x="-12" y="-40" width="24" height="12" rx="4" fill="#FF6B35" opacity="0.9"/>
-      <svg:text x="0" y="-31" text-anchor="middle" font-size="6" fill="white" font-weight="700">PR ✓</svg:text>
-    </svg:g>
-  </svg:g>
+    <!-- Forge accessories -->
+    <g *ngIf="agent.name === 'forge'">
+      <ellipse cx="0" cy="-22" rx="16" ry="7" [attr.fill]="agent.color"/>
+      <rect x="-12" y="-19" width="24" height="4" rx="2" [attr.fill]="agent.color"/>
+      <rect x="-14" y="-17" width="28" height="2" rx="1" fill="#e05a28"/>
+      <g class="wrench" transform="translate(18, 0) rotate(45)">
+        <rect x="-2" y="-8" width="4" height="12" rx="1" fill="#aaa"/>
+        <rect x="-4" y="-10" width="8" height="3" rx="1" fill="#aaa"/>
+      </g>
+      <!-- Signature: PR badge -->
+      <g class="pr-badge" opacity="0">
+        <rect x="-12" y="-38" width="24" height="12" rx="4" fill="#FF6B35" opacity="0.9"/>
+        <text x="0" y="-29" text-anchor="middle" font-size="6" fill="white" font-weight="700">PR ✓</text>
+      </g>
+    </g>
 
-  <!-- ─── Winston accessories ─────────────────────── -->
-  <svg:g class="accessory-group accessory-winston" *ngIf="agent.name === 'winston'">
-    <!-- Coffee cup -->
-    <svg:rect class="cup-body" x="-28" y="-4" width="10" height="10" rx="2" fill="#5d4037"/>
-    <svg:rect x="-28" y="-4" width="10" height="3" rx="1" [attr.fill]="agent.color" opacity="0.6"/>
-    <!-- Steam -->
-    <svg:path class="steam-1" d="M-24,-5 Q-22,-9 -24,-13" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
-    <svg:path class="steam-2" d="M-21,-5 Q-19,-9 -21,-13" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
-    <!-- CI badge -->
-    <svg:rect x="15" y="-28" width="14" height="9" rx="3" [attr.fill]="agent.color"/>
-    <svg:text x="22" y="-21" text-anchor="middle" font-size="5" fill="#0a0a14" font-weight="800">CI ✓</svg:text>
-    <!-- CI check (signature anim target) -->
-    <svg:g class="ci-check" opacity="0">
-      <svg:circle cx="22" cy="-34" r="7" fill="#00FFAB" opacity="0.9"/>
-      <svg:text x="22" y="-30" text-anchor="middle" font-size="8" fill="#0a0a14">✓</svg:text>
-    </svg:g>
-  </svg:g>
+    <!-- Winston accessories -->
+    <g *ngIf="agent.name === 'winston'">
+      <rect class="cup-body" x="-28" y="-4" width="10" height="10" rx="2" fill="#5d4037"/>
+      <rect x="-28" y="-4" width="10" height="3" rx="1" [attr.fill]="agent.color" opacity="0.6"/>
+      <path class="steam-1" d="M-24,-5 Q-22,-9 -24,-13" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+      <path class="steam-2" d="M-21,-5 Q-19,-9 -21,-13" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+      <rect x="15" y="-28" width="14" height="9" rx="3" [attr.fill]="agent.color"/>
+      <text x="22" y="-21" text-anchor="middle" font-size="5" fill="#0a0a14" font-weight="800">CI ✓</text>
+      <!-- Signature: CI check -->
+      <g class="ci-check" opacity="0">
+        <circle cx="22" cy="-34" r="7" fill="#00FFAB" opacity="0.9"/>
+        <text x="22" y="-30" text-anchor="middle" font-size="8" fill="#0a0a14">✓</text>
+      </g>
+    </g>
 
-  <!-- ─── Rocco accessories ─────────────────────── -->
-  <svg:g class="accessory-group accessory-rocco" *ngIf="agent.name === 'rocco'">
-    <!-- Magnifying glass -->
-    <svg:circle cx="24" cy="-10" r="8" fill="none" [attr.stroke]="agent.color" stroke-width="2"/>
-    <svg:line x1="30" y1="-4" x2="35" y2="1" [attr.stroke]="agent.color" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- Orbiting data dots -->
-    <svg:circle class="data-dot-1" cx="0" cy="-30" r="2" [attr.fill]="agent.color" opacity="0.8"/>
-    <svg:circle class="data-dot-2" cx="30" cy="-20" r="1.5" [attr.fill]="agent.color" opacity="0.6"/>
-    <svg:circle class="data-dot-3" cx="-25" cy="-20" r="1.5" [attr.fill]="agent.color" opacity="0.6"/>
-  </svg:g>
+    <!-- Rocco accessories -->
+    <g *ngIf="agent.name === 'rocco'">
+      <circle cx="24" cy="-10" r="8" fill="none" [attr.stroke]="agent.color" stroke-width="2"/>
+      <line x1="30" y1="-4" x2="35" y2="1" [attr.stroke]="agent.color" stroke-width="2.5" stroke-linecap="round"/>
+      <circle class="data-dot-1" cx="0" cy="-30" r="2" [attr.fill]="agent.color" opacity="0.8"/>
+      <circle class="data-dot-2" cx="30" cy="-20" r="1.5" [attr.fill]="agent.color" opacity="0.6"/>
+      <circle class="data-dot-3" cx="-25" cy="-20" r="1.5" [attr.fill]="agent.color" opacity="0.6"/>
+    </g>
 
-  <!-- ─── Stormy accessories ─────────────────────── -->
-  <svg:g class="accessory-group accessory-stormy" *ngIf="agent.name === 'stormy'">
-    <!-- Quill pen -->
-    <svg:g transform="translate(-22, -20) rotate(-30)">
-      <svg:rect x="-1" y="-12" width="2.5" height="16" rx="1" fill="#4A90D9"/>
-      <svg:polygon points="0,-14 -3,-8 3,-8" fill="#f0f0f0"/>
-    </svg:g>
-    <!-- Floating notebook (signature target) -->
-    <svg:g class="notebook" opacity="0">
-      <svg:rect x="-10" y="-38" width="20" height="14" rx="3" fill="#4A90D9" opacity="0.85"/>
-      <svg:line x1="-6" y1="-34" x2="6" y2="-34" stroke="white" stroke-width="1" opacity="0.6"/>
-      <svg:line x1="-6" y1="-30" x2="6" y2="-30" stroke="white" stroke-width="1" opacity="0.6"/>
-    </svg:g>
-  </svg:g>
+    <!-- Stormy accessories -->
+    <g *ngIf="agent.name === 'stormy'">
+      <g transform="translate(-22, -20) rotate(-30)">
+        <rect x="-1" y="-12" width="2.5" height="16" rx="1" fill="#4A90D9"/>
+        <polygon points="0,-14 -3,-8 3,-8" fill="#f0f0f0"/>
+      </g>
+      <!-- Signature: notebook -->
+      <g class="notebook" opacity="0">
+        <rect x="-10" y="-38" width="20" height="14" rx="3" fill="#4A90D9" opacity="0.85"/>
+        <line x1="-6" y1="-34" x2="6" y2="-34" stroke="white" stroke-width="1" opacity="0.6"/>
+        <line x1="-6" y1="-30" x2="6" y2="-30" stroke="white" stroke-width="1" opacity="0.6"/>
+      </g>
+    </g>
 
-  <!-- ─── Debo accessories ─────────────────────── -->
-  <svg:g class="accessory-group accessory-debo" *ngIf="agent.name === 'debo'">
-    <!-- Server rack icon overhead -->
-    <svg:rect x="-12" y="-36" width="24" height="16" rx="3" fill="#1a1a2e" [attr.stroke]="agent.color" stroke-width="1"/>
-    <svg:rect x="-9" y="-33" width="18" height="4" rx="1" fill="#333"/>
-    <svg:rect x="-9" y="-27" width="18" height="4" rx="1" fill="#333"/>
-    <!-- Server glow indicator -->
-    <svg:circle class="server-glow" cx="5" cy="-31" r="2" fill="#00FFAB" opacity="0.3"/>
-    <svg:circle class="server-glow" cx="5" cy="-25" r="2" fill="#00FFAB" opacity="0.3"/>
-    <!-- Terraform chip -->
-    <svg:rect x="-20" y="-8" width="12" height="8" rx="2" fill="#7B42BC" opacity="0.9"/>
-    <svg:text x="-14" y="-2" text-anchor="middle" font-size="4" fill="white" font-weight="700">TF</svg:text>
-  </svg:g>
+    <!-- Debo accessories -->
+    <g *ngIf="agent.name === 'debo'">
+      <rect x="-12" y="-36" width="24" height="16" rx="3" fill="#1a1a2e" [attr.stroke]="agent.color" stroke-width="1"/>
+      <rect x="-9" y="-33" width="18" height="4" rx="1" fill="#333"/>
+      <rect x="-9" y="-27" width="18" height="4" rx="1" fill="#333"/>
+      <circle class="server-glow" cx="5" cy="-31" r="2" fill="#00FFAB" opacity="0.3"/>
+      <circle class="server-glow" cx="5" cy="-25" r="2" fill="#00FFAB" opacity="0.3"/>
+      <rect x="-20" y="-8" width="12" height="8" rx="2" fill="#7B42BC" opacity="0.9"/>
+      <text x="-14" y="-2" text-anchor="middle" font-size="4" fill="white" font-weight="700">TF</text>
+    </g>
 
-  <!-- Name label (hover reveal) -->
-  <svg:text
-    class="agent-label"
-    y="30"
-    text-anchor="middle"
-    font-size="7"
-    font-weight="700"
-    [attr.fill]="agent.color"
-    [style.opacity]="0"
-  >{{ agent.displayName }}</svg:text>
-
-  <!-- Status bubble (signature animations) -->
-  <svg:g class="status-bubble" opacity="0">
-    <svg:rect x="-10" y="-44" width="20" height="12" rx="4"
-      fill="rgba(10,10,20,0.9)" [attr.stroke]="agent.color" stroke-width="0.5"/>
-    <svg:text class="status-text" x="0" y="-34" text-anchor="middle" font-size="8">💬</svg:text>
-  </svg:g>
-</svg:g>
+    <!-- Name label (hover) -->
+    <text
+      class="agent-label"
+      y="28"
+      text-anchor="middle"
+      font-size="6"
+      font-weight="700"
+      [attr.fill]="agent.color"
+    >{{ agent.displayName }}</text>
+  </svg>
+</div>

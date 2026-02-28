@@ -21,19 +21,29 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
   @Output() blobClick = new EventEmitter<AgentBlob>();
   @Output() blobHover = new EventEmitter<{ agent: AgentBlob; entering: boolean }>();
 
-  @ViewChild('blobGroup', { static: true }) blobGroupRef!: ElementRef<SVGGElement>;
+  @ViewChild('blobSvg', { static: true }) svgRef!: ElementRef<SVGSVGElement>;
 
   private blinkTimer: any;
   private signatureTimer: any;
-  private idleTween: gsap.core.Tween | null = null;
-  private prefersReducedMotion = false;
+  prefersReducedMotion = false;
 
-  get el(): SVGGElement {
-    return this.blobGroupRef.nativeElement;
+  private get svg(): SVGSVGElement {
+    return this.svgRef.nativeElement;
+  }
+
+  private qa(sel: string): Element[] {
+    return Array.from(this.svg.querySelectorAll(sel));
   }
 
   ngAfterViewInit(): void {
     this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Apply initial scale via GSAP on the SVG itself
+    gsap.set(this.svg, { scale: this.agent.scale, transformOrigin: 'center center' });
+
+    // Show name label hidden initially
+    gsap.set(this.svg.querySelector('.agent-label'), { opacity: 0 });
+
     this.startIdleAnimation();
     this.startBlink();
     if (!this.prefersReducedMotion) {
@@ -44,35 +54,34 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     clearTimeout(this.blinkTimer);
     clearTimeout(this.signatureTimer);
-    gsap.killTweensOf(this.el);
-    gsap.killTweensOf(this.el.querySelectorAll('*'));
+    gsap.killTweensOf(this.svg);
+    gsap.killTweensOf(this.qa('*'));
   }
 
   onMouseEnter(): void {
     this.blobHover.emit({ agent: this.agent, entering: true });
     this.playWave();
-    gsap.to(this.el, {
-      scale: 1.15,
+    gsap.to(this.svg, {
+      scale: this.agent.scale * 1.15,
       duration: 0.3,
       ease: 'back.out(1.7)',
       transformOrigin: 'center center',
     });
-    gsap.to(this.el.querySelector('.agent-label'), {
+    gsap.to(this.svg.querySelector('.agent-label'), {
       opacity: 1,
       duration: 0.3,
-      ease: 'power2.out',
     });
   }
 
   onMouseLeave(): void {
     this.blobHover.emit({ agent: this.agent, entering: false });
-    gsap.to(this.el, {
+    gsap.to(this.svg, {
       scale: this.agent.scale,
       duration: 0.3,
       ease: 'power2.out',
       transformOrigin: 'center center',
     });
-    gsap.to(this.el.querySelector('.agent-label'), {
+    gsap.to(this.svg.querySelector('.agent-label'), {
       opacity: 0,
       duration: 0.2,
     });
@@ -82,10 +91,10 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
     this.blobClick.emit(this.agent);
   }
 
-  // ── Wave arm on hover ──────────────────────────────
-  private playWave(): void {
+  // ── Public wave (called from scene orchestrator) ──
+  wave(delay = 0): void {
     if (this.prefersReducedMotion) return;
-    const arm = this.el.querySelector('.arm-right');
+    const arm = this.svg.querySelector('.arm-right');
     if (!arm) return;
     gsap.to(arm, {
       rotation: -35,
@@ -94,10 +103,16 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
       ease: 'sine.inOut',
       yoyo: true,
       repeat: 5,
+      delay,
     });
   }
 
-  // ── Idle animations per agent ──────────────────────────────
+  // ── Private: Wave on hover ──
+  private playWave(): void {
+    this.wave(0);
+  }
+
+  // ── Idle animations ──────────────────────────────
   private startIdleAnimation(): void {
     if (this.prefersReducedMotion) return;
 
@@ -110,8 +125,8 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
       case 'nod':     this.animateNod(); break;
     }
 
-    // Universal breath squish on all blobs
-    const body = this.el.querySelector('.b-body');
+    // Universal breathing squish
+    const body = this.svg.querySelector('.b-body');
     if (body) {
       gsap.to(body, {
         attr: { ry: 17 },
@@ -124,9 +139,8 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  // Boris: pacing left-right
   private animatePace(): void {
-    gsap.to(this.el, {
+    gsap.to(this.svg, {
       x: '+=40',
       duration: 1.8,
       ease: 'sine.inOut',
@@ -135,111 +149,48 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // Forge: hammering bounce + body squash
   private animateHammer(): void {
-    const body = this.el.querySelector('.b-body');
-    gsap.to(this.el, {
-      y: '+=3',
-      duration: 0.3,
-      ease: 'power2.in',
-      yoyo: true,
-      repeat: -1,
-    });
+    const body = this.svg.querySelector('.b-body');
+    gsap.to(this.svg, { y: '+=3', duration: 0.3, ease: 'power2.in', yoyo: true, repeat: -1 });
     if (body) {
-      gsap.to(body, {
-        attr: { ry: 13 },
-        duration: 0.3,
-        ease: 'power2.in',
-        yoyo: true,
-        repeat: -1,
-      });
+      gsap.to(body, { attr: { ry: 13 }, duration: 0.3, ease: 'power2.in', yoyo: true, repeat: -1 });
     }
   }
 
-  // Winston: patrol walk + steam puffs
   private animatePatrol(): void {
-    gsap.to(this.el, {
-      x: '+=80',
-      duration: 4,
-      ease: 'none',
-      yoyo: true,
-      repeat: -1,
-    });
-    const steams = this.el.querySelectorAll('.steam-1, .steam-2');
-    gsap.to(steams, {
-      opacity: 0,
-      y: '-=4',
-      duration: 0.8,
-      ease: 'sine.out',
-      stagger: 0.2,
-      repeat: -1,
-      repeatDelay: 0.2,
-    });
+    gsap.to(this.svg, { x: '+=60', duration: 4, ease: 'none', yoyo: true, repeat: -1 });
+    const steams = this.qa('.steam-1, .steam-2');
+    if (steams.length) {
+      gsap.to(steams, { opacity: 0, y: '-=4', duration: 0.8, ease: 'sine.out', stagger: 0.2, repeat: -1, repeatDelay: 0.2 });
+    }
   }
 
-  // Rocco: orbiting data dots
   private animateOrbit(): void {
-    const dots = this.el.querySelectorAll('.data-dot-1, .data-dot-2, .data-dot-3');
+    const dots = this.qa('.data-dot-1, .data-dot-2, .data-dot-3');
     dots.forEach((dot, i) => {
       let angle = (i / dots.length) * Math.PI * 2;
-      const radius = 28;
+      const radius = 26;
       const speed = 0.04 + i * 0.01;
       gsap.to({}, {
-        duration: 999,
+        duration: 9999,
         repeat: -1,
         ease: 'none',
         onUpdate: function () {
           angle += speed;
-          gsap.set(dot, {
-            x: Math.cos(angle) * radius,
-            y: Math.sin(angle) * radius * 0.6,
-          });
+          gsap.set(dot, { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius * 0.6 });
         },
       });
     });
-
-    // Head tilt
-    gsap.to(this.el, {
-      rotation: 10,
-      duration: 2,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-    });
+    gsap.to(this.svg, { rotation: 8, duration: 2, ease: 'sine.inOut', yoyo: true, repeat: -1 });
   }
 
-  // Stormy: quill writing oscillation
   private animateWrite(): void {
-    const acc = this.el.querySelector('.accessory-group');
-    if (acc) {
-      gsap.to(acc, {
-        x: '+=4',
-        y: '+=2',
-        duration: 0.4,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-      });
-    }
-    // Also gentle drift
-    gsap.to(this.el, {
-      y: '+=3',
-      duration: 2,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-    });
+    const acc = this.svg.querySelector('g:not(.b-eyes):not(.b-mouth)');
+    gsap.to(this.svg, { y: '+=3', duration: 2, ease: 'sine.inOut', yoyo: true, repeat: -1 });
   }
 
-  // Debo: slow nod
   private animateNod(): void {
-    gsap.to(this.el, {
-      y: '+=2',
-      duration: 2.5,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-    });
+    gsap.to(this.svg, { y: '+=2', duration: 2.5, ease: 'sine.inOut', yoyo: true, repeat: -1 });
   }
 
   // ── Signature animations ──────────────────────────────
@@ -263,116 +214,80 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
   }
 
   private sigBoris(): void {
-    const bubble = this.el.querySelector('.status-bubble');
-    const txt = this.el.querySelector('.status-text');
-    if (!bubble || !txt) return;
-    if (txt) (txt as SVGTextElement).textContent = '📨';
-    gsap.fromTo(bubble,
-      { opacity: 0, y: 0 },
-      {
-        keyframes: [
-          { opacity: 1, y: -10, duration: 0.4 },
-          { opacity: 0.9, y: -22, duration: 0.9 },
-          { opacity: 0, y: -38, duration: 0.4 },
-        ],
-      }
-    );
+    const bubble = this.svg.querySelector('.status-bubble');
+    if (!bubble) return;
+    gsap.fromTo(bubble, { opacity: 0, y: 0 }, {
+      keyframes: [
+        { opacity: 1, y: -8, duration: 0.4 },
+        { opacity: 0.9, y: -20, duration: 0.9 },
+        { opacity: 0, y: -36, duration: 0.4 },
+      ],
+    });
   }
 
   private sigForge(): void {
-    const badge = this.el.querySelector('.pr-badge');
+    const badge = this.svg.querySelector('.pr-badge');
     if (!badge) return;
-    gsap.fromTo(badge,
-      { opacity: 0, y: 0 },
-      {
-        keyframes: [
-          { opacity: 1, y: -12, duration: 0.5 },
-          { opacity: 1, y: -28, duration: 0.9 },
-          { opacity: 0, y: -44, duration: 0.4 },
-        ],
-      }
-    );
+    gsap.fromTo(badge, { opacity: 0, y: 0 }, {
+      keyframes: [
+        { opacity: 1, y: -10, duration: 0.5 },
+        { opacity: 1, y: -26, duration: 0.9 },
+        { opacity: 0, y: -42, duration: 0.4 },
+      ],
+    });
   }
 
   private sigWinston(): void {
-    const check = this.el.querySelector('.ci-check');
+    const check = this.svg.querySelector('.ci-check');
     if (!check) return;
-    gsap.fromTo(check,
-      { opacity: 0, y: 0, scale: 0.5 },
-      {
-        keyframes: [
-          { opacity: 1, y: -10, scale: 1.2, duration: 0.3 },
-          { opacity: 0.8, y: -22, scale: 1, duration: 0.8 },
-          { opacity: 0, y: -36, duration: 0.4 },
-        ],
-        transformOrigin: 'center center',
-      }
-    );
-  }
-
-  private sigRocco(): void {
-    const dots = this.el.querySelectorAll('.data-dot-1, .data-dot-2, .data-dot-3');
-    gsap.to(dots, {
-      scale: 2,
-      opacity: 1,
-      duration: 0.3,
-      stagger: 0.1,
-      yoyo: true,
-      repeat: 3,
-      ease: 'sine.inOut',
+    gsap.fromTo(check, { opacity: 0, y: 0, scale: 0.5 }, {
+      keyframes: [
+        { opacity: 1, y: -8, scale: 1.2, duration: 0.3 },
+        { opacity: 0.8, y: -20, scale: 1, duration: 0.8 },
+        { opacity: 0, y: -34, duration: 0.4 },
+      ],
       transformOrigin: 'center center',
     });
   }
 
+  private sigRocco(): void {
+    const dots = this.qa('.data-dot-1, .data-dot-2, .data-dot-3');
+    gsap.to(dots, {
+      scale: 2.5, opacity: 1, duration: 0.3,
+      stagger: 0.1, yoyo: true, repeat: 3,
+      ease: 'sine.inOut', transformOrigin: 'center center',
+    });
+  }
+
   private sigStormy(): void {
-    const notebook = this.el.querySelector('.notebook');
-    if (!notebook) return;
-    gsap.fromTo(notebook,
-      { opacity: 0.5, y: 0 },
-      {
-        keyframes: [
-          { opacity: 1, y: -8, duration: 0.5 },
-          { opacity: 1, y: -18, duration: 0.5 },
-          { opacity: 0, y: -30, duration: 0.4 },
-        ],
-      }
-    );
+    const nb = this.svg.querySelector('.notebook');
+    if (!nb) return;
+    gsap.fromTo(nb, { opacity: 0.5, y: 0 }, {
+      keyframes: [
+        { opacity: 1, y: -6, duration: 0.5 },
+        { opacity: 1, y: -16, duration: 0.5 },
+        { opacity: 0, y: -28, duration: 0.4 },
+      ],
+    });
   }
 
   private sigDebo(): void {
-    const server = this.el.querySelector('.server-glow');
-    if (!server) return;
-    gsap.fromTo(server,
-      { opacity: 0.2 },
-      {
-        opacity: 0.9,
-        duration: 0.4,
-        ease: 'power2.inOut',
-        yoyo: true,
-        repeat: 3,
-      }
-    );
+    const glows = this.qa('.server-glow');
+    gsap.fromTo(glows, { opacity: 0.2 }, {
+      opacity: 0.95, duration: 0.4, ease: 'power2.inOut', yoyo: true, repeat: 3,
+    });
   }
 
   // ── Blink ──────────────────────────────
   private startBlink(): void {
     const schedule = () => {
       this.blinkTimer = setTimeout(() => {
-        const eyes = this.el.querySelector('.b-eyes');
+        const eyes = this.svg.querySelector('.b-eyes');
         if (eyes) {
           gsap.to(eyes, {
-            scaleY: 0.08,
-            duration: 0.06,
-            ease: 'power2.in',
-            transformOrigin: '0px -3px',
+            scaleY: 0.08, duration: 0.06, ease: 'power2.in', transformOrigin: '0px -3px',
             onComplete: () => {
-              gsap.to(eyes, {
-                scaleY: 1,
-                duration: 0.1,
-                ease: 'power2.out',
-                delay: 0.04,
-                transformOrigin: '0px -3px',
-              });
+              gsap.to(eyes, { scaleY: 1, duration: 0.1, ease: 'power2.out', delay: 0.04, transformOrigin: '0px -3px' });
             },
           });
         }

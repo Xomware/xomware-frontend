@@ -4,9 +4,12 @@ import {
   OnDestroy,
   ElementRef,
   ViewChild,
+  ViewChildren,
+  QueryList,
+  HostListener,
 } from '@angular/core';
-import { gsap } from 'gsap';
 import { AgentBlob } from '../../../models/agent.models';
+import { AgentBlobComponent } from '../agent-blob/agent-blob.component';
 
 @Component({
   selector: 'app-agent-scene',
@@ -14,14 +17,14 @@ import { AgentBlob } from '../../../models/agent.models';
   styleUrls: ['./agent-scene.component.scss'],
 })
 export class AgentSceneComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('sceneSvg', { static: true }) sceneSvgRef!: ElementRef<SVGSVGElement>;
+  @ViewChild('sceneStage', { static: true }) stageRef!: ElementRef<HTMLDivElement>;
+  @ViewChildren(AgentBlobComponent) blobComponents!: QueryList<AgentBlobComponent>;
 
   selectedAgent: AgentBlob | null = null;
+  isMobile = window.innerWidth < 768;
 
-  private proximityInterval: any;
   private intersectionObserver: IntersectionObserver | null = null;
   private hasWaved = false;
-  private agentPositions: Map<string, { x: number; y: number }> = new Map();
 
   readonly agents: AgentBlob[] = [
     {
@@ -30,8 +33,8 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
       role: 'iMessage Dispatcher',
       color: '#00b4d8',
       scale: 1.0,
-      startX: 50,
-      startY: 90,
+      startX: 30,
+      startY: 60,
       idleAnimation: 'pace',
       signatureAnimation: 'pace',
       currentTask: 'Dispatching messages to Dom',
@@ -43,8 +46,8 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
       role: 'Code Builder',
       color: '#FF6B35',
       scale: 1.2,
-      startX: 130,
-      startY: 75,
+      startX: 120,
+      startY: 45,
       idleAnimation: 'hammer',
       signatureAnimation: 'hammer',
       currentTask: 'Building agent-blobs feature',
@@ -56,8 +59,8 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
       role: 'Research Analyst',
       color: '#9C0ABF',
       scale: 0.85,
-      startX: 220,
-      startY: 100,
+      startX: 210,
+      startY: 65,
       idleAnimation: 'orbit',
       signatureAnimation: 'orbit',
       currentTask: 'Analyzing competitor landscape',
@@ -70,7 +73,7 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
       color: '#00FFAB',
       scale: 1.0,
       startX: 300,
-      startY: 80,
+      startY: 55,
       idleAnimation: 'patrol',
       signatureAnimation: 'patrol',
       currentTask: 'Monitoring 3 build pipelines',
@@ -82,8 +85,8 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
       role: 'Memory Curator',
       color: '#4A90D9',
       scale: 0.8,
-      startX: 400,
-      startY: 95,
+      startX: 390,
+      startY: 68,
       idleAnimation: 'write',
       signatureAnimation: 'write',
       currentTask: 'Documenting today\'s decisions',
@@ -95,8 +98,8 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
       role: 'Infrastructure Agent',
       color: '#E74C3C',
       scale: 1.15,
-      startX: 490,
-      startY: 85,
+      startX: 470,
+      startY: 50,
       idleAnimation: 'nod',
       signatureAnimation: 'nod',
       currentTask: 'Watching infra on 4 nodes',
@@ -104,19 +107,23 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
     },
   ];
 
-  /** Agents to show on mobile (reduced) */
-  get mobileAgents(): AgentBlob[] {
-    return this.agents.filter(a => ['boris', 'forge', 'winston'].includes(a.name));
+  get visibleAgents(): AgentBlob[] {
+    if (this.isMobile) {
+      return this.agents.filter(a => ['boris', 'forge', 'winston'].includes(a.name));
+    }
+    return this.agents;
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.isMobile = window.innerWidth < 768;
   }
 
   ngAfterViewInit(): void {
-    this.initAgentPositions();
     this.setupScrollTrigger();
-    this.startProximityCheck();
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.proximityInterval);
     this.intersectionObserver?.disconnect();
   }
 
@@ -128,112 +135,23 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
     this.selectedAgent = null;
   }
 
-  onBlobHover(event: { agent: AgentBlob; entering: boolean }): void {
-    // Track for analytics or cross-agent reactions if desired
+  onBlobHover(_event: { agent: AgentBlob; entering: boolean }): void {
+    // Available for cross-agent reactions
   }
 
-  // ── Positions ──────────────────────────────
-  private initAgentPositions(): void {
-    this.agents.forEach(a => {
-      this.agentPositions.set(a.name, { x: a.startX, y: a.startY });
-    });
-  }
-
-  // ── Scroll trigger — wave on view ──────────────────────────────
+  // ── Scroll-into-view: all agents wave simultaneously ──
   private setupScrollTrigger(): void {
-    const target = this.sceneSvgRef.nativeElement;
+    const target = this.stageRef.nativeElement;
     this.intersectionObserver = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !this.hasWaved) {
           this.hasWaved = true;
-          this.allAgentsWave();
+          this.blobComponents.forEach((blob, i) => blob.wave(i * 0.15));
           this.intersectionObserver?.disconnect();
         }
       },
       { threshold: 0.3 }
     );
     this.intersectionObserver.observe(target);
-  }
-
-  private allAgentsWave(): void {
-    const svg = this.sceneSvgRef.nativeElement;
-    const arms = svg.querySelectorAll('.arm-right');
-    arms.forEach((arm, i) => {
-      gsap.to(arm, {
-        rotation: -35,
-        transformOrigin: 'left center',
-        duration: 0.22,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: 5,
-        delay: i * 0.15,
-      });
-    });
-  }
-
-  // ── Collision / proximity detection ──────────────────────────────
-  private startProximityCheck(): void {
-    this.proximityInterval = setInterval(() => {
-      this.checkAgentProximity();
-    }, 500);
-  }
-
-  private checkAgentProximity(): void {
-    const agentList = this.agents;
-    for (let i = 0; i < agentList.length; i++) {
-      for (let j = i + 1; j < agentList.length; j++) {
-        const posA = this.agentPositions.get(agentList[i].name);
-        const posB = this.agentPositions.get(agentList[j].name);
-        if (!posA || !posB) continue;
-        const dx = posA.x - posB.x;
-        const dy = posA.y - posB.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 35) {
-          this.triggerCollision(agentList[i].name, agentList[j].name);
-        }
-      }
-    }
-  }
-
-  private triggerCollision(a: string, b: string): void {
-    const emojis = ['😂', '🤝', '👋', '💪', '🎉'];
-    const svg = this.sceneSvgRef.nativeElement;
-    const blobA = svg.querySelector(`[data-agent="${a}"]`);
-    const blobB = svg.querySelector(`[data-agent="${b}"]`);
-    if (!blobA || !blobB) return;
-
-    // Bounce apart
-    gsap.to(blobA, { x: '-=12', duration: 0.3, ease: 'back.out(2)' });
-    gsap.to(blobB, { x: '+=12', duration: 0.3, ease: 'back.out(2)' });
-
-    // 40% chance: emoji pop
-    if (Math.random() < 0.4) {
-      const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-      this.showEmojiPop(blobA, emoji);
-    }
-  }
-
-  private showEmojiPop(blobEl: Element, emoji: string): void {
-    const svg = this.sceneSvgRef.nativeElement;
-    const ns = 'http://www.w3.org/2000/svg';
-    const text = document.createElementNS(ns, 'text');
-    text.setAttribute('font-size', '14');
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('x', '0');
-    text.setAttribute('y', '0');
-    text.textContent = emoji;
-    blobEl.appendChild(text);
-
-    gsap.fromTo(text,
-      { opacity: 0, y: 0 },
-      {
-        keyframes: [
-          { opacity: 1, y: -10, duration: 0.3 },
-          { opacity: 0.8, y: -28, duration: 0.6 },
-          { opacity: 0, y: -44, duration: 0.3 },
-        ],
-        onComplete: () => text.remove(),
-      }
-    );
   }
 }

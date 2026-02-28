@@ -1,15 +1,20 @@
 @import 'styles/variables';
 
-// Styles for elements inside the SVG blob
-// Most styling is done via SVG attributes in the template
-
 :host {
-  display: contents; // transparent host — SVG group is the real element
+  display: block;
+  position: absolute;
+  // Position is set via [style.left] / [style.top] on the host in the scene
 }
 
-.agent-blob {
-  will-change: transform;
+.blob-container {
+  position: relative;
   cursor: pointer;
+}
+
+.agent-blob-svg {
+  overflow: visible;
+  will-change: transform;
+  display: block;
 }
 
 .agent-label {
@@ -19,7 +24,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .agent-blob {
+  .agent-blob-svg {
     animation: none !important;
   }
 }
