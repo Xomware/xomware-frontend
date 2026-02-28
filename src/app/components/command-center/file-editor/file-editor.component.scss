@@ -1,7 +1,10 @@
 @import 'styles/variables';
 
 .file-editor {
+  // Use dynamic viewport height (dvh) so mobile browser chrome is accounted for.
+  // Falls back to regular vh for browsers that don't support dvh.
   height: calc(100vh - 80px);
+  height: calc(100dvh - 80px);
   display: flex;
   flex-direction: column;
 }
@@ -522,6 +525,7 @@
   .file-dropdown {
     display: block;
     width: 100%;
+    box-sizing: border-box;
     padding: $spacing-sm $spacing-md;
     background: rgba($bg-card, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -531,6 +535,15 @@
     font-size: 0.85rem;
     margin-bottom: $spacing-sm;
     outline: none;
+    // Improve native select appearance on mobile
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8a9a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    // Ensure touch tap height is accessible
+    min-height: 44px;
 
     option {
       background: $bg-dark;
@@ -545,11 +558,33 @@
   .editor-toolbar {
     flex-wrap: wrap;
     gap: $spacing-xs;
+    padding: $spacing-xs $spacing-sm;
+  }
+
+  .toolbar-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  // Prevent long filenames from breaking toolbar layout
+  .toolbar-filename {
+    max-width: 45vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.8rem;
   }
 
   .toolbar-meta,
   .toolbar-modified {
     display: none;
+  }
+
+  // Improve touch targets for toolbar buttons
+  .toolbar-btn {
+    min-height: 36px;
+    padding: $spacing-xs $spacing-sm;
+    touch-action: manipulation;
   }
 
   .line-numbers {
@@ -558,5 +593,18 @@
 
   .revert-btn {
     display: none;
+  }
+
+  // Ensure editor areas are scrollable within fixed height
+  .editor-preview,
+  .editor-textarea {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // Mobile header is ~100px tall (tabs wrap to new row) — use a tighter height
+  // so the editor doesn't overflow the viewport on small devices.
+  .file-editor {
+    height: calc(100vh - 110px);
+    height: calc(100dvh - 110px);
   }
 }
