@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FileService, WorkspaceFile } from '../../../services/file.service';
+import MarkdownIt from 'markdown-it';
 
 interface FileIcon {
   [key: string]: string;
@@ -15,12 +17,15 @@ export class FileEditorComponent implements OnInit {
   selectedFile: WorkspaceFile | null = null;
   editorContent = '';
   originalContent = '';
-  previewMode = false;
+  /** true = View mode (rendered markdown), false = Edit mode (raw text) */
+  previewMode = true;
   loading = false;
   saving = false;
   saveSuccess = false;
   saveError = '';
   loadError = '';
+
+  private md = new MarkdownIt({ html: false, linkify: true, typographer: true });
 
   readonly fileIcons: FileIcon = {
     'SOUL.md': '🧬',
@@ -35,7 +40,10 @@ export class FileEditorComponent implements OnInit {
 
   readonly defaultIcon = '📄';
 
-  constructor(private fileService: FileService) {}
+  constructor(
+    private fileService: FileService,
+    private sanitizer: DomSanitizer,
+  ) {}
 
   ngOnInit(): void {
     this.loadFiles();
@@ -59,7 +67,8 @@ export class FileEditorComponent implements OnInit {
     this.loadError = '';
     this.saveSuccess = false;
     this.saveError = '';
-    this.previewMode = false;
+    // Default to view mode on each new file selection
+    this.previewMode = true;
     try {
       const result = await this.fileService.getFile(file.name);
       this.selectedFile = result;
@@ -82,6 +91,11 @@ export class FileEditorComponent implements OnInit {
 
   get lineCount(): number {
     return this.editorContent ? this.editorContent.split('\n').length : 0;
+  }
+
+  get renderedMarkdown(): SafeHtml {
+    const html = this.md.render(this.editorContent || '');
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
   togglePreview(): void {

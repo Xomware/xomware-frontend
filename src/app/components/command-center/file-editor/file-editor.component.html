@@ -5,8 +5,20 @@
     <button class="retry-btn" (click)="loadFiles()">Retry</button>
   </div>
 
+  <!-- Mobile file selector (visible on small screens, outside sidebar) -->
+  <select
+    class="file-dropdown"
+    [value]="selectedFile?.name || ''"
+    (change)="selectFile({ name: $any($event.target).value })"
+  >
+    <option value="" disabled>Select a file…</option>
+    <option *ngFor="let file of files" [value]="file.name">
+      {{ getIcon(file.name) }} {{ file.name }}
+    </option>
+  </select>
+
   <div class="editor-layout">
-    <!-- File sidebar -->
+    <!-- File sidebar (desktop) -->
     <aside class="file-sidebar">
       <div class="sidebar-header">
         <h3>📂 Files</h3>
@@ -15,19 +27,6 @@
         </button>
       </div>
 
-      <!-- Mobile dropdown -->
-      <select
-        class="file-dropdown"
-        [value]="selectedFile?.name || ''"
-        (change)="selectFile({ name: $any($event.target).value })"
-      >
-        <option value="" disabled>Select a file…</option>
-        <option *ngFor="let file of files" [value]="file.name">
-          {{ getIcon(file.name) }} {{ file.name }}
-        </option>
-      </select>
-
-      <!-- Desktop list -->
       <div class="file-list">
         <div *ngIf="loading && files.length === 0" class="loading-indicator">
           Loading…
@@ -50,8 +49,8 @@
     <main class="editor-panel">
       <div *ngIf="!selectedFile && !loading" class="empty-state">
         <span class="empty-icon">📝</span>
-        <p>Select a file to edit</p>
-        <p class="empty-hint">⌘+S to save</p>
+        <p>Select a file to view</p>
+        <p class="empty-hint">Defaults to View mode — click ✏️ Edit to make changes</p>
       </div>
 
       <div *ngIf="selectedFile" class="editor-container">
@@ -64,12 +63,12 @@
           </div>
           <div class="toolbar-right">
             <button
-              class="toolbar-btn"
-              [class.active]="previewMode"
+              class="toolbar-btn view-edit-btn"
+              [class.edit-active]="!previewMode"
               (click)="togglePreview()"
-              title="Toggle preview"
+              [title]="previewMode ? 'Switch to Edit mode' : 'Switch to View mode'"
             >
-              {{ previewMode ? '✏️ Edit' : '👁️ Preview' }}
+              {{ previewMode ? '✏️ Edit' : '👁️ View' }}
             </button>
             <button
               class="toolbar-btn revert-btn"
@@ -101,7 +100,7 @@
           Loading file…
         </div>
 
-        <!-- Editor textarea -->
+        <!-- Editor textarea (Edit mode) -->
         <div *ngIf="!previewMode && !loading" class="editor-wrapper">
           <div class="line-numbers" aria-hidden="true">
             <span *ngFor="let line of editorContent.split('\n'); let i = index">{{ i + 1 }}</span>
@@ -117,9 +116,9 @@
           ></textarea>
         </div>
 
-        <!-- Preview -->
-        <div *ngIf="previewMode && !loading" class="editor-preview">
-          <pre class="preview-content">{{ editorContent }}</pre>
+        <!-- Rendered markdown preview (View mode) -->
+        <div *ngIf="previewMode && !loading" class="editor-preview markdown-body">
+          <div [innerHTML]="renderedMarkdown"></div>
         </div>
       </div>
     </main>
