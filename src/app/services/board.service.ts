@@ -41,11 +41,13 @@ export class BoardService implements OnDestroy {
     cards: [],
   });
 
+  readonly isRefreshing$ = new BehaviorSubject<boolean>(false);
+
   constructor(private auth: AuthService) {}
 
   startPolling(intervalMs = 30_000): void {
+    this.stopPolling(); // stop any existing timer before starting fresh
     this.fetch(); // immediate first fetch
-    this.stopPolling();
     this.pollTimer = setInterval(() => this.fetch(), intervalMs);
   }
 
@@ -84,6 +86,7 @@ export class BoardService implements OnDestroy {
   }
 
   async fetch(): Promise<void> {
+    this.isRefreshing$.next(true);
     try {
       const res = await fetch(this.url, {
         headers: {
@@ -95,6 +98,8 @@ export class BoardService implements OnDestroy {
       this.board$.next(data);
     } catch {
       // silent fail — board just shows stale data
+    } finally {
+      this.isRefreshing$.next(false);
     }
   }
 }

@@ -2,7 +2,10 @@
   <div class="kanban-header">
     <h2>📋 XomBoard</h2>
     <span class="live-status" [class.live]="isLive">{{ liveStatus }}</span>
-    <button class="refresh-btn" (click)="refreshBoard()">🔄 Refresh</button>
+    <button class="refresh-btn" (click)="refreshBoard()" [disabled]="isRefreshing" [class.refreshing]="isRefreshing">
+      <span class="refresh-icon" [class.spin]="isRefreshing">🔄</span>
+      {{ isRefreshing ? 'Refreshing...' : 'Refresh' }}
+    </button>
     <span class="card-count">{{ filteredCount }} active · {{ archivedCards.length }} archived</span>
     <button class="add-idea-btn" (click)="showAddIdea = true">
       💡 Add Idea

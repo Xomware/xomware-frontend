@@ -24,6 +24,7 @@ export class KanbanComponent implements OnInit, OnDestroy {
   archivedCards: BoardCard[] = [];
   lastUpdated: string | null = null;
   isLive = false;
+  isRefreshing = false;
   showArchive = false;
 
   // Filtering
@@ -40,6 +41,7 @@ export class KanbanComponent implements OnInit, OnDestroy {
 
   private boardSub?: Subscription;
   private inboxSub?: Subscription;
+  private refreshSub?: Subscription;
 
   constructor(
     private boardService: BoardService,
@@ -58,6 +60,10 @@ export class KanbanComponent implements OnInit, OnDestroy {
       this.repos = [...new Set(this.cards.map(c => c.repo).filter(Boolean) as string[])].sort();
     });
 
+    this.refreshSub = this.boardService.isRefreshing$.subscribe(v => {
+      this.isRefreshing = v;
+    });
+
     this.inboxService.fetch();
     this.inboxSub = this.inboxService.inbox$.subscribe(items => {
       this.pendingIdeas = items.filter(i => i.status === 'pending');
@@ -68,6 +74,7 @@ export class KanbanComponent implements OnInit, OnDestroy {
     this.boardService.stopPolling();
     this.boardSub?.unsubscribe();
     this.inboxSub?.unsubscribe();
+    this.refreshSub?.unsubscribe();
   }
 
   getColumnCards(columnId: string): BoardCard[] {
@@ -149,8 +156,8 @@ export class KanbanComponent implements OnInit, OnDestroy {
     }
   }
 
-  refreshBoard(): void {
-    this.boardService.fetch();
+  async refreshBoard(): Promise<void> {
+    await this.boardService.fetch();
   }
 
   onDragEnd(): void {
