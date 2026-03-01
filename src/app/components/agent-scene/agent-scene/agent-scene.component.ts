@@ -14,7 +14,8 @@ import { AgentBlob, AGENTS } from '../../../models/agent.models';
   styleUrls: ['./agent-scene.component.scss'],
 })
 export class AgentSceneComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('sceneSvg', { static: true }) sceneSvgRef!: ElementRef<SVGSVGElement>;
+  @ViewChild('sceneSvg', { static: false }) sceneSvgRef!: ElementRef<SVGSVGElement>;
+  @ViewChild('sceneSvgMobile', { static: false }) sceneSvgMobileRef!: ElementRef<SVGSVGElement>;
 
   selectedAgent: AgentBlob | null = null;
 
@@ -29,6 +30,17 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
   /** Agents to show on mobile (reduced) */
   get mobileAgents(): AgentBlob[] {
     return this.agents.filter(a => ['boris', 'forge', 'winston'].includes(a.name));
+  }
+
+  /** Mobile 3×2 grid positions */
+  getMobileX(index: number): number {
+    const col = index % 3;
+    return 55 + col * 100; // 55, 155, 255
+  }
+
+  getMobileY(index: number): number {
+    const row = Math.floor(index / 3);
+    return 55 + row * 110; // row 0: 55, row 1: 165
   }
 
   ngAfterViewInit(): void {
@@ -63,7 +75,8 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
 
   // ── Scroll trigger — wave on view ──────────────────────────────
   private setupScrollTrigger(): void {
-    const target = this.sceneSvgRef.nativeElement;
+    const target = (this.sceneSvgRef || this.sceneSvgMobileRef)?.nativeElement;
+    if (!target) return;
     this.intersectionObserver = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !this.hasWaved) {
@@ -78,7 +91,8 @@ export class AgentSceneComponent implements AfterViewInit, OnDestroy {
   }
 
   private allAgentsWave(): void {
-    const svg = this.sceneSvgRef.nativeElement;
+    const svg = (this.sceneSvgRef || this.sceneSvgMobileRef)?.nativeElement;
+    if (!svg) return;
     const arms = svg.querySelectorAll('.arm-right');
     arms.forEach((arm, i) => {
       gsap.to(arm, {

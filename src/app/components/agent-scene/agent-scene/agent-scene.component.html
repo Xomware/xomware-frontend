@@ -2,11 +2,12 @@
   <div class="scene-header">
     <span class="scene-eyebrow">🤖 The Team</span>
     <h2 class="scene-title">Meet the Agents</h2>
-    <p class="scene-subtitle">They never sleep. Hover to meet them.</p>
+    <p class="scene-subtitle desktop-only">They never sleep. Hover to meet them.</p>
+    <p class="scene-subtitle mobile-only">They never sleep. Tap to meet them.</p>
   </div>
 
-  <!-- Full scene (desktop + tablet) -->
-  <div class="scene-container">
+  <!-- Desktop scene -->
+  <div class="scene-container desktop-only">
     <svg
       #sceneSvg
       class="scene-svg"
@@ -26,9 +27,38 @@
       <line x1="0" y1="140" x2="560" y2="140"
             stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
 
-      <!-- Agent blobs (projected into SVG via ng-container) -->
+      <!-- Agent blobs -->
       <svg:g *ngFor="let agent of agents"
              [attr.transform]="'translate(' + agent.startX + ',' + agent.startY + ') scale(' + agent.scale + ')'">
+        <app-agent-blob
+          [agent]="agent"
+          (blobClick)="onAgentClick($event)"
+          (blobHover)="onBlobHover($event)"
+        ></app-agent-blob>
+      </svg:g>
+    </svg>
+  </div>
+
+  <!-- Mobile scene — 3×2 grid layout for touch devices -->
+  <div class="scene-container mobile-only">
+    <svg
+      #sceneSvgMobile
+      class="scene-svg scene-svg--mobile"
+      viewBox="0 0 300 220"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Xomware AI agent team"
+      role="img"
+    >
+      <defs>
+        <radialGradient id="blobShineMobile" cx="35%" cy="30%">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Row 1: agents 0-2 -->
+      <svg:g *ngFor="let agent of agents; let i = index"
+             [attr.transform]="'translate(' + getMobileX(i) + ',' + getMobileY(i) + ') scale(1.1)'">
         <app-agent-blob
           [agent]="agent"
           (blobClick)="onAgentClick($event)"
