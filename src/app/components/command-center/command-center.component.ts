@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 
-export type TabId = 'kanban' | 'files' | 'activity' | 'office' | 'infra';
+export type TabId = 'kanban' | 'files' | 'activity' | 'office' | 'infra' | 'analytics';
 
 /** Maps URL path segment → internal tab ID */
 const ROUTE_TO_TAB: Record<string, TabId> = {
@@ -12,6 +12,7 @@ const ROUTE_TO_TAB: Record<string, TabId> = {
   activity: 'activity',
   infra: 'infra',
   office: 'office',
+  analytics: 'analytics',
 };
 
 /** Maps internal tab ID → URL path segment */
@@ -21,6 +22,7 @@ const TAB_TO_ROUTE: Record<TabId, string> = {
   activity: 'activity',
   infra: 'infra',
   office: 'office',
+  analytics: 'analytics',
 };
 
 interface Tab {
@@ -43,6 +45,7 @@ export class CommandCenterComponent implements OnInit, OnDestroy {
     { id: 'activity', label: 'Activity', icon: '📊' },
     { id: 'infra', label: 'Infrastructure', icon: '🏗️' },
     { id: 'office', label: 'Office', icon: '🏢' },
+    { id: 'analytics', label: 'Analytics', icon: '📈' },
   ];
 
   private routeSub?: Subscription;
