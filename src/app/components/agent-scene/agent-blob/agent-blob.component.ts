@@ -12,7 +12,7 @@ import { gsap } from 'gsap';
 import { AgentBlob } from '../../../models/agent.models';
 
 @Component({
-  selector: 'app-agent-blob',
+  selector: '[appAgentBlob]',
   templateUrl: './agent-blob.component.html',
   styleUrls: ['./agent-blob.component.scss'],
 })

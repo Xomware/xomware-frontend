@@ -30,11 +30,11 @@
       <!-- Agent blobs -->
       <svg:g *ngFor="let agent of agents"
              [attr.transform]="'translate(' + agent.startX + ',' + agent.startY + ') scale(' + agent.scale + ')'">
-        <app-agent-blob
+        <svg:g appAgentBlob
           [agent]="agent"
           (blobClick)="onAgentClick($event)"
           (blobHover)="onBlobHover($event)"
-        ></app-agent-blob>
+        ></svg:g>
       </svg:g>
     </svg>
   </div>
@@ -59,11 +59,11 @@
       <!-- Row 1: agents 0-2 -->
       <svg:g *ngFor="let agent of agents; let i = index"
              [attr.transform]="'translate(' + getMobileX(i) + ',' + getMobileY(i) + ') scale(1.1)'">
-        <app-agent-blob
+        <svg:g appAgentBlob
           [agent]="agent"
           (blobClick)="onAgentClick($event)"
           (blobHover)="onBlobHover($event)"
-        ></app-agent-blob>
+        ></svg:g>
       </svg:g>
     </svg>
   </div>
