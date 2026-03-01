@@ -88,3 +88,4 @@ src/app/
 | Xomcloud Orange | `#ff6b35` |
 | Xomper Emerald | `#00ffab` |
 | Background | `#0a0a14` |
+
