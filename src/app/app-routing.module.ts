@@ -10,6 +10,8 @@ const routes: Routes = [
   { path: '', component: LandingComponent },
   // Standalone feature routes (no auth required — public data)
   { path: 'prs', component: PrDashboardComponent },
+  // Standalone /ci route (no auth required — public CI data)
+  { path: 'ci', redirectTo: 'command/ci', pathMatch: 'full' },
   // Redirect bare /command to the default tab
   { path: 'command', redirectTo: 'command/board', pathMatch: 'full' },
   // Login must come before the :tab wildcard

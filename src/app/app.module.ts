@@ -32,6 +32,7 @@ import { TicketDetailModalComponent } from './components/command-center/ticket-d
 import { AnalyticsDashboardComponent } from './components/command-center/analytics-dashboard/analytics-dashboard.component';
 
 // Standalone feature views
+import { CiMonitorComponent } from './components/command-center/ci-monitor/ci-monitor.component';
 import { PrDashboardComponent } from './components/pr-dashboard/pr-dashboard.component';
 
 @NgModule({
@@ -61,6 +62,7 @@ import { PrDashboardComponent } from './components/pr-dashboard/pr-dashboard.com
     AnalyticsDashboardComponent,
     // Standalone views
     PrDashboardComponent,
+    CiMonitorComponent,
   ],
   imports: [
     BrowserModule,
