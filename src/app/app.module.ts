@@ -26,6 +26,7 @@ import { AgentBlobComponent } from './components/agent-scene/agent-blob/agent-bl
 import { AgentSceneComponent } from './components/agent-scene/agent-scene/agent-scene.component';
 import { AgentStatusModalComponent } from './components/agent-scene/agent-status-modal/agent-status-modal.component';
 import { TicketDetailModalComponent } from './components/command-center/ticket-detail-modal/ticket-detail-modal.component';
+import { AgentStatusComponent } from './components/agent-status/agent-status.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { TicketDetailModalComponent } from './components/command-center/ticket-d
     AgentSceneComponent,
     AgentStatusModalComponent,
     TicketDetailModalComponent,
+    AgentStatusComponent,
   ],
   imports: [
     BrowserModule,

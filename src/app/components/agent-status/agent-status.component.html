@@ -1,0 +1,69 @@
+<!-- Floating pill -->
+<button class="agent-pill" (click)="toggle()" [class.hidden]="expanded">
+  <span *ngIf="loading" class="spinner"></span>
+  <span *ngIf="!loading">🔨 {{ activeCards.length }} active</span>
+</button>
+
+<!-- Backdrop -->
+<div class="backdrop" *ngIf="expanded" (click)="close()"></div>
+
+<!-- Sidebar panel -->
+<aside class="agent-panel" [class.open]="expanded">
+  <div class="panel-header">
+    <h3>Agent Activity</h3>
+    <button class="close-btn" (click)="close()">✕</button>
+  </div>
+
+  <div class="panel-body" *ngIf="!loading; else loadingTpl">
+    <!-- Active -->
+    <section class="section" *ngIf="activeCards.length">
+      <h4 class="section-title cyan">Active</h4>
+      <div class="card-item" *ngFor="let card of activeCards">
+        <span class="pulse-dot"></span>
+        <div class="card-info">
+          <span class="card-title">{{ card.title }}</span>
+          <span class="card-meta" *ngIf="card.repo">{{ card.repo }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- In Review -->
+    <section class="section" *ngIf="reviewCards.length">
+      <h4 class="section-title yellow">In Review</h4>
+      <div class="card-item" *ngFor="let card of reviewCards">
+        <span class="dot yellow-dot"></span>
+        <div class="card-info">
+          <span class="card-title">{{ card.title }}</span>
+          <span class="card-meta" *ngIf="card.repo">{{ card.repo }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Velocity -->
+    <section class="section velocity">
+      <h4 class="section-title green">Today's Velocity</h4>
+      <div class="velocity-count">{{ velocityCount }}</div>
+    </section>
+
+    <!-- Recent Done -->
+    <section class="section" *ngIf="doneToday.length">
+      <h4 class="section-title green">Recent Done</h4>
+      <div class="card-item done" *ngFor="let card of doneToday">
+        <span class="dot green-dot"></span>
+        <div class="card-info">
+          <span class="card-title">{{ card.title }}</span>
+        </div>
+      </div>
+    </section>
+
+    <p class="empty" *ngIf="!activeCards.length && !reviewCards.length && !doneToday.length">
+      No agent activity right now.
+    </p>
+  </div>
+
+  <ng-template #loadingTpl>
+    <div class="loading-container">
+      <span class="spinner large"></span>
+    </div>
+  </ng-template>
+</aside>
