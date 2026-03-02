@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
+import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface GitHubLabel {
   name: string;
@@ -42,118 +44,37 @@ export interface TicketDetail {
 
 @Injectable({ providedIn: 'root' })
 export class TicketDetailService {
-  private readonly GITHUB_API = 'https://api.github.com';
+  private readonly API_BASE = environment.apiBaseUrl;
+
+  constructor(
+    private auth: AuthService,
+    private ngZone: NgZone,
+  ) {}
 
   async fetchTicket(owner: string, repo: string, issueNumber: number): Promise<TicketDetail | null> {
     try {
-      // Fetch issue
-      const issueRes = await fetch(`${this.GITHUB_API}/repos/${owner}/${repo}/issues/${issueNumber}`, {
-        headers: { Accept: 'application/vnd.github.v3+json' },
-      });
-      if (!issueRes.ok) return null;
-      const issue = await issueRes.json();
+      const res = await fetch(
+        `${this.API_BASE}/status/ticket/${owner}/${repo}/${issueNumber}`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'X-Auth-Hash': this.auth.getPassphraseHash(),
+          },
+        }
+      );
+      if (!res.ok) return null;
+      const ticket = await res.json();
 
-      // Fetch timeline events for linked PRs
-      const linkedPRs = await this.fetchLinkedPRs(owner, repo, issueNumber);
+      // relatedIssues not provided by proxy yet, default to empty
+      if (!ticket.relatedIssues) {
+        ticket.relatedIssues = [];
+      }
 
-      // Parse related issues from body
-      const relatedIssues = await this.parseRelatedIssues(owner, repo, issue.body || '');
-
-      return {
-        number: issue.number,
-        title: issue.title,
-        body: issue.body || '',
-        state: issue.state,
-        labels: issue.labels || [],
-        assignee: issue.assignee,
-        assignees: issue.assignees || [],
-        created_at: issue.created_at,
-        updated_at: issue.updated_at,
-        html_url: issue.html_url,
-        repository_url: issue.repository_url,
-        pull_request: issue.pull_request,
-        linkedPRs,
-        relatedIssues,
-        repoOwner: owner,
-        repoName: repo,
-      };
+      return ticket as TicketDetail;
     } catch (err) {
       console.error('Failed to fetch ticket:', err);
       return null;
     }
-  }
-
-  private async fetchLinkedPRs(owner: string, repo: string, issueNumber: number): Promise<GitHubPR[]> {
-    try {
-      const eventsRes = await fetch(
-        `${this.GITHUB_API}/repos/${owner}/${repo}/issues/${issueNumber}/timeline`,
-        { headers: { Accept: 'application/vnd.github.v3+json' } }
-      );
-      if (!eventsRes.ok) return [];
-      const events = await eventsRes.json();
-
-      const prNumbers = new Set<number>();
-      const prs: GitHubPR[] = [];
-
-      for (const event of events) {
-        if (event.event === 'cross-referenced' && event.source?.issue?.pull_request) {
-          const pr = event.source.issue;
-          if (!prNumbers.has(pr.number)) {
-            prNumbers.add(pr.number);
-            prs.push({
-              number: pr.number,
-              title: pr.title,
-              html_url: pr.html_url,
-              state: pr.pull_request?.merged_at ? 'merged' : pr.state,
-              merged: !!pr.pull_request?.merged_at,
-              draft: pr.draft || false,
-            });
-          }
-        }
-      }
-      return prs;
-    } catch {
-      return [];
-    }
-  }
-
-  private async parseRelatedIssues(
-    owner: string,
-    repo: string,
-    body: string
-  ): Promise<{ number: number; title: string; state: string; html_url: string }[]> {
-    // Parse #123 references from body
-    const refs = new Set<number>();
-    const regex = /#(\d+)/g;
-    let match;
-    while ((match = regex.exec(body)) !== null) {
-      refs.add(parseInt(match[1], 10));
-    }
-
-    const results: { number: number; title: string; state: string; html_url: string }[] = [];
-    // Limit to 5 to avoid rate limiting
-    const refsArr = [...refs].slice(0, 5);
-
-    await Promise.all(
-      refsArr.map(async (num) => {
-        try {
-          const res = await fetch(`${this.GITHUB_API}/repos/${owner}/${repo}/issues/${num}`, {
-            headers: { Accept: 'application/vnd.github.v3+json' },
-          });
-          if (res.ok) {
-            const issue = await res.json();
-            results.push({
-              number: issue.number,
-              title: issue.title,
-              state: issue.state,
-              html_url: issue.html_url,
-            });
-          }
-        } catch { /* skip */ }
-      })
-    );
-
-    return results.sort((a, b) => a.number - b.number);
   }
 
   parseIssueUrl(url: string): { owner: string; repo: string; issueNumber: number } | null {
