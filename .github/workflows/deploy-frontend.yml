@@ -32,41 +32,79 @@ jobs:
       - name: Build
         run: npm run build:prod
 
-      - name: Deploy to S3
+      - name: Deploy hashed bundles to S3 (1 year cache)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
-        run: aws s3 sync ./dist/xomware s3://xomware.com --delete
+        run: |
+          # Upload everything EXCEPT index.html with long cache (hashed filenames)
+          aws s3 sync ./dist/xomware s3://xomware.com --delete \
+            --exclude "index.html" \
+            --cache-control "public, max-age=31536000, immutable"
 
-      - name: Make index.html non-cacheable
+      - name: Deploy index.html (no-cache)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
         run: |
           aws s3 cp ./dist/xomware/index.html s3://xomware.com/index.html \
-            --cache-control "no-cache, no-store, must-revalidate"
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --content-type "text/html"
 
-      - name: Invalidate CloudFront cache
+      - name: Invalidate CloudFront and wait
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
         run: |
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[?@ == 'xomware.com']].Id" --output text)
-          if [ -n "$DISTRIBUTION_ID" ]; then
-            aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
-            echo "CloudFront cache invalidated for distribution $DISTRIBUTION_ID"
-          else
-            echo "No CloudFront distribution found for xomware.com, skipping invalidation"
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Aliases.Items[?@ == 'xomware.com']].Id" \
+            --output text)
+
+          if [ -z "$DISTRIBUTION_ID" ]; then
+            echo "::error::No CloudFront distribution found for xomware.com"
+            exit 1
+          fi
+
+          echo "Invalidating CloudFront distribution: $DISTRIBUTION_ID"
+          INVALIDATION_ID=$(aws cloudfront create-invalidation \
+            --distribution-id "$DISTRIBUTION_ID" \
+            --paths "/" "/index.html" "/status/board" "/command" \
+            --query 'Invalidation.Id' --output text)
+
+          echo "Invalidation ID: $INVALIDATION_ID — waiting for completion..."
+          # Poll until invalidation completes (timeout after 5 minutes)
+          TIMEOUT=300
+          ELAPSED=0
+          while [ $ELAPSED -lt $TIMEOUT ]; do
+            STATUS=$(aws cloudfront get-invalidation \
+              --distribution-id "$DISTRIBUTION_ID" \
+              --id "$INVALIDATION_ID" \
+              --query 'Invalidation.Status' --output text)
+            echo "  Status: $STATUS (${ELAPSED}s)"
+            if [ "$STATUS" = "Completed" ]; then
+              echo "✅ CloudFront invalidation completed"
+              break
+            fi
+            sleep 10
+            ELAPSED=$((ELAPSED + 10))
+          done
+
+          if [ "$STATUS" != "Completed" ]; then
+            echo "::warning::Invalidation did not complete within ${TIMEOUT}s (status: $STATUS)"
           fi
 
       - name: Deployment Summary
         if: success()
         run: |
-          echo "## Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Deployment Successful" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**S3 Bucket:** s3://xomware.com" >> $GITHUB_STEP_SUMMARY
+          echo "**Cache Strategy:**" >> $GITHUB_STEP_SUMMARY
+          echo "- \`index.html\`: no-cache (always fresh)" >> $GITHUB_STEP_SUMMARY
+          echo "- Bundles (JS/CSS): 1 year immutable (hash-busted)" >> $GITHUB_STEP_SUMMARY
+          echo "**CloudFront:** Invalidated \`/\`, \`/index.html\`, \`/status/board\`, \`/command\`" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** https://xomware.com" >> $GITHUB_STEP_SUMMARY
