@@ -6,6 +6,7 @@ import {
   OnChanges,
   SimpleChanges,
   ElementRef,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { TicketDetailService, TicketDetail } from '../../../services/ticket-detail.service';
 import MarkdownIt from 'markdown-it';
@@ -28,7 +29,8 @@ export class TicketDetailModalComponent implements OnChanges {
 
   constructor(
     private ticketService: TicketDetailService,
-    private el: ElementRef
+    private el: ElementRef,
+    private cdr: ChangeDetectorRef,
   ) {
     this.md = new MarkdownIt({
       html: false,
@@ -58,17 +60,20 @@ export class TicketDetailModalComponent implements OnChanges {
     this.loading = true;
     this.error = false;
     this.ticket = null;
+    this.cdr.detectChanges();
 
     const ticket = await this.ticketService.fetchTicket(parsed.owner, parsed.repo, parsed.issueNumber);
     this.loading = false;
 
     if (!ticket) {
       this.error = true;
+      this.cdr.detectChanges();
       return;
     }
 
     this.ticket = ticket;
     this.renderedBody = this.md.render(ticket.body);
+    this.cdr.detectChanges();
   }
 
   close(): void {
