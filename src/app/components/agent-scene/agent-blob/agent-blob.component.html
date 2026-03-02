@@ -7,6 +7,8 @@
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
   (click)="onClick()"
+  (touchstart)="onTouchStart($event)"
+  (touchend)="onTouchEnd($event)"
 >
   <!-- Drop shadow -->
   <svg:ellipse cy="22" rx="16" ry="4" [attr.fill]="'rgba(0,0,0,0.15)'" class="b-shadow"/>

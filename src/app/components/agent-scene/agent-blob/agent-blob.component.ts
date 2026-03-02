@@ -12,7 +12,7 @@ import { gsap } from 'gsap';
 import { AgentBlob } from '../../../models/agent.models';
 
 @Component({
-  selector: 'app-agent-blob',
+  selector: '[appAgentBlob]',
   templateUrl: './agent-blob.component.html',
   styleUrls: ['./agent-blob.component.scss'],
 })
@@ -27,6 +27,8 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
   private signatureTimer: any;
   private idleTween: gsap.core.Tween | null = null;
   private prefersReducedMotion = false;
+  private isTouchActive = false;
+  private touchStartTime = 0;
 
   get el(): SVGGElement {
     return this.blobGroupRef.nativeElement;
@@ -80,6 +82,58 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
 
   onClick(): void {
     this.blobClick.emit(this.agent);
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    this.touchStartTime = Date.now();
+  }
+
+  onTouchEnd(event: TouchEvent): void {
+    event.preventDefault(); // Prevent ghost click / mouseenter
+    const elapsed = Date.now() - this.touchStartTime;
+    if (elapsed > 500) return; // Ignore long press
+
+    if (!this.isTouchActive) {
+      // First tap: show hover state + play wave
+      this.isTouchActive = true;
+      this.playWave();
+      gsap.to(this.el, {
+        scale: 1.15,
+        duration: 0.3,
+        ease: 'back.out(1.7)',
+        transformOrigin: 'center center',
+      });
+      gsap.to(this.el.querySelector('.agent-label'), {
+        opacity: 1,
+        duration: 0.3,
+        ease: 'power2.out',
+      });
+
+      // Auto-dismiss after 3 seconds
+      setTimeout(() => {
+        if (this.isTouchActive) {
+          this.dismissTouch();
+        }
+      }, 3000);
+    } else {
+      // Second tap: open modal
+      this.dismissTouch();
+      this.blobClick.emit(this.agent);
+    }
+  }
+
+  private dismissTouch(): void {
+    this.isTouchActive = false;
+    gsap.to(this.el, {
+      scale: this.agent.scale,
+      duration: 0.3,
+      ease: 'power2.out',
+      transformOrigin: 'center center',
+    });
+    gsap.to(this.el.querySelector('.agent-label'), {
+      opacity: 0,
+      duration: 0.2,
+    });
   }
 
   // ── Wave arm on hover ──────────────────────────────

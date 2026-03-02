@@ -91,9 +91,44 @@
   flex-shrink: 0;
 }
 
+// ── Responsive visibility ──────────────────────────────
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: block;
+}
+
 @media (max-width: $breakpoint-md) {
+  .mobile-only {
+    display: block;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
   .scene-container {
     max-width: 100%;
+  }
+
+  .scene-svg--mobile {
+    width: 100%;
+    height: auto;
+    min-height: 220px;
+    touch-action: manipulation; // Fast tap, no double-tap zoom
+  }
+
+  .agent-pills {
+    gap: $spacing-xs;
+  }
+
+  .agent-pill {
+    padding: 8px 16px;
+    font-size: 14px;
+    // Larger touch target
+    min-height: 44px;
   }
 }
 
