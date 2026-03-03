@@ -76,6 +76,65 @@
   font-size: 0.9rem;
 }
 
+// --- Meals Quick-Access Card ---
+.meals-quickcard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 4px solid #ff6b35;
+  border-radius: $radius-lg;
+  padding: $spacing-md $spacing-lg;
+  margin-bottom: $spacing-xl;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(2px);
+  }
+}
+
+.mqc-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.mqc-icon {
+  font-size: 1.8rem;
+}
+
+.mqc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mqc-title {
+  font-weight: 600;
+  color: $text-primary;
+  font-size: 0.95rem;
+}
+
+.mqc-subtitle {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.mqc-arrow {
+  font-size: 1.2rem;
+  color: $text-muted;
+  transition: transform $transition-fast;
+
+  .meals-quickcard:hover & {
+    transform: translateX(4px);
+    color: #ff6b35;
+  }
+}
+
 // --- Workspace Grid ---
 .workspace-grid {
   display: grid;

@@ -1,4 +1,10 @@
 <div class="infra-dashboard">
+  <!-- MEALS DASHBOARD VIEW -->
+  <app-meals-dashboard
+    *ngIf="view === 'meals'"
+    (back)="backToOverview()"
+  ></app-meals-dashboard>
+
   <!-- OVERVIEW VIEW -->
   <div *ngIf="view === 'overview'" class="overview">
     <div class="section-header">
@@ -8,6 +14,18 @@
       </button>
     </div>
     <p class="section-subtitle">Terraform workspaces across Xomware apps</p>
+
+    <!-- Meals Quick-Access Card -->
+    <div class="meals-quickcard" (click)="openMealsDashboard()">
+      <div class="mqc-left">
+        <span class="mqc-icon">🍽️</span>
+        <div class="mqc-info">
+          <span class="mqc-title">Meals Infrastructure Dashboard</span>
+          <span class="mqc-subtitle">DynamoDB · Lambda · API Gateway · CloudWatch</span>
+        </div>
+      </div>
+      <span class="mqc-arrow">→</span>
+    </div>
 
     <div *ngIf="error" class="error-banner">
       <span>⚠️ {{ error }}</span>

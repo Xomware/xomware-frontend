@@ -1,0 +1,166 @@
+<div class="meals-dashboard">
+  <!-- Header -->
+  <div class="meals-header">
+    <button class="back-btn" (click)="back.emit()">← Infrastructure</button>
+    <div class="header-title">
+      <span class="header-icon">🍽️</span>
+      <h2>Meals Infrastructure</h2>
+      <span
+        class="overall-badge"
+        [class.healthy]="overallStatus === 'healthy'"
+        [class.degraded]="overallStatus === 'degraded'"
+        [class.error]="overallStatus === 'error'"
+      >
+        {{ overallStatus === 'healthy' ? '● All Systems Go' : overallStatus === 'degraded' ? '● Degraded' : '● Down' }}
+      </span>
+    </div>
+    <button class="refresh-btn" (click)="load()" [disabled]="loading">↻ Refresh</button>
+  </div>
+
+  <div *ngIf="error" class="error-banner">
+    <span>⚠️ {{ error }}</span>
+    <button class="retry-btn" (click)="load()">Retry</button>
+  </div>
+
+  <div *ngIf="loading && !data" class="loading-state">Loading meals infrastructure…</div>
+
+  <div *ngIf="data" class="dashboard-content">
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card accent-blue">
+        <span class="stat-icon">🗄️</span>
+        <span class="stat-value">{{ data.stats.totalMeals }}</span>
+        <span class="stat-label">Total Meals</span>
+      </div>
+      <div class="stat-card accent-purple">
+        <span class="stat-icon">⭐</span>
+        <span class="stat-value">{{ data.stats.totalRatings }}</span>
+        <span class="stat-label">Total Ratings</span>
+      </div>
+      <div class="stat-card accent-green">
+        <span class="stat-icon">⚡</span>
+        <span class="stat-value">{{ healthyLambdas }}/{{ totalLambdas }}</span>
+        <span class="stat-label">Functions Active</span>
+      </div>
+      <div class="stat-card accent-orange">
+        <span class="stat-icon">🌐</span>
+        <span class="stat-value">{{ apiHealthy ? 'Live' : 'Down' }}</span>
+        <span class="stat-label">API Gateway</span>
+      </div>
+    </div>
+
+    <!-- DynamoDB Section -->
+    <div class="section">
+      <h3 class="section-title">🗃️ DynamoDB Tables</h3>
+      <div class="table-grid">
+        <div
+          *ngFor="let table of data.dynamodb.tables"
+          class="table-card"
+          [class.table-active]="table.status === 'ACTIVE'"
+          [class.table-error]="table.status !== 'ACTIVE'"
+        >
+          <div class="table-card-header">
+            <span class="table-status-dot" [class.active]="table.status === 'ACTIVE'"></span>
+            <span class="table-name">{{ table.name }}</span>
+            <span class="table-badge">{{ table.status }}</span>
+          </div>
+          <div class="table-card-stats" *ngIf="table.status === 'ACTIVE'">
+            <div class="table-stat">
+              <span class="ts-value">{{ table.itemCount }}</span>
+              <span class="ts-label">Items</span>
+            </div>
+            <div class="table-stat">
+              <span class="ts-value">{{ formatBytes(table.sizeBytes || 0) }}</span>
+              <span class="ts-label">Size</span>
+            </div>
+            <div class="table-stat">
+              <span class="ts-value">{{ table.billingMode === 'PAY_PER_REQUEST' ? 'On-Demand' : 'Provisioned' }}</span>
+              <span class="ts-label">Billing</span>
+            </div>
+          </div>
+          <div *ngIf="table.error" class="table-error-msg">{{ table.error }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Gateway Section -->
+    <div class="section" *ngIf="data.apiGateway">
+      <h3 class="section-title">🌐 API Gateway</h3>
+      <div class="api-card">
+        <div class="api-info">
+          <span class="api-name">{{ data.apiGateway.name || 'Meals API' }}</span>
+          <span class="api-endpoint" *ngIf="data.apiGateway.endpoint">
+            <a [href]="data.apiGateway.endpoint" target="_blank">{{ data.apiGateway.endpoint }}</a>
+          </span>
+        </div>
+        <div class="api-meta">
+          <span *ngIf="data.apiGateway.id">ID: {{ data.apiGateway.id }}</span>
+          <span *ngIf="data.apiGateway.createdDate">Created: {{ formatDate(data.apiGateway.createdDate) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lambda Functions Section -->
+    <div class="section">
+      <h3 class="section-title">⚡ Lambda Functions</h3>
+      <div class="lambda-grid">
+        <div
+          *ngFor="let fn of data.lambdas"
+          class="lambda-card"
+          [class]="getStatusClass(fn)"
+        >
+          <div class="lambda-header">
+            <span class="lambda-status-icon">{{ getStatusIcon(fn) }}</span>
+            <span class="lambda-name">{{ shortName(fn.name) }}</span>
+          </div>
+          <div class="lambda-details" *ngIf="fn.status === 'Active'">
+            <div class="lambda-metrics">
+              <div class="lm">
+                <span class="lm-val">{{ fn.invocations24h || 0 }}</span>
+                <span class="lm-label">calls/24h</span>
+              </div>
+              <div class="lm">
+                <span class="lm-val" [class.error-text]="(fn.errors24h || 0) > 0">{{ fn.errors24h || 0 }}</span>
+                <span class="lm-label">errors</span>
+              </div>
+              <div class="lm">
+                <span class="lm-val">{{ fn.avgDurationMs }}ms</span>
+                <span class="lm-label">avg</span>
+              </div>
+            </div>
+            <div class="lambda-meta">
+              <span>{{ fn.runtime }} · {{ fn.memoryMB }}MB · {{ fn.timeout }}s timeout</span>
+              <span class="lambda-modified">Updated: {{ formatDate(fn.lastModified) }}</span>
+            </div>
+          </div>
+          <div class="lambda-error" *ngIf="fn.status === 'NOT_FOUND'">
+            Function not deployed
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logs Section -->
+    <div class="section">
+      <div class="section-title-row">
+        <h3 class="section-title">📜 Recent Logs (meals-list)</h3>
+        <button class="toggle-btn" (click)="showLogs = !showLogs">
+          {{ showLogs ? 'Hide' : 'Show' }}
+        </button>
+      </div>
+      <div *ngIf="showLogs" class="logs-container">
+        <div *ngIf="data.logs.length === 0" class="empty-logs">No recent logs</div>
+        <div *ngFor="let log of data.logs" class="log-entry">
+          <span class="log-time" *ngIf="log.timestamp">{{ formatDate(log.timestamp) }}</span>
+          <span class="log-msg">{{ log.message || log.error }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deploy Info -->
+    <div class="deploy-footer">
+      <span class="deploy-label">Dashboard data fetched:</span>
+      <span class="deploy-time">{{ formatDate(data.timestamp) }}</span>
+    </div>
+  </div>
+</div>

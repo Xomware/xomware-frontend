@@ -15,6 +15,7 @@ import { FileEditorComponent } from './components/command-center/file-editor/fil
 import { ActivityLogComponent } from './components/command-center/activity-log/activity-log.component';
 import { PixelOfficeComponent } from './components/command-center/pixel-office/pixel-office.component';
 import { InfraDashboardComponent } from './components/command-center/infra-dashboard/infra-dashboard.component';
+import { MealsDashboardComponent } from './components/command-center/meals-dashboard/meals-dashboard.component';
 
 // Coming Soon components
 import { CautionTapeComponent } from './components/coming-soon/caution-tape/caution-tape.component';
@@ -41,6 +42,7 @@ import { AgentStatusComponent } from './components/agent-status/agent-status.com
     ActivityLogComponent,
     PixelOfficeComponent,
     InfraDashboardComponent,
+    MealsDashboardComponent,
     // Coming Soon
     CautionTapeComponent,
     ComingSoonCardComponent,

@@ -6,7 +6,7 @@ import {
   StateResource,
 } from '../../../services/infra.service';
 
-type View = 'overview' | 'detail';
+type View = 'overview' | 'detail' | 'meals';
 
 @Component({
   selector: 'app-infra-dashboard',
@@ -78,6 +78,10 @@ export class InfraDashboardComponent implements OnInit {
     } finally {
       this.detailLoading = false;
     }
+  }
+
+  openMealsDashboard(): void {
+    this.view = 'meals';
   }
 
   backToOverview(): void {
