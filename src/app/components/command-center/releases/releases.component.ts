@@ -5,8 +5,8 @@ import { ReleasesService, RepoReleases, Release, MergedPr } from '../../../servi
 const REPO_COLORS: Record<string, string> = {
   'Float': '#00b4d8',
   'xomfit-ios': '#22c55e',
-  'xomify-frontend': '#a855f7',
-  'xomware-frontend': '#f97316',
+  'xomify': '#a855f7',
+  'xomware': '#f97316',
 };
 
 interface TimelineItem {

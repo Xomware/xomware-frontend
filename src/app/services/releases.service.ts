@@ -29,7 +29,7 @@ export interface RepoReleases {
   recentMergedPrs?: MergedPr[];
 }
 
-const REPOS = ['Float', 'xomfit-ios', 'xomify-frontend', 'xomware-frontend'];
+const REPOS = ['Float', 'xomfit-ios', 'xomify', 'xomware'];
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 @Injectable({ providedIn: 'root' })

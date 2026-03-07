@@ -34,6 +34,36 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
 
   apps: AppCard[] = [
     {
+      name: 'Xomware',
+      description: 'The mothership. Home of all Xomware apps, agents & infrastructure.',
+      color: '#f97316',
+      colorRgb: '249, 115, 22',
+      url: 'https://xomware.com',
+      monsterState: 'wave',
+      logo: 'assets/img/xomware-icon-transparent-background.png',
+      tag: 'Platform',
+    },
+    {
+      name: 'Float',
+      description: 'Real-time deals for bars & restaurants. Live happy hours near you.',
+      color: '#FFB800',
+      colorRgb: '255, 184, 0',
+      url: 'https://float.xomware.com',
+      monsterState: 'idle',
+      logo: 'assets/img/float-placeholder.svg',
+      tag: 'iOS · Coming Soon',
+    },
+    {
+      name: 'XomFit',
+      description: 'Social fitness & lifting tracker. Challenge friends, follow AI workout plans.',
+      color: '#34C759',
+      colorRgb: '52, 199, 89',
+      url: 'https://xomfit.xomware.com',
+      monsterState: 'idle',
+      logo: 'assets/img/xomfit-placeholder.svg',
+      tag: 'iOS · Coming Soon',
+    },
+    {
       name: 'Xomify',
       description: 'Your Spotify stats, wrapped your way. Top songs, artists, genres & more.',
       color: '#9c0abf',
@@ -62,26 +92,6 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
       monsterState: 'football',
       logo: 'assets/img/xomper-logo.jpg',
       tag: 'Web App',
-    },
-    {
-      name: 'Meals',
-      description: 'Track what you eat, rate your meals, and build better habits with AI insights.',
-      color: '#ff6b6b',
-      colorRgb: '255, 107, 107',
-      url: 'https://meals.xomware.com',
-      monsterState: 'idle',
-      logo: 'assets/img/xomware-icon-transparent-background.png',
-      tag: 'Web App',
-    },
-    {
-      name: 'XomFit',
-      description: 'Social fitness & lifting tracker. Challenge friends, follow AI workout plans.',
-      color: '#34C759',
-      colorRgb: '52, 199, 89',
-      url: 'https://xomfit.xomware.com',
-      monsterState: 'idle',
-      logo: 'assets/img/xomfit-placeholder.svg',
-      tag: 'iOS · Coming Soon',
     },
   ];
 
