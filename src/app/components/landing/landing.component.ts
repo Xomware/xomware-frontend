@@ -34,16 +34,6 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
 
   apps: AppCard[] = [
     {
-      name: 'Xomware',
-      description: 'The mothership. Home of all Xomware apps, agents & infrastructure.',
-      color: '#f97316',
-      colorRgb: '249, 115, 22',
-      url: 'https://xomware.com',
-      monsterState: 'wave',
-      logo: 'assets/img/xomware-icon-transparent-background.png',
-      tag: 'Platform',
-    },
-    {
       name: 'Float',
       description: 'Real-time deals for bars & restaurants. Live happy hours near you.',
       color: '#FFB800',
@@ -158,7 +148,7 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
         trigger: '.hero',
         start: 'top top',
         end: 'bottom top',
-        scrub: true,
+        scrub: 0.5,
       },
       opacity: 0,
       y: -50,
@@ -205,6 +195,9 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
       duration: 0.6,
       ease: 'power2.out',
     });
+
+    // Refresh ScrollTrigger after all animations are set up
+    ScrollTrigger.refresh();
   }
 
   private checkMobile(): void {

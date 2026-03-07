@@ -7,7 +7,9 @@
   align-items: center;
   background: $bg-dark;
   position: relative;
-  overflow-x: hidden;
+  overflow: visible;
+  // Note: overflow-x: hidden was causing ScrollTrigger lockups
+  // Orbs are handled by .bg-orbs overflow:hidden instead
 }
 
 // ── Ambient Background Orbs ──────────────────────
@@ -17,6 +19,7 @@
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
+  clip: rect(0, auto, auto, 0);
 }
 
 .orb {

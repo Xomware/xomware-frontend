@@ -23,12 +23,34 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('blobGroup', { static: true }) blobGroupRef!: ElementRef<SVGGElement>;
 
+  hoverEmoji = '👋';
+  convoBubbleText = '';
+
   private blinkTimer: any;
   private signatureTimer: any;
   private idleTween: gsap.core.Tween | null = null;
   private prefersReducedMotion = false;
   private isTouchActive = false;
   private touchStartTime = 0;
+  private clickCount = 0;
+
+  private readonly agentEmojis: Record<string, string[]> = {
+    boris: ['📨', '⚡', '🏃', '💬', '📱', '🔥', '😎'],
+    forge: ['🔨', '🛠️', '💻', '🚀', '⚙️', '🏗️', '💪'],
+    winston: ['☕', '✅', '🛡️', '👀', '🔍', '🚦', '💚'],
+    rocco: ['🔬', '🧠', '📊', '🔮', '🎯', '📡', '🤓'],
+    stormy: ['📝', '✍️', '📚', '🗂️', '💭', '🌊', '📖'],
+    debo: ['🏗️', '🔧', '☁️', '🖥️', '⚡', '🔒', '💎'],
+  };
+
+  private readonly agentQuotes: Record<string, string[]> = {
+    boris: ['Dispatching...', 'On it, boss!', 'Message sent! 📨', 'Roger that.', 'Spawning agents...'],
+    forge: ['Building...', 'PR incoming!', 'Code shipped 🚀', 'Tests passing ✅', 'Hammering away...'],
+    winston: ['All green ✓', 'Builds stable', 'Watching pipes...', 'CI clear! ☕', 'Nothing escapes me'],
+    rocco: ['Analyzing...', 'Data says yes', 'Found something!', 'Interesting... 🔬', 'Pattern detected'],
+    stormy: ['Documenting...', 'Memory saved', 'Context logged 📝', 'Writing it down', 'For posterity...'],
+    debo: ['Infra solid 💪', 'Terraform clean', 'Servers humming', 'Zero downtime', 'All nodes green'],
+  };
 
   get el(): SVGGElement {
     return this.blobGroupRef.nativeElement;
@@ -58,6 +80,7 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
   onMouseEnter(): void {
     this.blobHover.emit({ agent: this.agent, entering: true });
     this.playWave();
+    this.showRandomEmoji();
     gsap.to(this.el, {
       scale: 1.15,
       duration: 0.3,
@@ -69,6 +92,8 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
       duration: 0.3,
       ease: 'power2.out',
     });
+    // Color pulse on hover
+    this.playColorPulse();
   }
 
   onMouseLeave(): void {
@@ -83,10 +108,21 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
       opacity: 0,
       duration: 0.2,
     });
+    gsap.to(this.el.querySelector('.hover-emoji'), {
+      opacity: 0,
+      duration: 0.2,
+    });
   }
 
   onClick(): void {
-    this.blobClick.emit(this.agent);
+    this.clickCount++;
+    // Show conversation bubble on first click, open modal on second
+    if (this.clickCount % 2 === 1) {
+      this.showConvoBubble();
+      this.playDanceAnimation();
+    } else {
+      this.blobClick.emit(this.agent);
+    }
   }
 
   onTouchStart(event: TouchEvent): void {
@@ -138,6 +174,83 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
     gsap.to(this.el.querySelector('.agent-label'), {
       opacity: 0,
       duration: 0.2,
+    });
+  }
+
+  // ── Personality animations ──────────────────────────────
+  private showRandomEmoji(): void {
+    const emojis = this.agentEmojis[this.agent.name] || ['👋', '😊', '✨'];
+    this.hoverEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    const emojiEl = this.el.querySelector('.hover-emoji');
+    if (!emojiEl) return;
+    gsap.fromTo(emojiEl,
+      { opacity: 0, y: 0, scale: 0.5 },
+      {
+        opacity: 1, y: -8, scale: 1.2,
+        duration: 0.4,
+        ease: 'back.out(2)',
+        transformOrigin: 'center center',
+      }
+    );
+  }
+
+  private showConvoBubble(): void {
+    const quotes = this.agentQuotes[this.agent.name] || ['Hey!'];
+    this.convoBubbleText = quotes[Math.floor(Math.random() * quotes.length)];
+    const bubble = this.el.querySelector('.convo-bubble');
+    if (!bubble) return;
+    gsap.fromTo(bubble,
+      { opacity: 0, y: 10, scale: 0.8 },
+      {
+        keyframes: [
+          { opacity: 1, y: 0, scale: 1, duration: 0.3 },
+          { opacity: 1, y: 0, scale: 1, duration: 1.5 },
+          { opacity: 0, y: -10, scale: 0.9, duration: 0.3 },
+        ],
+        transformOrigin: 'center bottom',
+      }
+    );
+  }
+
+  private playDanceAnimation(): void {
+    if (this.prefersReducedMotion) return;
+    // Quick wiggle dance
+    gsap.to(this.el, {
+      keyframes: [
+        { rotation: -8, duration: 0.1 },
+        { rotation: 8, duration: 0.1 },
+        { rotation: -6, duration: 0.1 },
+        { rotation: 6, duration: 0.1 },
+        { rotation: 0, duration: 0.15 },
+      ],
+      transformOrigin: 'center bottom',
+    });
+    // Color flash on body
+    const body = this.el.querySelector('.b-body');
+    if (body) {
+      gsap.to(body, {
+        attr: { fill: '#ffffff' },
+        duration: 0.1,
+        yoyo: true,
+        repeat: 1,
+        onComplete: () => {
+          gsap.set(body, { attr: { fill: this.agent.color } });
+        },
+      });
+    }
+  }
+
+  private playColorPulse(): void {
+    if (this.prefersReducedMotion) return;
+    const halo = this.el.querySelector('.b-halo');
+    if (!halo) return;
+    gsap.to(halo, {
+      opacity: 0.5,
+      attr: { rx: 32, ry: 28 },
+      duration: 0.3,
+      ease: 'power2.out',
+      yoyo: true,
+      repeat: 1,
     });
   }
 

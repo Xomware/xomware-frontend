@@ -132,6 +132,24 @@
     [style.opacity]="0"
   >{{ agent.displayName }}</svg:text>
 
+  <!-- Hover emoji (random, appears on hover) -->
+  <svg:text
+    class="hover-emoji"
+    x="22"
+    y="-22"
+    text-anchor="middle"
+    font-size="10"
+    opacity="0"
+  >{{ hoverEmoji }}</svg:text>
+
+  <!-- Conversation bubble (appears on click) -->
+  <svg:g class="convo-bubble" opacity="0">
+    <svg:rect x="-30" y="-56" width="60" height="18" rx="6"
+      fill="rgba(10,10,20,0.92)" [attr.stroke]="agent.color" stroke-width="0.8"/>
+    <svg:polygon [attr.points]="'-2,-38 2,-38 0,-34'" fill="rgba(10,10,20,0.92)"/>
+    <svg:text class="convo-text" x="0" y="-44" text-anchor="middle" font-size="5.5" fill="white">{{ convoBubbleText }}</svg:text>
+  </svg:g>
+
   <!-- Status bubble (signature animations) -->
   <svg:g class="status-bubble" opacity="0">
     <svg:rect x="-10" y="-44" width="20" height="12" rx="4"
