@@ -76,31 +76,32 @@
       <p class="section-subtitle">Live products built and maintained by AI agents.</p>
     </div>
     <div class="cards-container">
-      <a *ngFor="let app of apps; let i = index"
-         class="app-card glass-card"
-         [style.--app-color]="app.color"
-         [style.--app-rgb]="app.colorRgb"
-         [style.animation-delay]="(i * 0.1) + 's'"
-         [href]="app.url"
-         target="_blank"
-         rel="noopener"
-         (mouseenter)="onCardHover(app.monsterState)"
-         (mouseleave)="onCardLeave()">
-        <div class="card-glow" aria-hidden="true"></div>
-        <div class="card-logo">
-          <img [src]="app.logo" [alt]="app.name + ' logo'" />
-        </div>
-        <div class="card-content">
-          <h3 class="card-name">{{ app.name }}</h3>
-          <p class="card-description">{{ app.description }}</p>
-        </div>
-        <div class="card-footer">
-          <span class="card-tag">{{ app.tag }}</span>
-          <svg class="card-arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
-          </svg>
-        </div>
-      </a>
+      <ng-container *ngFor="let app of apps; let i = index">
+        <a class="app-card glass-card"
+           [style.--app-color]="app.color"
+           [style.--app-rgb]="app.colorRgb"
+           [style.animation-delay]="(i * 0.1) + 's'"
+           [href]="app.url"
+           target="_blank"
+           rel="noopener"
+           (mouseenter)="onCardHover(app.monsterState)"
+           (mouseleave)="onCardLeave()">
+          <div class="card-glow" aria-hidden="true"></div>
+          <div class="card-logo">
+            <img [src]="app.logo" [alt]="app.name + ' logo'" loading="lazy" />
+          </div>
+          <div class="card-content">
+            <h3 class="card-name">{{ app.name }}</h3>
+            <p class="card-description">{{ app.description }}</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-tag">{{ app.tag }}</span>
+            <svg class="card-arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+            </svg>
+          </div>
+        </a>
+      </ng-container>
     </div>
   </section>
 
