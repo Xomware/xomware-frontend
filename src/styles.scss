@@ -32,19 +32,19 @@ body {
 
 // Custom scrollbar
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba($brand-cyan, 0.5);
-  border-radius: 4px;
+  background: rgba($brand-cyan, 0.3);
+  border-radius: 3px;
 
   &:hover {
-    background: rgba($brand-cyan, 0.7);
+    background: rgba($brand-cyan, 0.5);
   }
 }
 

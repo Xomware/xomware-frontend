@@ -10,8 +10,13 @@
 .agent-blob {
   will-change: transform;
   cursor: pointer;
-  touch-action: manipulation; // Fast taps, no 300ms delay
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+.b-halo {
+  will-change: opacity;
+  pointer-events: none;
 }
 
 .agent-label {

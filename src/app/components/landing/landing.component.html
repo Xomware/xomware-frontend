@@ -1,20 +1,62 @@
 <div class="landing" (mousemove)="onPageInteraction()">
-  <!-- Hero Section -->
-  <header class="hero">
-    <div class="logo-container">
-      <img src="assets/img/xomware-transparent-background.png" alt="Xomware" class="brand-logo" />
-    </div>
-    <p class="tagline">Apps built by
-      <a href="https://github.com/domgiordano" target="_blank" rel="noopener" class="github-link">
-        <svg class="github-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
-                fill="currentColor"/>
-        </svg>
-        &#64;domgiordano
+  <!-- Ambient background orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-cyan"></div>
+    <div class="orb orb-purple"></div>
+    <div class="orb orb-emerald"></div>
+  </div>
+
+  <!-- Sticky Navigation -->
+  <nav class="sticky-nav" [class.scrolled]="isScrolled">
+    <div class="nav-inner">
+      <a routerLink="/" class="nav-brand">
+        <img src="assets/img/xomware-icon-transparent-background.png" alt="Xomware" class="nav-logo" />
+        <span class="nav-wordmark">XOMWARE</span>
       </a>
-    </p>
+      <div class="nav-links">
+        <a href="#apps" class="nav-link">Apps</a>
+        <a href="#agents" class="nav-link">Agents</a>
+        <a href="https://github.com/domgiordano" target="_blank" rel="noopener" class="nav-link nav-link-github">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="nav-icon">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" fill="currentColor"/>
+          </svg>
+          GitHub
+        </a>
+        <a routerLink="/command" class="nav-cta">Command Center</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero" id="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>AI-Powered Development</span>
+      </div>
+      <h1 class="hero-title">
+        Building the future,<br>
+        <span class="hero-gradient-text">one app at a time.</span>
+      </h1>
+      <p class="hero-subtitle">
+        A suite of apps crafted by
+        <a href="https://github.com/domgiordano" target="_blank" rel="noopener" class="hero-link">&#64;domgiordano</a>
+        — powered by an autonomous AI agent team.
+      </p>
+      <div class="hero-ctas">
+        <a href="#apps" class="btn-primary">
+          Explore Apps
+          <svg viewBox="0 0 24 24" class="btn-icon"><path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z" fill="currentColor"/></svg>
+        </a>
+        <a href="https://github.com/domgiordano" target="_blank" rel="noopener" class="btn-secondary">
+          <svg viewBox="0 0 24 24" class="btn-icon"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" fill="currentColor"/></svg>
+          View on GitHub
+        </a>
+      </div>
+    </div>
     <!-- Scroll hint -->
     <div class="scroll-hint">
+      <span>Scroll to explore</span>
       <svg class="scroll-arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="currentColor"/>
       </svg>
@@ -22,28 +64,39 @@
   </header>
 
   <!-- Agent Scene Section -->
-  <app-agent-scene></app-agent-scene>
+  <section id="agents">
+    <app-agent-scene></app-agent-scene>
+  </section>
 
   <!-- App Cards Section -->
-  <section class="apps-section">
+  <section class="apps-section" id="apps">
+    <div class="section-header">
+      <span class="section-eyebrow">⚡ The Suite</span>
+      <h2 class="section-title">Apps by Xomware</h2>
+      <p class="section-subtitle">Live products built and maintained by AI agents.</p>
+    </div>
     <div class="cards-container">
       <a *ngFor="let app of apps; let i = index"
-         class="app-card"
+         class="app-card glass-card"
          [style.--app-color]="app.color"
-         [style.animation-delay]="(i * 0.12) + 's'"
+         [style.--app-rgb]="app.colorRgb"
+         [style.animation-delay]="(i * 0.1) + 's'"
          [href]="app.url"
          target="_blank"
          rel="noopener"
          (mouseenter)="onCardHover(app.monsterState)"
          (mouseleave)="onCardLeave()">
+        <div class="card-glow" aria-hidden="true"></div>
         <div class="card-logo">
           <img [src]="app.logo" [alt]="app.name + ' logo'" />
         </div>
         <div class="card-content">
+          <h3 class="card-name">{{ app.name }}</h3>
           <p class="card-description">{{ app.description }}</p>
         </div>
-        <div class="card-arrow">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div class="card-footer">
+          <span class="card-tag">{{ app.tag }}</span>
+          <svg class="card-arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
           </svg>
         </div>
@@ -56,29 +109,31 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <div class="footer-content">
-      <span class="footer-text">Built by &#64;domgiordano</span>
-      <a href="https://github.com/domgiordano" target="_blank" rel="noopener" class="footer-github">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
-                fill="currentColor"/>
-        </svg>
-        GitHub
-      </a>
-      <a routerLink="/command" class="footer-command-center" title="Command Center">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="terminal-icon">
-          <path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H4V5h16v14zM6.41 15.59L10.83 11 6.41 6.41 7.83 5l6 6-6 6z"
-                fill="currentColor"/>
-        </svg>
-        Command Center
-      </a>
-      <a routerLink="/prs" class="footer-command-center" title="PR Dashboard">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="terminal-icon">
-          <path d="M6 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm0 10a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm12-10a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zM6 9v6M18 9v-2a2 2 0 0 0-2-2H8"
-                fill="none" stroke="currentColor" stroke-width="2"/>
-        </svg>
-        PRs
-      </a>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/img/xomware-icon-transparent-background.png" alt="Xomware" class="footer-logo" />
+        <div class="footer-brand-text">
+          <span class="footer-name">XOMWARE</span>
+          <span class="footer-tagline">Apps built by &#64;domgiordano</span>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/domgiordano" target="_blank" rel="noopener" class="footer-link">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" fill="currentColor"/></svg>
+          GitHub
+        </a>
+        <a routerLink="/command" class="footer-link">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H4V5h16v14zM6.41 15.59L10.83 11 6.41 6.41 7.83 5l6 6-6 6z" fill="currentColor"/></svg>
+          Command Center
+        </a>
+        <a routerLink="/prs" class="footer-link">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm0 10a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm12-10a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" fill="currentColor"/></svg>
+          PRs
+        </a>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; 2026 Xomware. All rights reserved.</span>
+      </div>
     </div>
   </footer>
 </div>

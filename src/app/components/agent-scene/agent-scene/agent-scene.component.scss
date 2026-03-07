@@ -1,8 +1,9 @@
 @import 'styles/variables';
 
 .agent-scene-section {
-  padding: $spacing-2xl $spacing-md;
+  padding: $spacing-3xl $spacing-md;
   position: relative;
+  z-index: 1;
 }
 
 .scene-header {
@@ -14,23 +15,23 @@
 }
 
 .scene-eyebrow {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: 0.8rem;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: $brand-cyan;
-  opacity: 0.9;
 }
 
 .scene-title {
-  font-size: clamp(26px, 4vw, 38px);
-  font-weight: 800;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: $font-weight-extrabold;
   color: $text-primary;
-  margin: 8px 0 10px;
+  margin: $spacing-sm 0;
+  letter-spacing: -0.01em;
 }
 
 .scene-subtitle {
-  font-size: 15px;
+  font-size: 1rem;
   color: $text-secondary;
   margin: 0;
 }
@@ -40,9 +41,7 @@
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: $radius-xl;
+  @include glass-card;
   overflow: hidden;
 }
 
@@ -65,12 +64,11 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(var(--agent-color, 255, 255, 255), 0.15);
-  border-radius: 20px;
+  @include glass-card(rgba(255, 255, 255, 0.04), rgba(var(--agent-color, 255, 255, 255), 0.15));
+  border-radius: $radius-pill;
   padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: $font-weight-semibold;
   color: $text-secondary;
   cursor: pointer;
   transition: all $transition-fast;
@@ -80,6 +78,7 @@
     background: rgba(255, 255, 255, 0.07);
     color: $text-primary;
     border-color: var(--agent-color);
+    box-shadow: 0 0 15px rgba(var(--agent-color), 0.15);
   }
 }
 
@@ -117,7 +116,7 @@
     width: 100%;
     height: auto;
     min-height: 220px;
-    touch-action: manipulation; // Fast tap, no double-tap zoom
+    touch-action: manipulation;
   }
 
   .agent-pills {
@@ -126,8 +125,7 @@
 
   .agent-pill {
     padding: 8px 16px;
-    font-size: 14px;
-    // Larger touch target
+    font-size: 0.85rem;
     min-height: 44px;
   }
 }

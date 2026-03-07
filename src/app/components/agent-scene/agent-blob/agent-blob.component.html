@@ -10,6 +10,9 @@
   (touchstart)="onTouchStart($event)"
   (touchend)="onTouchEnd($event)"
 >
+  <!-- Halo glow -->
+  <svg:ellipse class="b-halo" rx="26" ry="22" [attr.fill]="'none'" [attr.stroke]="agent.color" stroke-width="1.5" opacity="0.15"/>
+
   <!-- Drop shadow -->
   <svg:ellipse cy="22" rx="16" ry="4" [attr.fill]="'rgba(0,0,0,0.15)'" class="b-shadow"/>
 
