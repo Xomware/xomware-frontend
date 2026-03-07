@@ -34,18 +34,23 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
     return this.blobGroupRef.nativeElement;
   }
 
+  private mouseMoveHandler = (e: MouseEvent) => this.trackEyes(e);
+
   ngAfterViewInit(): void {
     this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.startIdleAnimation();
     this.startBlink();
+    this.startHaloPulse();
     if (!this.prefersReducedMotion) {
       this.scheduleSignature();
+      document.addEventListener('mousemove', this.mouseMoveHandler);
     }
   }
 
   ngOnDestroy(): void {
     clearTimeout(this.blinkTimer);
     clearTimeout(this.signatureTimer);
+    document.removeEventListener('mousemove', this.mouseMoveHandler);
     gsap.killTweensOf(this.el);
     gsap.killTweensOf(this.el.querySelectorAll('*'));
   }
@@ -406,6 +411,53 @@ export class AgentBlobComponent implements AfterViewInit, OnDestroy {
         repeat: 3,
       }
     );
+  }
+
+  // ── Eye Tracking ──────────────────────────────
+  private trackEyes(e: MouseEvent): void {
+    const pupils = this.el.querySelectorAll('.b-pupil');
+    if (!pupils.length) return;
+
+    const svgEl = this.el.closest('svg');
+    if (!svgEl) return;
+
+    const rect = svgEl.getBoundingClientRect();
+    const blobRect = this.el.getBoundingClientRect();
+    const cx = blobRect.left + blobRect.width / 2;
+    const cy = blobRect.top + blobRect.height / 2;
+
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const maxMove = 1.8;
+    const factor = Math.min(dist / 200, 1);
+
+    const moveX = (dx / (dist || 1)) * maxMove * factor;
+    const moveY = (dy / (dist || 1)) * maxMove * factor;
+
+    pupils.forEach((pupil, i) => {
+      const baseX = i === 0 ? -4.5 : 7.5;
+      gsap.to(pupil, {
+        attr: { cx: baseX + moveX, cy: -3 + moveY },
+        duration: 0.15,
+        ease: 'power2.out',
+      });
+    });
+  }
+
+  // ── Halo Pulse ──────────────────────────────
+  private startHaloPulse(): void {
+    if (this.prefersReducedMotion) return;
+    const halo = this.el.querySelector('.b-halo');
+    if (!halo) return;
+    gsap.to(halo, {
+      opacity: 0.3,
+      attr: { rx: 28, ry: 24 },
+      duration: 2 + Math.random(),
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: -1,
+    });
   }
 
   // ── Blink ──────────────────────────────
