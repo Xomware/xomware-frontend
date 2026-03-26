@@ -40,65 +40,11 @@
   white-space: nowrap;
 }
 
-// Tabs
-.cc-tabs {
-  display: flex;
-  gap: $spacing-xs;
-}
-
-.cc-tab {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: $spacing-sm $spacing-md;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: $radius-md;
-  color: $text-secondary;
-  font-size: 0.85rem;
-  font-family: $font-stack;
-  cursor: pointer;
-  transition: all $transition-base;
-  white-space: nowrap;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: $text-primary;
-  }
-
-  &.active {
-    background: rgba($brand-cyan, 0.1);
-    border-color: rgba($brand-cyan, 0.3);
-    color: $brand-cyan;
-  }
-}
-
-.tab-icon {
-  font-size: 1rem;
-}
-
 // Header right
 .cc-header-right {
   display: flex;
   align-items: center;
   gap: $spacing-md;
-}
-
-.cc-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  color: $text-secondary;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #00ffab;
-  box-shadow: 0 0 8px rgba(0, 255, 171, 0.5);
-  animation: pulse 2s ease-in-out infinite;
 }
 
 .cc-logout {
@@ -116,6 +62,11 @@
     border-color: rgba(255, 82, 82, 0.4);
     color: #ff5252;
   }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+  }
 }
 
 // Content
@@ -125,16 +76,9 @@
   overflow-y: auto;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
 // Responsive
 @media (max-width: $breakpoint-md) {
   .cc-header {
-    flex-wrap: wrap;
-    gap: $spacing-sm;
     padding: $spacing-sm;
   }
 
@@ -142,44 +86,12 @@
     display: none;
   }
 
-  .cc-tabs {
-    order: 3;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    &::-webkit-scrollbar { display: none; }
-  }
-
-  .tab-label {
-    display: none;
-  }
-
-  .cc-tab {
-    padding: $spacing-sm;
-    flex-shrink: 0;
-  }
-
   .cc-content {
     padding: $spacing-sm;
-  }
-
-  .cc-status {
-    font-size: 0.7rem;
   }
 
   .cc-logout {
     font-size: 0.7rem;
     padding: $spacing-xs $spacing-sm;
-  }
-}
-
-@media (max-width: $breakpoint-sm) {
-  .cc-header-right {
-    gap: $spacing-sm;
-  }
-
-  .cc-status span:not(.status-dot) {
-    display: none;
   }
 }

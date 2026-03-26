@@ -1,101 +1,49 @@
-<div class="blob-arena">
-  <svg #blobSvg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" class="blob-svg">
+<div class="blob-arena" aria-hidden="true">
+  <svg #blobSvg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" class="blob-svg" preserveAspectRatio="none">
     <defs>
       <radialGradient id="blobShine" cx="35%" cy="30%">
-        <stop offset="0%" stop-color="rgba(255,255,255,0.18)" />
+        <stop offset="0%" stop-color="rgba(255,255,255,0.12)" />
         <stop offset="100%" stop-color="rgba(255,255,255,0)" />
       </radialGradient>
+      <filter id="blobBlur">
+        <feGaussianBlur stdDeviation="3" />
+      </filter>
     </defs>
 
-    <!-- Blob 0 (large) -->
-    <g class="blob blob-0">
-      <ellipse cy="20" rx="14" ry="3" fill="rgba(0,0,0,0.1)" class="b-shadow" />
-      <ellipse rx="18" ry="16" fill="#00b4d8" class="b-body" />
+    <!-- Blob 0 -->
+    <g class="blob blob-0" filter="url(#blobBlur)">
+      <ellipse rx="18" ry="16" fill="#00e5ff" opacity="0.1" class="b-body" />
       <ellipse cx="-5" cy="-6" rx="7" ry="4" fill="url(#blobShine)" />
-      <g class="b-eyes">
-        <circle cx="-6" cy="-3" r="4.5" fill="white" />
-        <circle cx="-4.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-        <circle cx="6" cy="-3" r="4.5" fill="white" />
-        <circle cx="7.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-      </g>
-      <path d="M-3,5 Q0,7 3,5" stroke="#111" stroke-width="1.2" fill="none" stroke-linecap="round" class="b-mouth" />
     </g>
 
-    <!-- Blob 1 (small) -->
-    <g class="blob blob-1">
-      <ellipse cy="20" rx="14" ry="3" fill="rgba(0,0,0,0.1)" class="b-shadow" />
-      <ellipse rx="18" ry="16" fill="#00b4d8" class="b-body" />
+    <!-- Blob 1 -->
+    <g class="blob blob-1" filter="url(#blobBlur)">
+      <ellipse rx="18" ry="16" fill="#00e5ff" opacity="0.1" class="b-body" />
       <ellipse cx="-5" cy="-6" rx="7" ry="4" fill="url(#blobShine)" />
-      <g class="b-eyes">
-        <circle cx="-6" cy="-3" r="4.5" fill="white" />
-        <circle cx="-4.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-        <circle cx="6" cy="-3" r="4.5" fill="white" />
-        <circle cx="7.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-      </g>
-      <path d="M-3,5 Q0,7 3,5" stroke="#111" stroke-width="1.2" fill="none" stroke-linecap="round" class="b-mouth" />
     </g>
 
-    <!-- Blob 2 (biggest) -->
-    <g class="blob blob-2">
-      <ellipse cy="20" rx="14" ry="3" fill="rgba(0,0,0,0.1)" class="b-shadow" />
-      <ellipse rx="18" ry="16" fill="#00b4d8" class="b-body" />
+    <!-- Blob 2 -->
+    <g class="blob blob-2" filter="url(#blobBlur)">
+      <ellipse rx="18" ry="16" fill="#00e5ff" opacity="0.1" class="b-body" />
       <ellipse cx="-5" cy="-6" rx="7" ry="4" fill="url(#blobShine)" />
-      <g class="b-eyes">
-        <circle cx="-6" cy="-3" r="4.5" fill="white" />
-        <circle cx="-4.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-        <circle cx="6" cy="-3" r="4.5" fill="white" />
-        <circle cx="7.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-      </g>
-      <path d="M-3,5 Q0,7 3,5" stroke="#111" stroke-width="1.2" fill="none" stroke-linecap="round" class="b-mouth" />
     </g>
 
-    <!-- Blob 3 (tiny) -->
-    <g class="blob blob-3">
-      <ellipse cy="20" rx="14" ry="3" fill="rgba(0,0,0,0.1)" class="b-shadow" />
-      <ellipse rx="18" ry="16" fill="#00b4d8" class="b-body" />
+    <!-- Blob 3 -->
+    <g class="blob blob-3" filter="url(#blobBlur)">
+      <ellipse rx="18" ry="16" fill="#00e5ff" opacity="0.1" class="b-body" />
       <ellipse cx="-5" cy="-6" rx="7" ry="4" fill="url(#blobShine)" />
-      <g class="b-eyes">
-        <circle cx="-6" cy="-3" r="4.5" fill="white" />
-        <circle cx="-4.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-        <circle cx="6" cy="-3" r="4.5" fill="white" />
-        <circle cx="7.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-      </g>
-      <path d="M-3,5 Q0,7 3,5" stroke="#111" stroke-width="1.2" fill="none" stroke-linecap="round" class="b-mouth" />
     </g>
 
-    <!-- Blob 4 (medium) -->
-    <g class="blob blob-4">
-      <ellipse cy="20" rx="14" ry="3" fill="rgba(0,0,0,0.1)" class="b-shadow" />
-      <ellipse rx="18" ry="16" fill="#00b4d8" class="b-body" />
+    <!-- Blob 4 -->
+    <g class="blob blob-4" filter="url(#blobBlur)">
+      <ellipse rx="18" ry="16" fill="#00e5ff" opacity="0.1" class="b-body" />
       <ellipse cx="-5" cy="-6" rx="7" ry="4" fill="url(#blobShine)" />
-      <g class="b-eyes">
-        <circle cx="-6" cy="-3" r="4.5" fill="white" />
-        <circle cx="-4.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-        <circle cx="6" cy="-3" r="4.5" fill="white" />
-        <circle cx="7.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-      </g>
-      <path d="M-3,5 Q0,7 3,5" stroke="#111" stroke-width="1.2" fill="none" stroke-linecap="round" class="b-mouth" />
     </g>
 
-    <!-- Blob 5 (small-medium) -->
-    <g class="blob blob-5">
-      <ellipse cy="20" rx="14" ry="3" fill="rgba(0,0,0,0.1)" class="b-shadow" />
-      <ellipse rx="18" ry="16" fill="#00b4d8" class="b-body" />
+    <!-- Blob 5 -->
+    <g class="blob blob-5" filter="url(#blobBlur)">
+      <ellipse rx="18" ry="16" fill="#00e5ff" opacity="0.1" class="b-body" />
       <ellipse cx="-5" cy="-6" rx="7" ry="4" fill="url(#blobShine)" />
-      <g class="b-eyes">
-        <circle cx="-6" cy="-3" r="4.5" fill="white" />
-        <circle cx="-4.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-        <circle cx="6" cy="-3" r="4.5" fill="white" />
-        <circle cx="7.5" cy="-3" r="2" fill="#111" class="b-pupil" />
-      </g>
-      <path d="M-3,5 Q0,7 3,5" stroke="#111" stroke-width="1.2" fill="none" stroke-linecap="round" class="b-mouth" />
-    </g>
-
-    <!-- Sleep Z's -->
-    <g class="sleep-group" opacity="0">
-      <text class="z1" fill="#00b4d8" font-size="14" font-weight="bold">Z</text>
-      <text class="z2" fill="#00b4d8" font-size="10" font-weight="bold">z</text>
-      <text class="z3" fill="#00b4d8" font-size="7" font-weight="bold">z</text>
     </g>
   </svg>
 </div>

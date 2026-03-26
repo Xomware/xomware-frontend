@@ -88,31 +88,6 @@ $breakpoint-md: 768px;
 $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
 
-// ── Coming Soon ──────────────────────────────────
-$caution-yellow: #FFD600;
-$caution-black: #1a1a1a;
-$caution-stripe: repeating-linear-gradient(
-  -45deg,
-  #{$caution-yellow} 0px,
-  #{$caution-yellow} 22px,
-  #{$caution-black} 22px,
-  #{$caution-black} 44px
-);
-$caution-glow: rgba(255, 214, 0, 0.25);
-
-// App coming-soon colors
-$xomfit-rgb: 52, 199, 89;
-$float-gold: #FFB800;
-$float-rgb: 255, 184, 0;
-
-// ── Agent Colors ──────────────────────────────────
-$agent-boris: #00b4d8;
-$agent-forge: #FF6B35;
-$agent-rocco: #9C0ABF;
-$agent-winston: #00FFAB;
-$agent-stormy: #4A90D9;
-$agent-debo: #E74C3C;
-
 // ── Glass Morphism Mixin ─────────────────────────
 @mixin glass-card($bg: $glass-bg, $border: $glass-border) {
   background: $bg;
