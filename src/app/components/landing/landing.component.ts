@@ -10,9 +10,9 @@ interface AppCard {
   color: string;
   colorRgb: string;
   url: string;
-  monsterState: string;
   logo: string;
   tag: string;
+  status: 'live' | 'coming-soon';
 }
 
 @Component({
@@ -21,47 +21,19 @@ interface AppCard {
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent implements AfterViewInit, OnDestroy {
-  monsterState = 'idle';
-  isMobile = false;
   isScrolled = false;
-
-  private idleTimer: any;
-  private mobileTimer: any;
-  private readonly SLEEP_DELAY = 12000;
-  private readonly MOBILE_CYCLE_MIN = 4000;
-  private readonly MOBILE_CYCLE_MAX = 8000;
-  private readonly mobileStates = ['idle', 'wave', 'headphones', 'dj', 'football', 'idle', 'idle'];
+  menuOpen = false;
 
   apps: AppCard[] = [
-    {
-      name: 'Float',
-      description: 'Real-time deals for bars & restaurants. Live happy hours near you.',
-      color: '#FFB800',
-      colorRgb: '255, 184, 0',
-      url: 'https://float.xomware.com',
-      monsterState: 'idle',
-      logo: 'assets/img/float-placeholder.svg',
-      tag: 'iOS · Coming Soon',
-    },
-    {
-      name: 'XomFit',
-      description: 'Social fitness & lifting tracker. Challenge friends, follow AI workout plans.',
-      color: '#34C759',
-      colorRgb: '52, 199, 89',
-      url: 'https://xomfit.xomware.com',
-      monsterState: 'idle',
-      logo: 'assets/img/xomfit-placeholder.svg',
-      tag: 'iOS · Coming Soon',
-    },
     {
       name: 'Xomify',
       description: 'Your Spotify stats, wrapped your way. Top songs, artists, genres & more.',
       color: '#9c0abf',
       colorRgb: '156, 10, 191',
       url: 'https://xomify.xomware.com',
-      monsterState: 'headphones',
       logo: 'assets/img/xomify-logo.png',
       tag: 'Web App',
+      status: 'live',
     },
     {
       name: 'XomCloud',
@@ -69,9 +41,9 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
       color: '#ff6b35',
       colorRgb: '255, 107, 53',
       url: 'https://xomcloud.xomware.com',
-      monsterState: 'dj',
       logo: 'assets/img/xomcloud-logo.png',
       tag: 'Web App',
+      status: 'live',
     },
     {
       name: 'Xomper',
@@ -79,9 +51,39 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
       color: '#00ffab',
       colorRgb: '0, 255, 171',
       url: 'https://xomper.xomware.com',
-      monsterState: 'football',
       logo: 'assets/img/xomper-logo.jpg',
       tag: 'Web App',
+      status: 'live',
+    },
+    {
+      name: 'Hornets SE Champs',
+      description: 'Hornets SE Division Win Bet Tracker',
+      color: '#00788C',
+      colorRgb: '0, 120, 140',
+      url: 'https://hornets-southeast-champs.xomware.com',
+      logo: 'assets/img/hornets-placeholder.svg',
+      tag: 'Web App',
+      status: 'live',
+    },
+    {
+      name: 'XomFit',
+      description: 'Social fitness & lifting tracker. Challenge friends, follow AI workout plans.',
+      color: '#34C759',
+      colorRgb: '52, 199, 89',
+      url: 'https://xomfit.xomware.com',
+      logo: 'assets/img/xomfit-placeholder.svg',
+      tag: 'iOS · Coming Soon',
+      status: 'coming-soon',
+    },
+    {
+      name: 'Float',
+      description: 'Real-time deals for bars & restaurants. Live happy hours near you.',
+      color: '#FFB800',
+      colorRgb: '255, 184, 0',
+      url: 'https://float.xomware.com',
+      logo: 'assets/img/float-placeholder.svg',
+      tag: 'iOS · Coming Soon',
+      status: 'coming-soon',
     },
   ];
 
@@ -90,55 +92,22 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
     this.isScrolled = window.scrollY > 50;
   }
 
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  closeMenu(): void {
+    this.menuOpen = false;
+  }
+
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.checkMobile();
-      if (this.isMobile) {
-        this.startMobileCycle();
-      } else {
-        this.resetIdleTimer();
-      }
       this.initScrollAnimations();
     }, 100);
   }
 
   ngOnDestroy(): void {
-    clearTimeout(this.idleTimer);
-    clearTimeout(this.mobileTimer);
     ScrollTrigger.getAll().forEach(t => t.kill());
-  }
-
-  @HostListener('window:resize')
-  onResize(): void {
-    const wasMobile = this.isMobile;
-    this.checkMobile();
-    if (this.isMobile && !wasMobile) {
-      this.startMobileCycle();
-    } else if (!this.isMobile && wasMobile) {
-      clearTimeout(this.mobileTimer);
-      this.monsterState = 'idle';
-      this.resetIdleTimer();
-    }
-  }
-
-  onCardHover(state: string): void {
-    if (this.isMobile) return;
-    this.monsterState = state;
-    this.resetIdleTimer();
-  }
-
-  onCardLeave(): void {
-    if (this.isMobile) return;
-    this.monsterState = 'idle';
-    this.resetIdleTimer();
-  }
-
-  onPageInteraction(): void {
-    if (this.isMobile) return;
-    if (this.monsterState === 'sleep') {
-      this.monsterState = 'idle';
-    }
-    this.resetIdleTimer();
   }
 
   private initScrollAnimations(): void {
@@ -155,10 +124,10 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
     });
 
     // Section headers slide in
-    gsap.utils.toArray('.section-header').forEach((header: any) => {
-      gsap.from(header, {
+    gsap.utils.toArray('.section-header').forEach((header: unknown) => {
+      gsap.from(header as gsap.TweenTarget, {
         scrollTrigger: {
-          trigger: header,
+          trigger: header as Element,
           start: 'top 85%',
           toggleActions: 'play none none reverse',
         },
@@ -198,32 +167,5 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
 
     // Refresh ScrollTrigger after all animations are set up
     ScrollTrigger.refresh();
-  }
-
-  private checkMobile(): void {
-    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const isSmallScreen = window.innerWidth <= 1024;
-    this.isMobile = isTouch && isSmallScreen;
-  }
-
-  private resetIdleTimer(): void {
-    clearTimeout(this.idleTimer);
-    this.idleTimer = setTimeout(() => {
-      if (this.monsterState === 'idle' && !this.isMobile) {
-        this.monsterState = 'sleep';
-      }
-    }, this.SLEEP_DELAY);
-  }
-
-  private startMobileCycle(): void {
-    const cycle = () => {
-      if (!this.isMobile) return;
-      const randomState = this.mobileStates[Math.floor(Math.random() * this.mobileStates.length)];
-      this.monsterState = randomState;
-      const delay = this.MOBILE_CYCLE_MIN + Math.random() * (this.MOBILE_CYCLE_MAX - this.MOBILE_CYCLE_MIN);
-      this.mobileTimer = setTimeout(cycle, delay);
-    };
-    const initialDelay = 2000 + Math.random() * 3000;
-    this.mobileTimer = setTimeout(cycle, initialDelay);
   }
 }
