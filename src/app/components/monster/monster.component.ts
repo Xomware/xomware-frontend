@@ -144,7 +144,7 @@ export class MonsterComponent implements AfterViewInit, OnDestroy {
   // ── Lightning ──────────────────────────────────
 
   private scheduleLightning(): void {
-    const delay = 4000 + Math.random() * 8000; // 4-12s between strikes
+    const delay = 1500 + Math.random() * 3500; // 1.5-5s between strikes
     this.lightningTimer = setTimeout(() => {
       this.strikeLightning();
       this.scheduleLightning();
@@ -162,7 +162,7 @@ export class MonsterComponent implements AfterViewInit, OnDestroy {
     const startY = Math.random() * 200;
 
     // Generate jagged bolt path
-    const path = this.generateBoltPath(startX, startY, 300 + Math.random() * 500);
+    const path = this.generateBoltPath(startX, startY, 500 + Math.random() * 700);
 
     // Pick a color from brand palette (weighted toward cyan)
     const color = Math.random() > 0.3
@@ -174,7 +174,7 @@ export class MonsterComponent implements AfterViewInit, OnDestroy {
     bolt.setAttribute('d', path);
     bolt.setAttribute('fill', 'none');
     bolt.setAttribute('stroke', color);
-    bolt.setAttribute('stroke-width', '2');
+    bolt.setAttribute('stroke-width', '3.5');
     bolt.setAttribute('stroke-linecap', 'round');
     bolt.setAttribute('filter', 'url(#lightningGlow)');
     bolt.setAttribute('opacity', '0');
@@ -195,7 +195,7 @@ export class MonsterComponent implements AfterViewInit, OnDestroy {
           branch.setAttribute('d', branchPath);
           branch.setAttribute('fill', 'none');
           branch.setAttribute('stroke', color);
-          branch.setAttribute('stroke-width', '1');
+          branch.setAttribute('stroke-width', '2');
           branch.setAttribute('stroke-linecap', 'round');
           branch.setAttribute('filter', 'url(#lightningGlow)');
           branch.setAttribute('opacity', '0');
