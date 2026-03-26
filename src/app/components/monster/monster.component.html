@@ -9,8 +9,9 @@
         <feGaussianBlur stdDeviation="3" />
       </filter>
       <filter id="lightningGlow">
-        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feGaussianBlur stdDeviation="6" result="blur" />
         <feMerge>
+          <feMergeNode in="blur" />
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
