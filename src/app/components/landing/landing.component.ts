@@ -6,6 +6,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CognitoService, XomUser } from '../../services/cognito.service';
 import { ProfileService } from '../../services/profile.service';
 import { UserProfile } from '../../models/user.model';
+import { Agent } from '../../models/agent.model';
+import { AGENTS } from '../../config/agents.config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,7 +31,7 @@ interface ReportTarget {
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.scss'],
+  styleUrls: ['./landing.component.scss', './agents-section.scss'],
 })
 export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
   isScrolled = false;
@@ -222,6 +224,9 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
     },
   ];
 
+  /** The Xomware agent fleet, rendered in the "Meet the Agents" section. */
+  agents: Agent[] = AGENTS;
+
   get webApps(): AppCard[] {
     return this.apps.filter(a => a.platform === 'web');
   }
@@ -335,6 +340,27 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
         });
       }
     });
+
+    // Agent cards stagger in as the grid enters the viewport
+    const agentGrid = document.querySelector('.agents-grid');
+    if (agentGrid) {
+      const agentCards = gsap.utils.toArray<Element>('.agent-card', agentGrid);
+      if (agentCards.length) {
+        gsap.set(agentCards, { opacity: 0, y: 60 });
+        gsap.to(agentCards, {
+          scrollTrigger: {
+            trigger: agentGrid,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+          opacity: 1,
+          y: 0,
+          stagger: 0.1,
+          duration: 0.7,
+          ease: 'power3.out',
+        });
+      }
+    }
 
     // Footer slide in
     gsap.from('.footer-inner', {
