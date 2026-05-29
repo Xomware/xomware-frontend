@@ -341,37 +341,6 @@
     </div>
   </section>
 
-  <!-- Agents Section -->
-  <section class="agents-section" id="agents">
-    <div class="section-header">
-      <span class="section-eyebrow">&#129302; The Team</span>
-      <h2 class="section-title">Meet the Agents</h2>
-      <p class="section-subtitle">The AI fleet that builds and maintains the Xomware platform.</p>
-    </div>
-
-    <div class="agents-grid">
-      <ng-container *ngFor="let agent of agents; let i = index">
-        <article
-          class="agent-card glass-card"
-          [style.--agent-color]="agent.color.primary"
-          [style.--agent-secondary]="agent.color.secondary"
-          [style.--agent-glow]="agent.color.glow"
-          [style.animation-delay]="(i * 0.1) + 's'"
-        >
-          <div class="card-glow" aria-hidden="true"></div>
-          <div class="agent-avatar" [attr.data-style]="agent.visualStyle" aria-hidden="true">
-            <span class="agent-avatar-art"></span>
-          </div>
-          <div class="agent-card-content">
-            <h3 class="agent-name">{{ agent.name }}</h3>
-            <span class="agent-specialty">{{ agent.specialty }}</span>
-            <p class="agent-description">{{ agent.description }}</p>
-          </div>
-        </article>
-      </ng-container>
-    </div>
-  </section>
-
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-inner">
