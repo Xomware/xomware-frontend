@@ -1,0 +1,166 @@
+<!-- Loading state -->
+<div class="wrapped-loading" *ngIf="state === 'loading'" aria-live="polite" aria-label="Loading wrapped archive">
+  <div class="skeleton skeleton-chips"></div>
+  <div class="skeleton-section">
+    <div class="skeleton skeleton-heading"></div>
+    <div class="skeleton-cards">
+      <div class="skeleton skeleton-card" *ngFor="let i of [1,2,3,4,5]"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Error state -->
+<div class="wrapped-error" *ngIf="state === 'error'" role="alert">
+  <div class="wrapped-error-inner">
+    <svg viewBox="0 0 24 24" class="wrapped-error-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+    </svg>
+    <p class="wrapped-error-msg">{{ errorMessage }}</p>
+    <button type="button" class="wrapped-retry-btn" (click)="load()">Try again</button>
+  </div>
+</div>
+
+<!-- Loaded state -->
+<ng-container *ngIf="state === 'loaded' && archive">
+  <!-- Empty archive -->
+  <p class="wrapped-empty" *ngIf="archive.months.length === 0">
+    No monthly archives yet.
+  </p>
+
+  <ng-container *ngIf="archive.months.length > 0 && selectedMonth">
+    <!-- Month selector chips -->
+    <div class="month-selector" role="group" aria-label="Select month">
+      <button
+        *ngFor="let month of archive.months; trackBy: trackByMonthKey"
+        type="button"
+        class="month-chip"
+        [class.month-chip--active]="month.monthKey === selectedMonthKey"
+        [attr.aria-pressed]="month.monthKey === selectedMonthKey"
+        (click)="selectMonth(month.monthKey)"
+      >
+        {{ month.label }}
+      </button>
+    </div>
+
+    <!-- Playlist CTA -->
+    <div class="wrapped-playlist-row" *ngIf="selectedMonth.playlistUrl">
+      <a
+        [href]="selectedMonth.playlistUrl"
+        target="_blank"
+        rel="noopener"
+        class="wrapped-playlist-btn"
+        [attr.aria-label]="'Open ' + selectedMonth.label + ' playlist on Spotify'"
+      >
+        <svg viewBox="0 0 24 24" class="wrapped-playlist-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" fill="currentColor"/>
+        </svg>
+        Open {{ selectedMonth.label }} playlist ↗
+      </a>
+    </div>
+
+    <!-- Top Tracks -->
+    <section class="wrapped-section" aria-labelledby="wrapped-tracks-heading">
+      <h3 id="wrapped-tracks-heading" class="wrapped-section-title">Top Tracks</h3>
+      <p class="wrapped-section-empty" *ngIf="selectedMonth.topTracks.length === 0">
+        No track data for this month.
+      </p>
+      <ol class="tracks-list" *ngIf="selectedMonth.topTracks.length > 0">
+        <li
+          *ngFor="let track of selectedMonth.topTracks; let i = index; trackBy: trackByTrackUrl"
+          class="track-item"
+        >
+          <span class="track-rank" aria-hidden="true">{{ i + 1 }}</span>
+          <a
+            [href]="track.url"
+            target="_blank"
+            rel="noopener"
+            class="track-link"
+            [attr.aria-label]="track.name + ' by ' + track.artist + ' — open on Spotify'"
+          >
+            <img
+              [src]="track.albumArt"
+              [alt]="track.name + ' album art'"
+              class="track-art"
+              loading="lazy"
+            />
+            <span class="track-info">
+              <span class="track-name">{{ track.name }}</span>
+              <span class="track-artist">{{ track.artist }}</span>
+            </span>
+            <svg viewBox="0 0 24 24" class="track-ext-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="currentColor"/>
+            </svg>
+          </a>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Top Artists -->
+    <section class="wrapped-section" aria-labelledby="wrapped-artists-heading">
+      <h3 id="wrapped-artists-heading" class="wrapped-section-title">Top Artists</h3>
+      <p class="wrapped-section-empty" *ngIf="selectedMonth.topArtists.length === 0">
+        No artist data for this month.
+      </p>
+      <ol class="artists-list" *ngIf="selectedMonth.topArtists.length > 0">
+        <li
+          *ngFor="let artist of selectedMonth.topArtists; let i = index; trackBy: trackByArtistUrl"
+          class="artist-item"
+        >
+          <span class="artist-rank" aria-hidden="true">{{ i + 1 }}</span>
+          <a
+            [href]="artist.url"
+            target="_blank"
+            rel="noopener"
+            class="artist-link"
+            [attr.aria-label]="artist.name + ' — open on Spotify'"
+          >
+            <img
+              [src]="artist.image"
+              [alt]="artist.name + ' artist photo'"
+              class="artist-img"
+              loading="lazy"
+            />
+            <span class="artist-name">{{ artist.name }}</span>
+            <svg viewBox="0 0 24 24" class="track-ext-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="currentColor"/>
+            </svg>
+          </a>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Top Genres -->
+    <section class="wrapped-section" aria-labelledby="wrapped-genres-heading">
+      <h3 id="wrapped-genres-heading" class="wrapped-section-title">Top Genres</h3>
+      <p class="wrapped-section-empty" *ngIf="selectedMonth.topGenres.length === 0">
+        No genre data for this month.
+      </p>
+      <div class="genres-list" *ngIf="selectedMonth.topGenres.length > 0" role="list">
+        <div
+          *ngFor="let genre of selectedMonth.topGenres; let i = index; trackBy: trackByGenre"
+          class="genre-item"
+          role="listitem"
+        >
+          <div class="genre-bar-row">
+            <span class="genre-rank" aria-hidden="true">{{ i + 1 }}</span>
+            <span class="genre-name">{{ genre.genre }}</span>
+            <span class="genre-count">{{ genre.count }}</span>
+          </div>
+          <div
+            class="genre-bar-track"
+            role="progressbar"
+            [attr.aria-valuenow]="genre.count"
+            [attr.aria-valuemin]="0"
+            [attr.aria-valuemax]="selectedMonth.topGenres[0].count"
+            [attr.aria-label]="genre.genre + ' — ' + genre.count + ' tracks'"
+          >
+            <div
+              class="genre-bar-fill"
+              [style.width.%]="(genre.count / selectedMonth.topGenres[0].count) * 100"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+</ng-container>

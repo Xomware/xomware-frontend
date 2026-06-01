@@ -1,0 +1,115 @@
+@import 'styles/variables';
+
+$ticker-item-gap: $spacing-xl;
+$ticker-duration: 40s;
+
+.ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid $glass-border;
+  border-bottom: 1px solid $glass-border;
+  background: rgba(10, 10, 20, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: $spacing-md 0;
+  position: relative;
+}
+
+.now-playing-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-xl;
+  border-bottom: 1px solid $glass-border;
+  margin-bottom: $spacing-md;
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: ticker-scroll $ticker-duration linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-row {
+  display: flex;
+  align-items: center;
+  gap: $ticker-item-gap;
+  padding: 0 calc($ticker-item-gap / 2);
+}
+
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  text-decoration: none;
+  color: $text-secondary;
+  flex-shrink: 0;
+  transition: color $transition-fast;
+  border-radius: $radius-md;
+  padding: $spacing-xs $spacing-sm;
+
+  &:hover {
+    color: $text-primary;
+
+    .ticker-item-img {
+      box-shadow: 0 0 0 2px $brand-cyan;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+  }
+}
+
+.ticker-item-img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+  transition: box-shadow $transition-fast;
+
+  .ticker-item--artist & {
+    border-radius: 50%;
+  }
+}
+
+.ticker-item-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ticker-item-label {
+  font-size: 13px;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ticker-item-sub {
+  font-size: 11px;
+  color: $text-muted;
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

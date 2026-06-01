@@ -1,0 +1,286 @@
+<div class="music-page">
+  <!-- Lightweight header — own brand + back link (locked: option b) -->
+  <header class="music-header">
+    <div class="music-header-inner">
+      <a routerLink="/" class="music-header-brand" aria-label="Back to xomware.com">
+        <img
+          src="assets/img/xomware-icon-transparent-background.png"
+          alt="Xomware"
+          class="music-header-logo"
+        />
+        <span class="music-header-wordmark">XOMWARE</span>
+      </a>
+      <a routerLink="/" class="music-back-link" aria-label="Back to xomware.com">
+        &larr; Back to xomware.com
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero / page title -->
+  <section class="music-hero">
+    <div class="music-hero-inner">
+      <div class="music-hero-eyebrow">
+        <svg viewBox="0 0 24 24" class="music-hero-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
+        </svg>
+        <span>Listening Stats</span>
+      </div>
+      <h1 class="music-hero-title">What Dom's been<br />listening to</h1>
+      <p class="music-hero-subtitle">
+        Powered by
+        <a href="https://xomify.xomware.com" target="_blank" rel="noopener" class="music-hero-link">Xomify</a>
+        via Spotify.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── Tab navigation ───────────────────────────── -->
+  <nav class="music-tabs-nav" aria-label="Music sections">
+    <div class="music-tabs-inner" role="tablist" aria-label="Music sections">
+      <button
+        type="button"
+        role="tab"
+        class="music-tab"
+        data-tab="now"
+        [class.music-tab--active]="activeTab === 'now'"
+        [attr.aria-selected]="activeTab === 'now'"
+        [attr.tabindex]="activeTab === 'now' ? 0 : -1"
+        id="tab-now"
+        aria-controls="tabpanel-now"
+        (click)="selectTab('now')"
+        (keydown)="onTabKeydown($event)"
+      >
+        <svg viewBox="0 0 24 24" class="music-tab-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
+        </svg>
+        Now
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="music-tab"
+        data-tab="radar"
+        [class.music-tab--active]="activeTab === 'radar'"
+        [attr.aria-selected]="activeTab === 'radar'"
+        [attr.tabindex]="activeTab === 'radar' ? 0 : -1"
+        id="tab-radar"
+        aria-controls="tabpanel-radar"
+        (click)="selectTab('radar')"
+        (keydown)="onTabKeydown($event)"
+      >
+        <svg viewBox="0 0 24 24" class="music-tab-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4.83L17 8v4.55c0 2.87-1.93 5.57-5 6.84-3.07-1.27-5-3.97-5-6.84V8l5-2.17z" fill="currentColor"/>
+        </svg>
+        Release Radar
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="music-tab"
+        data-tab="wrapped"
+        [class.music-tab--active]="activeTab === 'wrapped'"
+        [attr.aria-selected]="activeTab === 'wrapped'"
+        [attr.tabindex]="activeTab === 'wrapped' ? 0 : -1"
+        id="tab-wrapped"
+        aria-controls="tabpanel-wrapped"
+        (click)="selectTab('wrapped')"
+        (keydown)="onTabKeydown($event)"
+      >
+        <svg viewBox="0 0 24 24" class="music-tab-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z" fill="currentColor"/>
+        </svg>
+        Wrapped
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Tab panels ────────────────────────────────── -->
+
+  <!-- Now panel -->
+  <div
+    id="tabpanel-now"
+    role="tabpanel"
+    aria-labelledby="tab-now"
+    class="music-tabpanel"
+    [class.music-tabpanel--visible]="activeTab === 'now'"
+    [attr.hidden]="activeTab !== 'now' ? '' : null"
+  >
+    <!-- Loading state -->
+    <div class="music-loading" *ngIf="state === 'loading'" aria-live="polite" aria-label="Loading listening stats">
+      <div class="music-loading-inner">
+        <div class="skeleton-section">
+          <div class="skeleton skeleton-heading"></div>
+          <div class="skeleton-cards">
+            <div class="skeleton skeleton-card" *ngFor="let i of [1,2,3,4,5]"></div>
+          </div>
+        </div>
+        <div class="skeleton-section">
+          <div class="skeleton skeleton-heading"></div>
+          <div class="skeleton-cards">
+            <div class="skeleton skeleton-card" *ngFor="let i of [1,2,3,4,5]"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div class="music-error" *ngIf="state === 'error'" role="alert">
+      <div class="music-error-inner">
+        <svg viewBox="0 0 24 24" class="music-error-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+        </svg>
+        <p class="music-error-msg">{{ errorMessage }}</p>
+        <button type="button" class="music-retry-btn" (click)="load()">Try again</button>
+      </div>
+    </div>
+
+    <!-- Loaded state -->
+    <ng-container *ngIf="state === 'loaded' && profile">
+      <!-- Meta: window + updated timestamp -->
+      <div class="music-meta">
+        <span class="music-meta-window">{{ profile.windowLabel }}</span>
+        <span class="music-meta-updated">Updated {{ relativeTime(profile.updatedAt) }}</span>
+      </div>
+
+      <!-- Ticker — Now tab only -->
+      <app-music-ticker [profile]="profile" [nowPlaying]="null"></app-music-ticker>
+
+      <main class="music-content">
+
+        <!-- Top Tracks -->
+        <section class="music-section" aria-labelledby="top-tracks-heading">
+          <h2 id="top-tracks-heading" class="music-section-title">Top Tracks</h2>
+          <p class="music-section-empty" *ngIf="profile.topTracks.length === 0">
+            No track data available for this window.
+          </p>
+          <ol class="tracks-list" *ngIf="profile.topTracks.length > 0">
+            <li *ngFor="let track of profile.topTracks; let i = index" class="track-item">
+              <span class="track-rank" aria-hidden="true">{{ i + 1 }}</span>
+              <a
+                [href]="track.url"
+                target="_blank"
+                rel="noopener"
+                class="track-link"
+                [attr.aria-label]="track.name + ' by ' + track.artist + ' — open on Spotify'"
+              >
+                <img
+                  [src]="track.albumArt"
+                  [alt]="track.name + ' album art'"
+                  class="track-art"
+                  loading="lazy"
+                />
+                <span class="track-info">
+                  <span class="track-name">{{ track.name }}</span>
+                  <span class="track-artist">{{ track.artist }}</span>
+                </span>
+                <svg viewBox="0 0 24 24" class="track-ext-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="currentColor"/>
+                </svg>
+              </a>
+            </li>
+          </ol>
+        </section>
+
+        <!-- Top Artists -->
+        <section class="music-section" aria-labelledby="top-artists-heading">
+          <h2 id="top-artists-heading" class="music-section-title">Top Artists</h2>
+          <p class="music-section-empty" *ngIf="profile.topArtists.length === 0">
+            No artist data available for this window.
+          </p>
+          <ol class="artists-list" *ngIf="profile.topArtists.length > 0">
+            <li *ngFor="let artist of profile.topArtists; let i = index" class="artist-item">
+              <span class="artist-rank" aria-hidden="true">{{ i + 1 }}</span>
+              <a
+                [href]="artist.url"
+                target="_blank"
+                rel="noopener"
+                class="artist-link"
+                [attr.aria-label]="artist.name + ' — open on Spotify'"
+              >
+                <img
+                  [src]="artist.image"
+                  [alt]="artist.name + ' artist photo'"
+                  class="artist-img"
+                  loading="lazy"
+                />
+                <span class="artist-name">{{ artist.name }}</span>
+                <svg viewBox="0 0 24 24" class="track-ext-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="currentColor"/>
+                </svg>
+              </a>
+            </li>
+          </ol>
+        </section>
+
+        <!-- Top Genres -->
+        <section class="music-section" aria-labelledby="top-genres-heading">
+          <h2 id="top-genres-heading" class="music-section-title">Top Genres</h2>
+          <p class="music-section-empty" *ngIf="profile.topGenres.length === 0">
+            No genre data available for this window.
+          </p>
+          <div class="genres-list" *ngIf="profile.topGenres.length > 0" role="list">
+            <div
+              *ngFor="let genre of profile.topGenres; let i = index"
+              class="genre-item"
+              role="listitem"
+            >
+              <div class="genre-bar-row">
+                <span class="genre-rank" aria-hidden="true">{{ i + 1 }}</span>
+                <span class="genre-name">{{ genre.genre }}</span>
+                <span class="genre-count">{{ genre.count }}</span>
+              </div>
+              <div
+                class="genre-bar-track"
+                role="progressbar"
+                [attr.aria-valuenow]="genre.count"
+                [attr.aria-valuemin]="0"
+                [attr.aria-valuemax]="profile.topGenres[0].count"
+                [attr.aria-label]="genre.genre + ' — ' + genre.count + ' tracks'"
+              >
+                <div
+                  class="genre-bar-fill"
+                  [style.width.%]="(genre.count / profile.topGenres[0].count) * 100"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </ng-container>
+  </div>
+
+  <!-- Release Radar panel — lazy: only rendered after first activation -->
+  <div
+    *ngIf="activatedTabs.has('radar')"
+    id="tabpanel-radar"
+    role="tabpanel"
+    aria-labelledby="tab-radar"
+    class="music-tabpanel music-tabpanel--content"
+    [class.music-tabpanel--visible]="activeTab === 'radar'"
+    [attr.hidden]="activeTab !== 'radar' ? '' : null"
+  >
+    <app-music-release-radar></app-music-release-radar>
+  </div>
+
+  <!-- Wrapped panel — lazy: only rendered after first activation -->
+  <div
+    *ngIf="activatedTabs.has('wrapped')"
+    id="tabpanel-wrapped"
+    role="tabpanel"
+    aria-labelledby="tab-wrapped"
+    class="music-tabpanel music-tabpanel--content"
+    [class.music-tabpanel--visible]="activeTab === 'wrapped'"
+    [attr.hidden]="activeTab !== 'wrapped' ? '' : null"
+  >
+    <app-music-wrapped></app-music-wrapped>
+  </div>
+
+  <!-- Footer -->
+  <footer class="music-footer">
+    <div class="music-footer-inner">
+      <span class="music-footer-copy">&copy; 2026 Xomware. All rights reserved.</span>
+      <a routerLink="/privacy" class="music-footer-link">Privacy</a>
+    </div>
+  </footer>
+</div>

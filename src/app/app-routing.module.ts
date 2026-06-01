@@ -14,6 +14,7 @@ import { CallbackComponent } from './components/auth/callback/callback.component
 import { ProfileComponent } from './components/auth/profile/profile.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { PrivacyComponent } from './components/privacy/privacy.component';
+import { MusicComponent } from './components/music/music.component';
 
 const routes: Routes = [
   // Landing is intentionally public so Google OAuth verification can confirm
@@ -21,6 +22,8 @@ const routes: Routes = [
   // tolerates `user: null` (no menu, just the public marketing view).
   { path: '', component: LandingComponent },
   { path: 'privacy', component: PrivacyComponent },
+  // Public route — Dom's listening stats, no auth required
+  { path: 'music', component: MusicComponent },
   { path: 'auth/sign-in', component: SignInComponent },
   { path: 'auth/sign-up', component: SignUpComponent },
   { path: 'auth/verify', component: VerifyComponent },

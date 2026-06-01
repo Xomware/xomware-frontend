@@ -1,0 +1,63 @@
+<!-- Loading state -->
+<div class="radar-loading" *ngIf="state === 'loading'" aria-live="polite" aria-label="Loading release radar">
+  <div class="skeleton-grid">
+    <div class="skeleton skeleton-release" *ngFor="let i of [1,2,3,4,5,6]"></div>
+  </div>
+</div>
+
+<!-- Error state -->
+<div class="radar-error" *ngIf="state === 'error'" role="alert">
+  <div class="radar-error-inner">
+    <svg viewBox="0 0 24 24" class="radar-error-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+    </svg>
+    <p class="radar-error-msg">{{ errorMessage }}</p>
+    <button type="button" class="radar-retry-btn" (click)="load()">Try again</button>
+  </div>
+</div>
+
+<!-- Loaded state -->
+<ng-container *ngIf="state === 'loaded' && radarProfile">
+  <div class="radar-meta">
+    <span class="radar-meta-window">{{ radarProfile.windowLabel }}</span>
+    <span class="radar-meta-count">{{ radarProfile.releases.length }} releases</span>
+  </div>
+
+  <!-- Empty state -->
+  <p class="radar-empty" *ngIf="radarProfile.releases.length === 0">
+    No new releases this week.
+  </p>
+
+  <!-- Release grid -->
+  <div class="radar-grid" *ngIf="radarProfile.releases.length > 0" role="list">
+    <a
+      *ngFor="let release of radarProfile.releases; trackBy: trackByUrl"
+      [href]="release.url"
+      target="_blank"
+      rel="noopener"
+      class="radar-card"
+      role="listitem"
+      [attr.aria-label]="release.name + ' by ' + release.artist + ', ' + typeBadgeLabel(release.type) + ' — open on Spotify'"
+    >
+      <div class="radar-card-art-wrap">
+        <img
+          [src]="release.albumArt"
+          [alt]="release.name + ' cover art'"
+          class="radar-card-art"
+          loading="lazy"
+        />
+        <span class="radar-card-type-badge" [class]="'radar-card-type-badge--' + release.type" aria-hidden="true">
+          {{ typeBadgeLabel(release.type) }}
+        </span>
+      </div>
+      <div class="radar-card-body">
+        <span class="radar-card-name">{{ release.name }}</span>
+        <span class="radar-card-artist">{{ release.artist }}</span>
+        <span class="radar-card-date">{{ relativeDate(release.releaseDate) }}</span>
+      </div>
+      <svg viewBox="0 0 24 24" class="radar-card-ext-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="currentColor"/>
+      </svg>
+    </a>
+  </div>
+</ng-container>
