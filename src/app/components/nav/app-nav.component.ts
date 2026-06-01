@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  Input,
   OnDestroy,
   OnInit,
 } from '@angular/core';
@@ -22,6 +23,13 @@ interface ReportTarget {
   styleUrls: ['./app-nav.component.scss'],
 })
 export class AppNavComponent implements OnInit, OnDestroy {
+  /**
+   * When true the nav always renders with its solid/scrolled background —
+   * use this on pages without a tall hero where the transparent nav would
+   * float over a light-colored or empty background and make links unreadable.
+   */
+  @Input() alwaysScrolled = false;
+
   isScrolled = false;
   menuOpen = false;
   reportMenuOpen = false;
@@ -45,7 +53,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
       (p) => (this.profile = p),
     );
     // Seed scroll state in case the component mounts after the user has scrolled.
-    this.isScrolled = window.scrollY > 50;
+    this.isScrolled = this.alwaysScrolled || window.scrollY > 50;
   }
 
   ngOnDestroy(): void {
@@ -101,7 +109,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll')
   onScroll(): void {
-    this.isScrolled = window.scrollY > 50;
+    this.isScrolled = this.alwaysScrolled || window.scrollY > 50;
   }
 
   @HostListener('document:click', ['$event'])

@@ -9,14 +9,29 @@
   flex-direction: column;
 }
 
+// ── Page-level ticker bar (under nav, above hero) ────
+.music-ticker-bar {
+  // Sits directly below the fixed nav (57px) — acts as the first element
+  // the user sees, edge-anchored like a header strip.
+  position: relative;
+  z-index: 1;
+  margin-top: 57px; // nav height
+
+  // The ticker component uses the full-bleed breakout pattern internally.
+  // Our container just needs to be position:relative with no overflow:hidden
+  // so the negative-margin breakout can escape.
+  overflow: visible;
+}
+
 // ── Hero ─────────────────────────────────────────────
 .music-hero {
   background: $hero-gradient;
-  // Push down below the fixed AppNavComponent (~57px tall)
-  padding: calc($spacing-4xl + 57px) $spacing-xl $spacing-3xl;
+  // The fixed nav (57px) + ticker bar are already above this.
+  // Just add normal section padding — no extra nav offset needed.
+  padding: $spacing-4xl $spacing-xl $spacing-3xl;
 
   @media (max-width: $breakpoint-md) {
-    padding: calc($spacing-3xl + 57px) $spacing-md $spacing-2xl;
+    padding: $spacing-3xl $spacing-md $spacing-2xl;
   }
 }
 
@@ -216,45 +231,66 @@
   color: $text-muted;
 }
 
-// ── Time-range switcher ───────────────────────────────
+// ── Time-range segmented control ─────────────────────
+//
+// Glass tray containing pill-shaped option segments.
+// Active segment gets a filled brand-cyan pill with dark text;
+// inactive segments are ghost and fade-hover.
+//
 .range-switcher {
   display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs;
+  background: $bg-glass-heavy;
   border: 1px solid $glass-border;
   border-radius: $radius-pill;
-  overflow: hidden;
-  gap: 0;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .range-btn {
-  background: none;
+  position: relative;
+  background: transparent;
   border: none;
-  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-pill;
+  padding: 5px $spacing-md;
   font-size: 12px;
-  font-weight: $font-weight-medium;
+  font-weight: $font-weight-semibold;
   font-family: $font-stack;
   color: $text-secondary;
   cursor: pointer;
-  transition: background $transition-fast, color $transition-fast;
   white-space: nowrap;
+  letter-spacing: 0.01em;
+  transition:
+    color $transition-fast,
+    background $transition-fast,
+    box-shadow $transition-fast;
 
-  &:hover:not(:disabled) {
+  &:hover:not(:disabled):not(.range-btn--active) {
     color: $text-primary;
     background: rgba(255, 255, 255, 0.06);
   }
 
   &:focus-visible {
     outline: 2px solid $brand-cyan;
-    outline-offset: -2px;
+    outline-offset: 2px;
+    border-radius: $radius-pill;
   }
 
   &--active {
-    background: rgba($brand-cyan, 0.12);
-    color: $brand-cyan;
+    background: $brand-cyan;
+    color: $bg-dark;
+    box-shadow: 0 2px 12px rgba(0, 180, 216, 0.35);
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: 5px $spacing-sm;
   }
 }
 
