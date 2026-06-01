@@ -24,6 +24,16 @@
   <!-- Shared site navbar -->
   <app-nav></app-nav>
 
+  <!-- ── Music ticker — sticky under fixed nav ──────────── -->
+  <!-- Rendered once at the top; stays pinned while scrolling. Positioned
+       here (above the hero) so it pins correctly in the sticky stack:
+       fixed nav → sticky ticker → hero content scrolls under both. -->
+  <div class="landing-ticker-top" *ngIf="landingTickerProfile" aria-label="Music ticker">
+    <app-music-ticker [profile]="landingTickerProfile" [nowPlaying]="null"></app-music-ticker>
+  </div>
+  <!-- Spacer so hero content starts below the sticky ticker -->
+  <div class="landing-ticker-spacer" *ngIf="landingTickerProfile"></div>
+
   <!-- Hero / Profile Section -->
   <header class="hero" id="hero">
     <div class="hero-content">
@@ -105,10 +115,11 @@
           <svg viewBox="0 0 24 24" class="btn-icon"><path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z" fill="currentColor"/></svg>
         </a>
       </div>
-      <!-- Now listening pill — only renders when something is playing -->
-      <div class="hero-now-playing-wrap">
-        <app-now-playing [showWhenIdle]="false"></app-now-playing>
-      </div>
+      <!-- Music snapshot module — replaces the isolated now-playing pill -->
+      <app-music-snapshot
+        [profile]="landingTickerProfile"
+        [nowPlayingState]="nowPlayingState"
+      ></app-music-snapshot>
     </div>
     <!-- Scroll hint -->
     <div class="scroll-hint">
@@ -200,11 +211,6 @@
       </ng-container>
     </div>
   </section>
-
-  <!-- Music ticker — footer strip, very bottom of page before footer -->
-  <div class="landing-ticker-wrap" *ngIf="landingTickerProfile">
-    <app-music-ticker [profile]="landingTickerProfile" [nowPlaying]="null"></app-music-ticker>
-  </div>
 
   <!-- Footer -->
   <footer class="footer">

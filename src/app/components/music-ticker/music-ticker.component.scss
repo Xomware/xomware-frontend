@@ -1,8 +1,8 @@
 @import 'styles/variables';
 
 $ticker-item-gap: $spacing-xl;
-// 25% faster than the original 40s
-$ticker-duration: 30s;
+// Slightly slower than 30s — keeps the strip readable without dragging back to 40s.
+$ticker-duration: 36s;
 
 .ticker-wrap {
   // Full-bleed: breaks out of any constrained parent container.
@@ -185,24 +185,35 @@ $ticker-duration: 30s;
 }
 
 // ── Powered by Xomify badge ───────────────────────
-.ticker-badge {
+// The badge is a flex container holding two sibling links: the logo and the
+// text label. Keeping them as separate <a> elements gives independent focus
+// targets while visually reading as one unit.
+.ticker-badge-wrap {
   display: inline-flex;
   align-items: center;
-  gap: $spacing-sm;
-  text-decoration: none;
+  gap: $spacing-xs;
   flex-shrink: 0;
   padding: 4px $spacing-md;
   border-radius: $radius-pill;
   background: rgba($xomify-purple, 0.08);
   border: 1px solid rgba($xomify-purple, 0.2);
-  transition: background $transition-fast, border-color $transition-fast;
   // Group boundary: more breathing room
   margin-left: $spacing-xl;
+  transition: background $transition-fast, border-color $transition-fast;
 
-  &:hover {
+  &:hover,
+  &:focus-within {
     background: rgba($xomify-purple, 0.15);
     border-color: rgba($xomify-purple, 0.35);
   }
+}
+
+.ticker-badge-logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  border-radius: $radius-sm;
 
   &:focus-visible {
     outline: 2px solid $xomify-purple;
@@ -211,17 +222,29 @@ $ticker-duration: 30s;
 }
 
 .ticker-badge-logo {
-  width: 18px;
-  height: 18px;
+  width: 26px;
+  height: 26px;
   object-fit: contain;
   border-radius: $radius-sm;
   flex-shrink: 0;
 }
 
+.ticker-badge-text-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  border-radius: $radius-sm;
+
+  &:focus-visible {
+    outline: 2px solid $xomify-purple;
+    outline-offset: 2px;
+  }
+}
+
 .ticker-badge-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: $font-weight-semibold;
   letter-spacing: 0.02em;
-  color: rgba($xomify-purple, 0.85);
+  color: rgba($xomify-purple, 0.9);
   white-space: nowrap;
 }

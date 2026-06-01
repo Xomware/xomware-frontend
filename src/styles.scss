@@ -8,6 +8,15 @@
   padding: 0;
 }
 
+:root {
+  // Sticky stack heights — keep these in sync with the actual rendered heights.
+  // Nav is fixed at 57px (padding-md on unscrolled, padding-sm when scrolled;
+  // the rendered height stays ~57px across both states).
+  // Ticker bar renders ~78px (album thumb 36px + 2 text lines + padding-md top/bottom).
+  --nav-h: 57px;
+  --ticker-h: 78px;
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;

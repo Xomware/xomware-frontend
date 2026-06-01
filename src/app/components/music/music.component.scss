@@ -9,16 +9,19 @@
   flex-direction: column;
 }
 
-// ── Page-level ticker bar (under nav, above hero) ────
+// ── Page-level ticker bar — sticky under fixed nav ───
+// Stack: fixed nav (z:1000) → sticky ticker (z:90) → sticky tabs (z:80)
+// Each subsequent sticky element uses `top` = sum of all elements above it.
 .music-ticker-bar {
-  // Sits directly below the fixed nav (57px) — acts as the first element
-  // the user sees, edge-anchored like a header strip.
-  position: relative;
-  z-index: 1;
-  margin-top: 57px; // nav height
+  position: sticky;
+  top: var(--nav-h);          // pins flush under the fixed nav
+  z-index: 90;
+  // Spacer for the fixed nav — only needed on the ticker since it's the
+  // first in-flow element (hero comes after tabs, not between ticker+tabs).
+  margin-top: var(--nav-h);
 
   // The ticker component uses the full-bleed breakout pattern internally.
-  // Our container just needs to be position:relative with no overflow:hidden
+  // Our container just needs to be position:sticky with no overflow:hidden
   // so the negative-margin breakout can escape.
   overflow: visible;
 }
@@ -26,8 +29,7 @@
 // ── Hero ─────────────────────────────────────────────
 .music-hero {
   background: $hero-gradient;
-  // The fixed nav (57px) + ticker bar are already above this.
-  // Just add normal section padding — no extra nav offset needed.
+  // Ticker and tabs are sticky above this — no extra offset needed here.
   padding: $spacing-4xl $spacing-xl $spacing-3xl;
 
   @media (max-width: $breakpoint-md) {
@@ -92,16 +94,19 @@
   }
 }
 
-// ── Tab navigation ───────────────────────────────────
+// ── Tab navigation — sticky below nav + ticker ────────
+// No full-width border-bottom: the border was spanning the entire viewport
+// making tabs look disconnected from content. Instead the active-tab indicator
+// (border-bottom on .music-tab--active) is scoped to just the tab width.
 .music-tabs-nav {
   background: $bg-glass-heavy;
-  border-bottom: 1px solid $glass-border;
   backdrop-filter: $glass-blur;
   -webkit-backdrop-filter: $glass-blur;
+  border-bottom: 1px solid $glass-border;
   position: sticky;
-  // AppNavComponent is fixed at z-index:1000 and ~57px tall.
-  top: 57px;
-  z-index: 90;
+  // Pin directly below the sticky ticker: nav height + ticker height.
+  top: calc(var(--nav-h) + var(--ticker-h));
+  z-index: 80;
 }
 
 .music-tabs-inner {
@@ -414,27 +419,45 @@
   }
 }
 
-// ── Main content ─────────────────────────────────────
+// ── Main content — 3-column dashboard on ≥md ─────────
+// Desktop: Tracks | Artists | Genres side-by-side so the page feels like a
+// dashboard rather than a scrolling list.
+// Mobile: stack columns, with a quick-jump chip row above them.
 .music-content {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: $spacing-3xl $spacing-xl;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-4xl;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-xl;
+  align-items: start;
+
+  @media (max-width: $breakpoint-lg) {
+    max-width: 900px;
+    // 2-column: Tracks | Artists, then Genres full-width
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-lg;
+  }
 
   @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
     padding: $spacing-2xl $spacing-md;
     gap: $spacing-3xl;
   }
 }
 
 // ── Section shared ───────────────────────────────────
+// Each section is one grid column. background + border give it a card feel
+// so the 3-col layout reads as a dashboard, not a raw grid.
 .music-section {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+  background: rgba(20, 20, 40, 0.45);
+  border: 1px solid $glass-border;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
 }
 
 .music-section-title {
@@ -451,6 +474,50 @@
   font-size: 14px;
   font-style: italic;
   margin: 0;
+}
+
+// ── Mobile quick-jump chips (Tracks / Artists / Genres) ─
+// Hidden on desktop (grid makes scrolling unnecessary). On mobile, sits above
+// the stacked columns so users can anchor-scroll directly to a section.
+.music-jump-chips {
+  display: none;
+
+  @media (max-width: $breakpoint-md) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: $spacing-md $spacing-md 0;
+  }
+}
+
+.music-jump-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: 5px $spacing-md;
+  background: $bg-card;
+  border: 1px solid $glass-border;
+  border-radius: $radius-pill;
+  font-size: 12px;
+  font-weight: $font-weight-semibold;
+  font-family: $font-stack;
+  color: $text-secondary;
+  text-decoration: none;
+  transition: background $transition-fast, color $transition-fast, border-color $transition-fast;
+  white-space: nowrap;
+
+  &:hover {
+    background: $brand-cyan-subtle;
+    color: $brand-cyan;
+    border-color: rgba($brand-cyan, 0.3);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+  }
 }
 
 // ── Tracks list ──────────────────────────────────────

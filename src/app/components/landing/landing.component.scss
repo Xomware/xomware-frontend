@@ -771,24 +771,24 @@
   50% { transform: translateY(5px); }
 }
 
-// ── Landing-page now playing pill ───────────────
-.hero-now-playing-wrap {
-  margin-top: $spacing-xl;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-
-  // The component renders nothing when not playing, so no empty-space cost.
-  app-now-playing {
-    display: block;
-  }
+// ── Landing: sticky ticker (top, under fixed nav) ────
+// Fixed nav is z:1000. Ticker sticks directly under it.
+.landing-ticker-top {
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 90;
+  // Push in-flow content below the nav so the ticker is the first thing
+  // seen after the nav; the margin-top accounts for the fixed nav offset.
+  margin-top: var(--nav-h);
+  overflow: visible; // allow ticker's full-bleed breakout
 }
 
-// ── Landing-page ticker ──────────────────────────
-.landing-ticker-wrap {
-  width: 100%;
-  position: relative;
-  z-index: 1;
+// Spacer so the hero starts below both the fixed nav AND sticky ticker.
+// Height = ticker height (defined in --ticker-h). Only rendered when the
+// ticker has data (same *ngIf as .landing-ticker-top).
+.landing-ticker-spacer {
+  height: var(--ticker-h);
+  flex-shrink: 0;
 }
 
 // ── Responsive ───────────────────────────────────

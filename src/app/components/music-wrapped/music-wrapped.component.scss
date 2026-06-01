@@ -240,16 +240,35 @@
   flex-shrink: 0;
 }
 
+// ── 3-column grid container for wrapped data ──────────
+// Mirrors the Now tab layout: Tracks | Artists | Genres side-by-side on
+// desktop, stacked on mobile.
+.wrapped-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-xl;
+  align-items: start;
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-lg;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+    gap: $spacing-3xl;
+  }
+}
+
 // ── Section shared ───────────────────────────────────
 .wrapped-section {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
-  margin-bottom: $spacing-4xl;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  background: rgba(20, 20, 40, 0.45);
+  border: 1px solid $glass-border;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
 }
 
 .wrapped-section-title {

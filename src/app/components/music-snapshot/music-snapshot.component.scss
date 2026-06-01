@@ -1,0 +1,370 @@
+@import 'styles/variables';
+
+.snapshot {
+  width: 100%;
+  max-width: 900px;
+  margin: $spacing-3xl auto 0;
+  padding: $spacing-xl;
+  background: rgba(20, 20, 40, 0.5);
+  border: 1px solid $glass-border;
+  border-radius: $radius-xl;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+// ── Header row: eyebrow label + CTA ──────────────────
+.snapshot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+  gap: $spacing-md;
+}
+
+.snapshot-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: 11px;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $brand-cyan;
+}
+
+.snapshot-eyebrow-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.snapshot-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: $font-weight-semibold;
+  color: $brand-cyan;
+  text-decoration: none;
+  padding: 5px $spacing-md;
+  border: 1px solid rgba($brand-cyan, 0.3);
+  border-radius: $radius-pill;
+  transition: background $transition-fast, border-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: rgba($brand-cyan, 0.08);
+    border-color: rgba($brand-cyan, 0.5);
+    color: $brand-cyan-light;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+  }
+}
+
+.snapshot-cta-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+// ── Now playing / last played card ────────────────────
+.snapshot-now {
+  margin-bottom: $spacing-lg;
+}
+
+.snapshot-now-inner {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid $glass-border;
+  border-radius: $radius-lg;
+  text-decoration: none;
+  color: $text-primary;
+  transition: background $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    background: rgba($brand-cyan, 0.05);
+    border-color: rgba($brand-cyan, 0.2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+    border-radius: $radius-lg;
+  }
+
+  &--playing {
+    border-color: rgba($brand-cyan, 0.2);
+  }
+}
+
+.snapshot-now-art-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+}
+
+.snapshot-now-art {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  display: block;
+}
+
+// Animated bars overlay
+.snapshot-now-bars {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 2px 3px;
+  border-radius: 3px;
+
+  @media (prefers-reduced-motion: reduce) {
+    display: none;
+  }
+}
+
+.sbar {
+  display: block;
+  width: 2px;
+  background: $brand-cyan;
+  border-radius: 1px;
+  transform-origin: bottom;
+  animation: sbar-bounce 0.9s ease-in-out infinite;
+
+  &-1 { height: 6px;  animation-delay: 0s; }
+  &-2 { height: 10px; animation-delay: 0.2s; }
+  &-3 { height: 5px;  animation-delay: 0.4s; }
+}
+
+@keyframes sbar-bounce {
+  0%, 100% { transform: scaleY(0.4); }
+  50%       { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sbar { animation: none !important; }
+}
+
+.snapshot-now-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+
+.snapshot-now-label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $brand-cyan;
+
+  &--recent {
+    color: $text-muted;
+  }
+}
+
+.snapshot-now-played-at {
+  font-size: 10px;
+  font-weight: $font-weight-medium;
+  text-transform: none;
+  letter-spacing: 0;
+  color: $text-muted;
+  opacity: 0.7;
+}
+
+.snapshot-now-track {
+  font-size: 14px;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.snapshot-now-artist {
+  font-size: 12px;
+  color: $text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.snapshot-now-spotify {
+  width: 16px;
+  height: 16px;
+  color: #1DB954;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+// ── Data grid: Tracks | Artists | Genres ─────────────
+.snapshot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-lg;
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
+  }
+}
+
+.snapshot-col-heading {
+  font-size: 11px;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $text-muted;
+  margin: 0 0 $spacing-md;
+}
+
+// ── List shared ───────────────────────────────────────
+.snapshot-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.snapshot-rank {
+  font-size: 11px;
+  font-weight: $font-weight-bold;
+  color: $text-muted;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+// ── Track / Artist items ──────────────────────────────
+.snapshot-track-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.snapshot-track-link {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+  text-decoration: none;
+  color: $text-primary;
+  padding: 4px $spacing-sm;
+  border-radius: $radius-md;
+  min-width: 0;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+
+    .snapshot-track-name {
+      color: $brand-cyan-light;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+    border-radius: $radius-md;
+  }
+}
+
+.snapshot-thumb {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+
+  &--circle {
+    border-radius: 50%;
+  }
+}
+
+.snapshot-track-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+
+.snapshot-track-name {
+  font-size: 13px;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color $transition-fast;
+}
+
+.snapshot-track-sub {
+  font-size: 11px;
+  color: $text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Genre items ───────────────────────────────────────
+.snapshot-genre-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: 4px $spacing-sm;
+}
+
+.snapshot-genre-name {
+  font-size: 13px;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+}
+
+.snapshot-genre-count {
+  font-size: 11px;
+  color: $text-muted;
+  min-width: 20px;
+  text-align: right;
+}
+
+// ── Responsive ───────────────────────────────────────
+@media (max-width: $breakpoint-md) {
+  .snapshot {
+    padding: $spacing-md;
+    margin-top: $spacing-2xl;
+  }
+}
+
+// ── Reduced motion ────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .sbar,
+  .snapshot-track-link,
+  .snapshot-now-inner,
+  .snapshot-cta {
+    transition: none !important;
+  }
+}
