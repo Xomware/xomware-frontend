@@ -115,11 +115,6 @@
           <svg viewBox="0 0 24 24" class="btn-icon"><path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z" fill="currentColor"/></svg>
         </a>
       </div>
-      <!-- Music snapshot module — replaces the isolated now-playing pill -->
-      <app-music-snapshot
-        [profile]="landingTickerProfile"
-        [nowPlayingState]="nowPlayingState"
-      ></app-music-snapshot>
     </div>
     <!-- Scroll hint -->
     <div class="scroll-hint">
@@ -129,6 +124,16 @@
       </svg>
     </div>
   </header>
+
+  <!-- Music snapshot — outside .hero-content so it is NOT faded by the
+       hero ScrollTrigger (which targets .hero-content only). Sits in its
+       own section between the hero and the app cards. -->
+  <section class="music-snapshot-section" *ngIf="landingTickerProfile" aria-label="Now playing">
+    <app-music-snapshot
+      [profile]="landingTickerProfile"
+      [nowPlayingState]="nowPlayingState"
+    ></app-music-snapshot>
+  </section>
 
   <!-- App Cards Section -->
   <section class="apps-section" id="apps">

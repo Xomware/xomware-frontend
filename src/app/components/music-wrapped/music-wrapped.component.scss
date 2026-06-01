@@ -154,50 +154,80 @@
   text-align: center;
 }
 
-// ── Month selector chips ──────────────────────────────
+// ── Month selector dropdown ───────────────────────────
 .month-selector {
   display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-sm;
+  align-items: center;
+  gap: $spacing-md;
   margin-bottom: $spacing-xl;
 }
 
-.month-chip {
+.month-selector-label {
   font-size: 13px;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.month-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.month-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: $bg-glass-heavy;
+  border: 1px solid $glass-border;
+  border-radius: $radius-md;
+  color: $text-primary;
+  font-size: 14px;
   font-weight: $font-weight-medium;
   font-family: $font-stack;
-  color: $text-secondary;
-  background: $bg-card;
-  border: 1px solid $glass-border;
-  border-radius: $radius-pill;
-  padding: $spacing-xs $spacing-md;
+  padding: $spacing-sm $spacing-3xl $spacing-sm $spacing-md;
   cursor: pointer;
   transition:
-    background $transition-fast,
-    color $transition-fast,
-    border-color $transition-fast;
+    border-color $transition-fast,
+    background $transition-fast;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  min-width: 160px;
+
+  // Option background inherits from system; can't style option internals
+  // cross-browser, so keep select bg dark for contrast.
+  option {
+    background: #141428;
+    color: $text-primary;
+  }
 
   &:hover {
-    background: $bg-card-hover;
-    color: $text-primary;
     border-color: $glass-border-hover;
   }
 
   &:focus-visible {
     outline: 2px solid $brand-cyan;
     outline-offset: 2px;
+    border-color: $brand-cyan;
   }
 
-  &--active {
-    background: $brand-cyan-subtle;
-    color: $brand-cyan;
-    border-color: rgba(0, 180, 216, 0.3);
-
-    &:hover {
-      background: rgba(0, 180, 216, 0.14);
-      color: $brand-cyan-light;
-    }
+  @media (max-width: $breakpoint-sm) {
+    min-width: 140px;
+    font-size: 13px;
   }
+}
+
+.month-select-caret {
+  position: absolute;
+  right: $spacing-sm;
+  width: 16px;
+  height: 16px;
+  color: $text-muted;
+  pointer-events: none;
+  flex-shrink: 0;
 }
 
 // ── Playlist CTA ─────────────────────────────────────
@@ -247,7 +277,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: $spacing-xl;
-  align-items: start;
+  align-items: stretch;
 
   @media (max-width: $breakpoint-lg) {
     grid-template-columns: repeat(2, 1fr);
@@ -261,10 +291,12 @@
 }
 
 // ── Section shared ───────────────────────────────────
+// height: 100% + flex-column stretches all three cards to the tallest.
 .wrapped-section {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+  height: 100%;
   background: rgba(20, 20, 40, 0.45);
   border: 1px solid $glass-border;
   border-radius: $radius-lg;

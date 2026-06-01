@@ -94,19 +94,12 @@
   }
 }
 
-// ── Tab navigation — sticky below nav + ticker ────────
-// No full-width border-bottom: the border was spanning the entire viewport
-// making tabs look disconnected from content. Instead the active-tab indicator
-// (border-bottom on .music-tab--active) is scoped to just the tab width.
+// ── Tab navigation — inline strip, contained to content width ────────
+// Not sticky: the full-width sticky band looked like a floating bar
+// disconnected from the cards below. Now it flows with the page content,
+// contained to the same max-width as the cards.
 .music-tabs-nav {
-  background: $bg-glass-heavy;
-  backdrop-filter: $glass-blur;
-  -webkit-backdrop-filter: $glass-blur;
-  border-bottom: 1px solid $glass-border;
-  position: sticky;
-  // Pin directly below the sticky ticker: nav height + ticker height.
-  top: calc(var(--nav-h) + var(--ticker-h));
-  z-index: 80;
+  // No full-width line — the underline is contained to content width below.
 }
 
 .music-tabs-inner {
@@ -115,6 +108,7 @@
   padding: 0 $spacing-xl;
   display: flex;
   gap: 0;
+  border-bottom: 1px solid $glass-border;
 
   @media (max-width: $breakpoint-md) {
     padding: 0 $spacing-md;
@@ -431,7 +425,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: $spacing-xl;
-  align-items: start;
+  align-items: stretch;
 
   @media (max-width: $breakpoint-lg) {
     max-width: 900px;
@@ -450,10 +444,12 @@
 // ── Section shared ───────────────────────────────────
 // Each section is one grid column. background + border give it a card feel
 // so the 3-col layout reads as a dashboard, not a raw grid.
+// height: 100% + flex-column lets all three cards stretch to equal height.
 .music-section {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+  height: 100%;
   background: rgba(20, 20, 40, 0.45);
   border: 1px solid $glass-border;
   border-radius: $radius-lg;
