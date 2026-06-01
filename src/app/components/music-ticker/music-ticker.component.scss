@@ -1,7 +1,8 @@
 @import 'styles/variables';
 
 $ticker-item-gap: $spacing-xl;
-$ticker-duration: 40s;
+// 25% faster than the original 40s
+$ticker-duration: 30s;
 
 .ticker-wrap {
   // Full-bleed: breaks out of any constrained parent container.
@@ -18,15 +19,6 @@ $ticker-duration: 40s;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: $spacing-md 0;
-}
-
-.now-playing-slot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: $spacing-sm $spacing-xl;
-  border-bottom: 1px solid $glass-border;
-  margin-bottom: $spacing-md;
 }
 
 .ticker-track {
@@ -52,12 +44,49 @@ $ticker-duration: 40s;
 .ticker-row {
   display: flex;
   align-items: center;
-  gap: $ticker-item-gap;
+  gap: $spacing-md;
   padding: 0 calc($ticker-item-gap / 2);
 }
 
+// ── Category divider label ────────────────────────
+.ticker-divider {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+  // Left breathing room before each group
+  margin-left: $spacing-xl;
+}
+
+.ticker-divider-timeframe {
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+.ticker-divider-sep {
+  color: $text-muted;
+  font-size: 12px;
+  opacity: 0.4;
+}
+
+.ticker-divider-label {
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $brand-cyan;
+  padding: 2px $spacing-sm;
+  background: $brand-cyan-subtle;
+  border: 1px solid rgba($brand-cyan, 0.18);
+  border-radius: $radius-pill;
+}
+
+// ── Track / artist / genre items ──────────────────
 .ticker-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: $spacing-sm;
   text-decoration: none;
@@ -81,16 +110,43 @@ $ticker-duration: 40s;
   }
 }
 
+.ticker-item-img-wrap {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .ticker-item-img {
   width: 36px;
   height: 36px;
   object-fit: cover;
   border-radius: $radius-sm;
-  flex-shrink: 0;
   transition: box-shadow $transition-fast;
 
   .ticker-item--artist & {
     border-radius: 50%;
+  }
+}
+
+// Genre icon placeholder (music note in a subtle circle)
+.ticker-item-genre-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba($brand-cyan, 0.08);
+  border: 1px solid rgba($brand-cyan, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $brand-cyan;
+  flex-shrink: 0;
+
+  svg {
+    width: 18px;
+    height: 18px;
   }
 }
 
@@ -117,4 +173,55 @@ $ticker-duration: 40s;
   max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+// Inter-item dot separator
+.ticker-dot {
+  font-size: 12px;
+  color: $text-muted;
+  opacity: 0.35;
+  margin-left: $spacing-xs;
+  flex-shrink: 0;
+}
+
+// ── Powered by Xomify badge ───────────────────────
+.ticker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  text-decoration: none;
+  flex-shrink: 0;
+  padding: 4px $spacing-md;
+  border-radius: $radius-pill;
+  background: rgba($xomify-purple, 0.08);
+  border: 1px solid rgba($xomify-purple, 0.2);
+  transition: background $transition-fast, border-color $transition-fast;
+  // Group boundary: more breathing room
+  margin-left: $spacing-xl;
+
+  &:hover {
+    background: rgba($xomify-purple, 0.15);
+    border-color: rgba($xomify-purple, 0.35);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $xomify-purple;
+    outline-offset: 2px;
+  }
+}
+
+.ticker-badge-logo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.ticker-badge-label {
+  font-size: 11px;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.02em;
+  color: rgba($xomify-purple, 0.85);
+  white-space: nowrap;
 }

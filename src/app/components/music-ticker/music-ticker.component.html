@@ -1,56 +1,120 @@
 <div class="ticker-wrap" aria-label="Scrolling music highlights" role="region">
-  <!-- Now-playing slot (v2 — null in v1) -->
-  <div class="now-playing-slot" *ngIf="nowPlaying" aria-label="Now playing">
-    <ng-content></ng-content>
-  </div>
-
-  <div class="ticker-track" *ngIf="items.length > 0" aria-hidden="true">
-    <!-- Two identical rows make a seamless loop -->
+  <div class="ticker-track" *ngIf="segments.length > 0" aria-hidden="true">
+    <!-- Primary row — these anchors ARE accessible (tabindex="-1" since
+         they're inside aria-hidden; the aria-hidden is on ticker-track,
+         not the outer region, so AT skips the marquee without losing the landmark) -->
     <div class="ticker-row ticker-row--a">
-      <a
-        *ngFor="let item of items"
-        [href]="item.url"
-        target="_blank"
-        rel="noopener"
-        class="ticker-item"
-        [class.ticker-item--track]="item.type === 'track'"
-        [class.ticker-item--artist]="item.type === 'artist'"
-        tabindex="-1"
-      >
-        <img
-          [src]="item.imageUrl"
-          [alt]="item.type === 'track' ? item.label + ' album art' : item.label + ' artist photo'"
-          class="ticker-item-img"
-          loading="lazy"
-        />
-        <span class="ticker-item-text">
-          <span class="ticker-item-label">{{ item.label }}</span>
-          <span class="ticker-item-sub">{{ item.sub }}</span>
+      <ng-container *ngFor="let seg of segments">
+
+        <!-- Category divider / label -->
+        <span class="ticker-divider" *ngIf="isDivider(seg)">
+          <span class="ticker-divider-timeframe">{{ seg.timeframe }}</span>
+          <span class="ticker-divider-sep" aria-hidden="true">·</span>
+          <span class="ticker-divider-label">{{ seg.label }}</span>
         </span>
-      </a>
+
+        <!-- Track / artist / genre item -->
+        <a
+          *ngIf="isItem(seg)"
+          [href]="seg.url"
+          target="_blank"
+          rel="noopener"
+          class="ticker-item"
+          [class.ticker-item--track]="seg.type === 'track'"
+          [class.ticker-item--artist]="seg.type === 'artist'"
+          [class.ticker-item--genre]="seg.type === 'genre'"
+          tabindex="-1"
+        >
+          <span class="ticker-item-img-wrap">
+            <img
+              *ngIf="seg.imageUrl"
+              [src]="seg.imageUrl"
+              [alt]="seg.type === 'track' ? seg.label + ' album art' : seg.label"
+              class="ticker-item-img"
+              loading="lazy"
+            />
+            <span *ngIf="!seg.imageUrl" class="ticker-item-genre-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/></svg>
+            </span>
+          </span>
+          <span class="ticker-item-text">
+            <span class="ticker-item-label">{{ seg.label }}</span>
+            <span class="ticker-item-sub">{{ seg.sub }}</span>
+          </span>
+          <span class="ticker-dot" aria-hidden="true">·</span>
+        </a>
+
+        <!-- Powered by Xomify badge -->
+        <a
+          *ngIf="isBadge(seg)"
+          [href]="xomifyUrl"
+          target="_blank"
+          rel="noopener"
+          class="ticker-badge"
+          tabindex="-1"
+        >
+          <img [src]="xomifyLogo" alt="Xomify" class="ticker-badge-logo" />
+          <span class="ticker-badge-label">Powered by Xomify</span>
+        </a>
+
+      </ng-container>
     </div>
+
+    <!-- Duplicate row for seamless loop — aria-hidden so AT only sees one set -->
     <div class="ticker-row ticker-row--b" aria-hidden="true">
-      <a
-        *ngFor="let item of items"
-        [href]="item.url"
-        target="_blank"
-        rel="noopener"
-        class="ticker-item"
-        [class.ticker-item--track]="item.type === 'track'"
-        [class.ticker-item--artist]="item.type === 'artist'"
-        tabindex="-1"
-      >
-        <img
-          [src]="item.imageUrl"
-          [alt]="item.type === 'track' ? item.label + ' album art' : item.label + ' artist photo'"
-          class="ticker-item-img"
-          loading="lazy"
-        />
-        <span class="ticker-item-text">
-          <span class="ticker-item-label">{{ item.label }}</span>
-          <span class="ticker-item-sub">{{ item.sub }}</span>
+      <ng-container *ngFor="let seg of segments">
+
+        <span class="ticker-divider" *ngIf="isDivider(seg)">
+          <span class="ticker-divider-timeframe">{{ seg.timeframe }}</span>
+          <span class="ticker-divider-sep" aria-hidden="true">·</span>
+          <span class="ticker-divider-label">{{ seg.label }}</span>
         </span>
-      </a>
+
+        <a
+          *ngIf="isItem(seg)"
+          [href]="seg.url"
+          target="_blank"
+          rel="noopener"
+          class="ticker-item"
+          [class.ticker-item--track]="seg.type === 'track'"
+          [class.ticker-item--artist]="seg.type === 'artist'"
+          [class.ticker-item--genre]="seg.type === 'genre'"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <span class="ticker-item-img-wrap">
+            <img
+              *ngIf="seg.imageUrl"
+              [src]="seg.imageUrl"
+              [alt]="''"
+              class="ticker-item-img"
+              loading="lazy"
+            />
+            <span *ngIf="!seg.imageUrl" class="ticker-item-genre-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/></svg>
+            </span>
+          </span>
+          <span class="ticker-item-text">
+            <span class="ticker-item-label">{{ seg.label }}</span>
+            <span class="ticker-item-sub">{{ seg.sub }}</span>
+          </span>
+          <span class="ticker-dot" aria-hidden="true">·</span>
+        </a>
+
+        <a
+          *ngIf="isBadge(seg)"
+          [href]="xomifyUrl"
+          target="_blank"
+          rel="noopener"
+          class="ticker-badge"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <img [src]="xomifyLogo" alt="" class="ticker-badge-logo" />
+          <span class="ticker-badge-label">Powered by Xomify</span>
+        </a>
+
+      </ng-container>
     </div>
   </div>
 </div>

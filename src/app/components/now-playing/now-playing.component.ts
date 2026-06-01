@@ -4,14 +4,22 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { Subscription, interval } from 'rxjs';
-import { switchMap, startWith } from 'rxjs/operators';
+import { Subscription, interval, of } from 'rxjs';
+import { switchMap, startWith, catchError } from 'rxjs/operators';
 import { NowPlayingService } from '../../services/now-playing.service';
 import { NowPlayingState } from '../../models/now-playing.model';
 import { environment } from '../../../environments/environment';
 
 /** Polling interval in milliseconds. */
 const POLL_INTERVAL_MS = 25_000;
+
+/** Safe idle state emitted when a poll request errors, so the interval keeps firing. */
+const IDLE_STATE: NowPlayingState = {
+  isPlaying: false,
+  track: null,
+  progressMs: null,
+  durationMs: null,
+};
 
 /**
  * Polls the now-playing endpoint every 25 seconds and displays the
@@ -43,16 +51,15 @@ export class NowPlayingComponent implements OnInit, OnDestroy {
       .pipe(
         startWith(0),
         switchMap(() =>
-          this.nowPlayingService.getNowPlaying(environment.musicProfileUserId),
+          this.nowPlayingService
+            .getNowPlaying(environment.musicProfileUserId)
+            .pipe(
+              // On error emit a safe idle state so the outer interval keeps firing.
+              catchError(() => of(IDLE_STATE)),
+            ),
         ),
       )
-      .subscribe({
-        next: (s) => (this.state = s),
-        error: () => {
-          // On error, keep stale state if available; otherwise null.
-          if (!this.state) this.state = null;
-        },
-      });
+      .subscribe((s) => (this.state = s));
   }
 
   ngOnDestroy(): void {
