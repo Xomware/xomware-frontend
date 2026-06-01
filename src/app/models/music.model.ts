@@ -1,3 +1,5 @@
+export type MusicRange = 'short_term' | 'medium_term' | 'long_term';
+
 export interface TopTrack {
   name: string;
   artist: string;
@@ -16,7 +18,7 @@ export interface TopGenre {
   count: number;
 }
 
-/** v2 — shape TBD with backend */
+/** Stub kept for ticker component input compatibility. */
 export interface NowPlaying {}
 
 export interface MusicProfile {

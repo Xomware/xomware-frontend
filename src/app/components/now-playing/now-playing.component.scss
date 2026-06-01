@@ -1,0 +1,207 @@
+@import 'styles/variables';
+
+.now-playing {
+  // Card container — blends with surrounding content
+  border-radius: $radius-lg;
+  overflow: hidden;
+
+  &--idle {
+    opacity: 0.55;
+  }
+}
+
+.now-playing-inner {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  background: $bg-glass;
+  border: 1px solid $glass-border;
+  border-radius: $radius-lg;
+  text-decoration: none;
+  color: $text-primary;
+  transition: background $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    background: rgba(0, 180, 216, 0.06);
+    border-color: rgba($brand-cyan, 0.25);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+    border-radius: $radius-lg;
+  }
+
+  &--idle {
+    cursor: default;
+    pointer-events: none;
+
+    &:hover {
+      background: $bg-glass;
+      border-color: $glass-border;
+    }
+  }
+}
+
+// ── Album art ────────────────────────────────────────
+.now-playing-art-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+
+  &--idle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: $radius-sm;
+  }
+}
+
+.now-playing-art {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  display: block;
+}
+
+.now-playing-idle-icon {
+  width: 24px;
+  height: 24px;
+  color: $text-muted;
+}
+
+// ── Animated bars (playing indicator) ───────────────
+.now-playing-bars {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 3px;
+  border-radius: $radius-sm;
+
+  @media (prefers-reduced-motion: reduce) {
+    display: none;
+  }
+}
+
+.bar {
+  display: block;
+  width: 3px;
+  background: $brand-cyan;
+  border-radius: 1px;
+  transform-origin: bottom;
+  animation: bar-bounce 0.9s ease-in-out infinite;
+
+  &-1 { height: 8px;  animation-delay: 0s; }
+  &-2 { height: 12px; animation-delay: 0.2s; }
+  &-3 { height: 6px;  animation-delay: 0.4s; }
+}
+
+@keyframes bar-bounce {
+  0%, 100% { transform: scaleY(0.4); }
+  50%       { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar { animation: none !important; }
+}
+
+// ── Track info ───────────────────────────────────────
+.now-playing-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+
+.now-playing-label {
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $brand-cyan;
+}
+
+.now-playing-track {
+  font-size: 15px;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &--idle {
+    font-size: 13px;
+    font-weight: $font-weight-medium;
+    color: $text-muted;
+  }
+}
+
+.now-playing-artist {
+  font-size: 13px;
+  color: $text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Progress bar ─────────────────────────────────────
+.now-playing-progress-wrap {
+  // Sits below the main row — spans full width of the card
+  // We apply it as a flex child so it stacks on its own row
+  // by making it 100% wide and breaking the flex row
+  width: 100%;
+  order: 10; // push after all other flex children
+}
+
+// The outer card must flex-wrap for the progress row to break
+.now-playing-inner {
+  flex-wrap: wrap;
+}
+
+.now-playing-progress-bar {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: $radius-pill;
+  overflow: hidden;
+  margin-top: $spacing-sm;
+}
+
+.now-playing-progress-fill {
+  height: 100%;
+  background: $brand-cyan;
+  border-radius: $radius-pill;
+  transition: width 1s linear;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+// ── Spotify icon ────────────────────────────────────
+.now-playing-spotify-icon {
+  width: 18px;
+  height: 18px;
+  color: #1DB954;
+  flex-shrink: 0;
+  opacity: 0.8;
+  transition: opacity $transition-fast;
+
+  .now-playing-inner:hover & {
+    opacity: 1;
+  }
+}
+
+// ── Compact landing pill variant ─────────────────────
+// The landing uses this component with showWhenIdle=false,
+// so we only see it when something is playing.
+// No extra variant styles needed — the default card works.

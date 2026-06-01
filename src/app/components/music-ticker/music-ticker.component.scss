@@ -4,7 +4,13 @@ $ticker-item-gap: $spacing-xl;
 $ticker-duration: 40s;
 
 .ticker-wrap {
-  width: 100%;
+  // Full-bleed: breaks out of any constrained parent container.
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   overflow: hidden;
   border-top: 1px solid $glass-border;
   border-bottom: 1px solid $glass-border;
@@ -12,7 +18,6 @@ $ticker-duration: 40s;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: $spacing-md 0;
-  position: relative;
 }
 
 .now-playing-slot {

@@ -9,81 +9,14 @@
   flex-direction: column;
 }
 
-// ── Header ──────────────────────────────────────────
-.music-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: $bg-glass-heavy;
-  backdrop-filter: $glass-blur;
-  -webkit-backdrop-filter: $glass-blur;
-  border-bottom: 1px solid $glass-border;
-}
-
-.music-header-inner {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: $spacing-md $spacing-xl;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  @media (max-width: $breakpoint-md) {
-    padding: $spacing-sm $spacing-md;
-  }
-}
-
-.music-header-brand {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  text-decoration: none;
-  color: $text-primary;
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 4px;
-    border-radius: $radius-sm;
-  }
-}
-
-.music-header-logo {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-}
-
-.music-header-wordmark {
-  font-size: 14px;
-  font-weight: $font-weight-bold;
-  letter-spacing: 0.12em;
-  color: $text-primary;
-}
-
-.music-back-link {
-  font-size: 13px;
-  color: $brand-cyan;
-  text-decoration: none;
-  transition: color $transition-fast;
-
-  &:hover {
-    color: $brand-cyan-light;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 4px;
-    border-radius: $radius-sm;
-  }
-}
-
 // ── Hero ─────────────────────────────────────────────
 .music-hero {
   background: $hero-gradient;
-  padding: $spacing-4xl $spacing-xl $spacing-3xl;
+  // Push down below the fixed AppNavComponent (~57px tall)
+  padding: calc($spacing-4xl + 57px) $spacing-xl $spacing-3xl;
 
   @media (max-width: $breakpoint-md) {
-    padding: $spacing-3xl $spacing-md $spacing-2xl;
+    padding: calc($spacing-3xl + 57px) $spacing-md $spacing-2xl;
   }
 }
 
@@ -151,7 +84,8 @@
   backdrop-filter: $glass-blur;
   -webkit-backdrop-filter: $glass-blur;
   position: sticky;
-  top: 57px; // sits below the sticky header
+  // AppNavComponent is fixed at z-index:1000 and ~57px tall.
+  top: 57px;
   z-index: 90;
 }
 
@@ -239,6 +173,17 @@
   }
 }
 
+// ── Now Playing (on /music) ───────────────────────────
+.music-now-playing-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: $spacing-lg $spacing-xl 0;
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md $spacing-md 0;
+  }
+}
+
 // ── Meta bar ─────────────────────────────────────────
 .music-meta {
   display: flex;
@@ -269,6 +214,73 @@
 .music-meta-updated {
   font-size: 12px;
   color: $text-muted;
+}
+
+// ── Time-range switcher ───────────────────────────────
+.range-switcher {
+  display: inline-flex;
+  border: 1px solid $glass-border;
+  border-radius: $radius-pill;
+  overflow: hidden;
+  gap: 0;
+}
+
+.range-btn {
+  background: none;
+  border: none;
+  padding: $spacing-xs $spacing-md;
+  font-size: 12px;
+  font-weight: $font-weight-medium;
+  font-family: $font-stack;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: background $transition-fast, color $transition-fast;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: -2px;
+  }
+
+  &--active {
+    background: rgba($brand-cyan, 0.12);
+    color: $brand-cyan;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Loading spinner dot for range switching
+.range-loading {
+  display: inline-flex;
+  align-items: center;
+}
+
+.range-loading-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $brand-cyan;
+  animation: range-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes range-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .range-loading-dot {
+    animation: none !important;
+  }
 }
 
 // ── Loading skeletons ─────────────────────────────────

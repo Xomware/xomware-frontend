@@ -21,153 +21,8 @@
   </main>
 
 <ng-container *ngIf="user">
-  <!-- Sticky Navigation -->
-  <nav class="sticky-nav" [class.scrolled]="isScrolled">
-    <div class="nav-inner">
-      <a routerLink="/" class="nav-brand">
-        <img src="assets/img/xomware-icon-transparent-background.png" alt="Xomware" class="nav-logo" />
-        <span class="nav-wordmark">XOMWARE</span>
-      </a>
-      <div class="nav-links">
-        <a routerLink="/" fragment="apps" class="nav-link">Apps</a>
-        <a href="#agents" class="nav-link">Agents</a>
-        <a routerLink="/music" class="nav-link">Music</a>
-        <a href="https://github.com/Xomware" target="_blank" rel="noopener" class="nav-link nav-link-github">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="nav-icon">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" fill="currentColor"/>
-          </svg>
-          GitHub
-        </a>
-        <div class="report-menu-wrapper">
-          <button
-            type="button"
-            class="nav-link report-menu-trigger"
-            (click)="toggleReportMenu($event)"
-            [attr.aria-expanded]="reportMenuOpen"
-            aria-haspopup="menu"
-          >
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="nav-icon" aria-hidden="true">
-              <path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" fill="currentColor"/>
-            </svg>
-            Report Issue
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="report-menu-caret" [class.open]="reportMenuOpen" aria-hidden="true">
-              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="currentColor"/>
-            </svg>
-          </button>
-          <div class="report-menu" role="menu" *ngIf="reportMenuOpen">
-            <span class="report-menu-header">Choose an app</span>
-            <a
-              *ngFor="let target of reportTargets"
-              [href]="reportUrl(target.repo)"
-              target="_blank"
-              rel="noopener"
-              role="menuitem"
-              class="report-menu-item"
-              (click)="closeReportMenu()"
-            >
-              <span class="report-menu-label">{{ target.label }}</span>
-              <span class="report-menu-repo">{{ target.repo }}</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Sign in / user menu -->
-        <ng-container *ngIf="!user">
-          <a routerLink="/auth/sign-in" class="nav-link nav-link-signin">Sign in</a>
-        </ng-container>
-        <div class="user-menu-wrapper" *ngIf="user">
-          <button
-            type="button"
-            class="nav-link user-menu-trigger"
-            (click)="toggleUserMenu($event)"
-            [attr.aria-expanded]="userMenuOpen"
-            aria-haspopup="menu"
-            [attr.aria-label]="'Account menu for ' + userLabel"
-          >
-            <span class="user-menu-avatar" [class.has-image]="profile?.avatarUrl">
-              <img
-                *ngIf="profile?.avatarUrl as src"
-                [src]="src"
-                [alt]="''"
-              />
-              <span *ngIf="!profile?.avatarUrl" class="user-menu-avatar-initial" aria-hidden="true">
-                {{ userInitial }}
-              </span>
-            </span>
-            <span class="user-menu-handle">{{ userLabel }}</span>
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="report-menu-caret" [class.open]="userMenuOpen" aria-hidden="true">
-              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="currentColor"/>
-            </svg>
-          </button>
-          <div class="report-menu user-menu" role="menu" *ngIf="userMenuOpen">
-            <a routerLink="/profile" role="menuitem" class="report-menu-item" (click)="closeUserMenu()">
-              <span class="report-menu-label">Profile</span>
-            </a>
-            <a *ngIf="isAdmin" routerLink="/admin" role="menuitem" class="report-menu-item" (click)="closeUserMenu()">
-              <span class="report-menu-label">Admin portal</span>
-            </a>
-            <button type="button" role="menuitem" class="report-menu-item user-menu-signout" (click)="signOut()">
-              <span class="report-menu-label">Sign out</span>
-            </button>
-          </div>
-        </div>
-      </div>
-      <button class="nav-hamburger" (click)="toggleMenu()" [class.open]="menuOpen" aria-label="Toggle menu">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- Mobile Menu Overlay -->
-  <div class="mobile-menu-overlay" [class.open]="menuOpen" (click)="closeMenu()">
-    <nav class="mobile-menu" (click)="$event.stopPropagation()">
-      <a routerLink="/" fragment="apps" class="mobile-menu-link" (click)="closeMenu()">Apps</a>
-      <a href="#agents" class="mobile-menu-link" (click)="closeMenu()">Agents</a>
-      <a routerLink="/music" class="mobile-menu-link" (click)="closeMenu()">Music</a>
-      <a href="https://github.com/Xomware" target="_blank" rel="noopener" class="mobile-menu-link" (click)="closeMenu()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="mobile-menu-icon">
-          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" fill="currentColor"/>
-        </svg>
-        GitHub
-      </a>
-      <div class="mobile-menu-section">
-        <span class="mobile-menu-section-label">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="mobile-menu-icon" aria-hidden="true">
-            <path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" fill="currentColor"/>
-          </svg>
-          Report Issue
-        </span>
-        <a
-          *ngFor="let target of reportTargets"
-          [href]="reportUrl(target.repo)"
-          target="_blank"
-          rel="noopener"
-          class="mobile-menu-sublink"
-          (click)="closeMenu()"
-        >
-          {{ target.label }}
-        </a>
-      </div>
-
-      <ng-container *ngIf="!user">
-        <a routerLink="/auth/sign-in" class="mobile-menu-link" (click)="closeMenu()">Sign in</a>
-      </ng-container>
-      <ng-container *ngIf="user">
-        <a routerLink="/profile" class="mobile-menu-link" (click)="closeMenu()">
-          &#64;{{ user.preferredUsername || user.username }}
-        </a>
-        <button
-          type="button"
-          class="mobile-menu-link mobile-menu-signout"
-          (click)="signOut(); closeMenu()"
-        >
-          Sign out
-        </button>
-      </ng-container>
-    </nav>
-  </div>
+  <!-- Shared site navbar -->
+  <app-nav></app-nav>
 
   <!-- Hero / Profile Section -->
   <header class="hero" id="hero">
@@ -202,7 +57,6 @@
           class="profile-link-btn"
           aria-label="LinkedIn"
         >
-          <!-- LinkedIn icon -->
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="profile-link-icon" aria-hidden="true">
             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" fill="currentColor"/>
           </svg>
@@ -250,6 +104,10 @@
           Explore Apps
           <svg viewBox="0 0 24 24" class="btn-icon"><path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z" fill="currentColor"/></svg>
         </a>
+      </div>
+      <!-- Now listening pill — only renders when something is playing -->
+      <div class="hero-now-playing-wrap">
+        <app-now-playing [showWhenIdle]="false"></app-now-playing>
       </div>
     </div>
     <!-- Scroll hint -->
@@ -343,36 +201,10 @@
     </div>
   </section>
 
-  <!-- Agents Section -->
-  <section class="agents-section" id="agents">
-    <div class="section-header">
-      <span class="section-eyebrow">&#129302; The Team</span>
-      <h2 class="section-title">Meet the Agents</h2>
-      <p class="section-subtitle">The AI fleet that builds and maintains the Xomware platform.</p>
-    </div>
-
-    <div class="agents-grid">
-      <ng-container *ngFor="let agent of agents; let i = index">
-        <article
-          class="agent-card glass-card"
-          [style.--agent-color]="agent.color.primary"
-          [style.--agent-secondary]="agent.color.secondary"
-          [style.--agent-glow]="agent.color.glow"
-          [style.animation-delay]="(i * 0.1) + 's'"
-        >
-          <div class="card-glow" aria-hidden="true"></div>
-          <div class="agent-avatar" [attr.data-style]="agent.visualStyle" aria-hidden="true">
-            <span class="agent-avatar-art"></span>
-          </div>
-          <div class="agent-card-content">
-            <h3 class="agent-name">{{ agent.name }}</h3>
-            <span class="agent-specialty">{{ agent.specialty }}</span>
-            <p class="agent-description">{{ agent.description }}</p>
-          </div>
-        </article>
-      </ng-container>
-    </div>
-  </section>
+  <!-- Music ticker on landing — fed from landing's own MusicService fetch -->
+  <div class="landing-ticker-wrap" *ngIf="landingTickerProfile">
+    <app-music-ticker [profile]="landingTickerProfile" [nowPlaying]="null"></app-music-ticker>
+  </div>
 
   <!-- Footer -->
   <footer class="footer">
