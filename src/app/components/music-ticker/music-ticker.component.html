@@ -45,18 +45,28 @@
           <span class="ticker-dot" aria-hidden="true">·</span>
         </a>
 
-        <!-- Powered by Xomify badge -->
-        <a
-          *ngIf="isBadge(seg)"
-          [href]="xomifyUrl"
-          target="_blank"
-          rel="noopener"
-          class="ticker-badge"
-          tabindex="-1"
-        >
-          <img [src]="xomifyLogo" alt="Xomify" class="ticker-badge-logo" />
-          <span class="ticker-badge-label">Powered by Xomify</span>
-        </a>
+        <!-- Powered by Xomify badge — logo link + text link side by side -->
+        <span *ngIf="isBadge(seg)" class="ticker-badge-wrap">
+          <a
+            [href]="xomifyUrl"
+            target="_blank"
+            rel="noopener"
+            class="ticker-badge-logo-link"
+            aria-label="Xomify"
+            tabindex="-1"
+          >
+            <img [src]="xomifyLogo" alt="Xomify logo" class="ticker-badge-logo" />
+          </a>
+          <a
+            [href]="xomifyUrl"
+            target="_blank"
+            rel="noopener"
+            class="ticker-badge-text-link"
+            tabindex="-1"
+          >
+            <span class="ticker-badge-label">Powered by Xomify</span>
+          </a>
+        </span>
 
       </ng-container>
     </div>
@@ -102,18 +112,14 @@
           <span class="ticker-dot" aria-hidden="true">·</span>
         </a>
 
-        <a
-          *ngIf="isBadge(seg)"
-          [href]="xomifyUrl"
-          target="_blank"
-          rel="noopener"
-          class="ticker-badge"
-          tabindex="-1"
-          aria-hidden="true"
-        >
-          <img [src]="xomifyLogo" alt="" class="ticker-badge-logo" />
-          <span class="ticker-badge-label">Powered by Xomify</span>
-        </a>
+        <span *ngIf="isBadge(seg)" class="ticker-badge-wrap" aria-hidden="true">
+          <span class="ticker-badge-logo-link">
+            <img [src]="xomifyLogo" alt="" class="ticker-badge-logo" />
+          </span>
+          <span class="ticker-badge-text-link">
+            <span class="ticker-badge-label">Powered by Xomify</span>
+          </span>
+        </span>
 
       </ng-container>
     </div>

@@ -1,0 +1,134 @@
+<section class="snapshot" aria-labelledby="snapshot-heading" *ngIf="hasData || isPlaying || isRecent">
+  <div class="snapshot-header">
+    <div class="snapshot-eyebrow">
+      <svg viewBox="0 0 24 24" class="snapshot-eyebrow-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
+      </svg>
+      <span>Listening Snapshot</span>
+    </div>
+    <a routerLink="/music" class="snapshot-cta" aria-label="View full music stats">
+      View music
+      <svg viewBox="0 0 24 24" class="snapshot-cta-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Now playing / last played -->
+  <div class="snapshot-now" *ngIf="isPlaying || isRecent">
+    <a
+      [href]="nowPlayingState!.track!.url"
+      target="_blank"
+      rel="noopener"
+      class="snapshot-now-inner"
+      [class.snapshot-now-inner--playing]="isPlaying"
+      [attr.aria-label]="(isPlaying ? 'Now playing: ' : 'Last played: ') + nowPlayingState!.track!.name + ' by ' + nowPlayingState!.track!.artist"
+    >
+      <div class="snapshot-now-art-wrap">
+        <img
+          [src]="nowPlayingState!.track!.albumArt"
+          [alt]="nowPlayingState!.track!.name + ' album art'"
+          class="snapshot-now-art"
+          loading="lazy"
+        />
+        <!-- Animated bars only when actively playing -->
+        <div class="snapshot-now-bars" aria-hidden="true" *ngIf="isPlaying">
+          <span class="sbar sbar-1"></span>
+          <span class="sbar sbar-2"></span>
+          <span class="sbar sbar-3"></span>
+        </div>
+      </div>
+      <div class="snapshot-now-info">
+        <span class="snapshot-now-label" [class.snapshot-now-label--recent]="isRecent">
+          {{ isPlaying ? 'Now playing' : 'Last played' }}
+          <span
+            class="snapshot-now-played-at"
+            *ngIf="isRecent && nowPlayingState!.playedAt"
+          >{{ relativeTime(nowPlayingState!.playedAt!) }}</span>
+        </span>
+        <span class="snapshot-now-track">{{ nowPlayingState!.track!.name }}</span>
+        <span class="snapshot-now-artist">{{ nowPlayingState!.track!.artist }}</span>
+      </div>
+      <svg class="snapshot-now-spotify" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" fill="currentColor"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Top data grid: Tracks | Artists | Genres -->
+  <div class="snapshot-grid" *ngIf="hasData">
+
+    <!-- Top Tracks -->
+    <div class="snapshot-col" *ngIf="topTracks.length > 0">
+      <h3 class="snapshot-col-heading" id="snapshot-heading">Top Tracks</h3>
+      <ol class="snapshot-list">
+        <li *ngFor="let track of topTracks; let i = index" class="snapshot-track-item">
+          <span class="snapshot-rank" aria-hidden="true">{{ i + 1 }}</span>
+          <a
+            [href]="track.url"
+            target="_blank"
+            rel="noopener"
+            class="snapshot-track-link"
+            [attr.aria-label]="track.name + ' by ' + track.artist + ' — open on Spotify'"
+          >
+            <img
+              [src]="track.albumArt"
+              [alt]="track.name + ' album art'"
+              class="snapshot-thumb"
+              loading="lazy"
+            />
+            <span class="snapshot-track-info">
+              <span class="snapshot-track-name">{{ track.name }}</span>
+              <span class="snapshot-track-sub">{{ track.artist }}</span>
+            </span>
+          </a>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Top Artists -->
+    <div class="snapshot-col" *ngIf="topArtists.length > 0">
+      <h3 class="snapshot-col-heading">Top Artists</h3>
+      <ol class="snapshot-list">
+        <li *ngFor="let artist of topArtists; let i = index" class="snapshot-track-item">
+          <span class="snapshot-rank" aria-hidden="true">{{ i + 1 }}</span>
+          <a
+            [href]="artist.url"
+            target="_blank"
+            rel="noopener"
+            class="snapshot-track-link"
+            [attr.aria-label]="artist.name + ' — open on Spotify'"
+          >
+            <img
+              [src]="artist.image"
+              [alt]="artist.name + ' artist photo'"
+              class="snapshot-thumb snapshot-thumb--circle"
+              loading="lazy"
+            />
+            <span class="snapshot-track-info">
+              <span class="snapshot-track-name">{{ artist.name }}</span>
+              <span class="snapshot-track-sub">Artist</span>
+            </span>
+          </a>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Top Genres -->
+    <div class="snapshot-col" *ngIf="topGenres.length > 0">
+      <h3 class="snapshot-col-heading">Top Genres</h3>
+      <ol class="snapshot-list" role="list">
+        <li
+          *ngFor="let genre of topGenres; let i = index"
+          class="snapshot-genre-item"
+          role="listitem"
+        >
+          <span class="snapshot-rank" aria-hidden="true">{{ i + 1 }}</span>
+          <span class="snapshot-genre-name">{{ genre.genre }}</span>
+          <span class="snapshot-genre-count">{{ genre.count }}</span>
+        </li>
+      </ol>
+    </div>
+
+  </div><!-- /.snapshot-grid -->
+</section>
