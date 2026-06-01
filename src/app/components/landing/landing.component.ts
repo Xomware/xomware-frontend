@@ -1,13 +1,11 @@
-import { Component, OnDestroy, AfterViewInit, HostListener, ElementRef, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, AfterViewInit, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CognitoService, XomUser } from '../../services/cognito.service';
-import { ProfileService } from '../../services/profile.service';
-import { UserProfile } from '../../models/user.model';
-import { Agent } from '../../models/agent.model';
-import { AGENTS } from '../../config/agents.config';
+import { MusicService } from '../../services/music.service';
+import { MusicProfile } from '../../models/music.model';
+import { environment } from '../../../environments/environment';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,103 +21,35 @@ interface AppCard {
   platform: 'web' | 'ios';
 }
 
-interface ReportTarget {
-  label: string;
-  repo: string;
-}
-
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.scss', './agents-section.scss'],
+  styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
-  isScrolled = false;
-  menuOpen = false;
-  reportMenuOpen = false;
-  userMenuOpen = false;
   user: XomUser | null = null;
-  profile: UserProfile | null = null;
+  landingTickerProfile: MusicProfile | null = null;
+
   private userSub?: Subscription;
-  private profileSub?: Subscription;
+  private tickerSub?: Subscription;
 
   constructor(
-    private host: ElementRef<HTMLElement>,
     private cognito: CognitoService,
-    private profileService: ProfileService,
-    private router: Router,
+    private musicService: MusicService,
   ) {}
 
   ngOnInit(): void {
     this.userSub = this.cognito.user$.subscribe((u) => (this.user = u));
-    this.profileSub = this.profileService.profile$.subscribe(
-      (p) => (this.profile = p),
-    );
-  }
-
-  /** First letter of the displayName/handle for the coral fallback bubble. */
-  get userInitial(): string {
-    const source =
-      this.profile?.displayName ??
-      this.profile?.preferredUsername ??
-      this.user?.preferredUsername ??
-      this.profile?.email ??
-      this.user?.username ??
-      '?';
-    return source.trim().charAt(0).toUpperCase() || '?';
-  }
-
-  /**
-   * Label for the user menu trigger.
-   *
-   * Prefers `@handle` when a real preferredUsername is set, then displayName
-   * (no @), then the email-local-part. Falls back to the raw Cognito
-   * username only as a last resort — for federated users that's the ugly
-   * `Google_102793155679...` form which no one wants on screen.
-   */
-  get userLabel(): string {
-    const handle = this.profile?.preferredUsername || this.user?.preferredUsername;
-    if (handle) return `@${handle}`;
-    if (this.profile?.displayName) return this.profile.displayName;
-    if (this.profile?.email) return this.profile.email.split('@')[0];
-    return this.user?.username ?? '';
-  }
-
-  /** True when the signed-in user is in the Cognito `admin` group. */
-  get isAdmin(): boolean {
-    return (this.user?.groups ?? []).includes('admin');
-  }
-
-  toggleUserMenu(event: Event): void {
-    event.stopPropagation();
-    this.userMenuOpen = !this.userMenuOpen;
-  }
-
-  closeUserMenu(): void {
-    this.userMenuOpen = false;
-  }
-
-  signOut(): void {
-    this.cognito.signOut().subscribe(() => {
-      this.userMenuOpen = false;
-      this.router.navigateByUrl('/');
-    });
-  }
-
-  reportTargets: ReportTarget[] = [
-    { label: 'Xomify (Web)', repo: 'Xomware/xomify-frontend' },
-    { label: 'Xomify (iOS)', repo: 'Xomware/xomify-ios' },
-    { label: 'XomCloud', repo: 'Xomware/xomcloud-frontend' },
-    { label: 'Xomper (Web)', repo: 'Xomware/xomper-front-end' },
-    { label: 'Xomper (iOS)', repo: 'Xomware/xomper-ios' },
-    { label: 'XomFit (iOS)', repo: 'Xomware/xomfit-ios' },
-    { label: 'Float (iOS)', repo: 'Xomware/Float' },
-    { label: 'Xom Appétit', repo: 'Xomware/xomappetit-frontend' },
-    { label: 'xomware.com', repo: 'Xomware/xomware-frontend' },
-  ];
-
-  reportUrl(repo: string): string {
-    return `https://github.com/${repo}/issues/new`;
+    // Fetch top-items once for the landing ticker (short_term default).
+    this.tickerSub = this.musicService
+      .getPublicTopItems(environment.musicProfileUserId)
+      .subscribe({
+        next: (data) => (this.landingTickerProfile = data),
+        error: () => {
+          // Silently skip the ticker if the fetch fails — don't break landing.
+          this.landingTickerProfile = null;
+        },
+      });
   }
 
   apps: AppCard[] = [
@@ -224,60 +154,12 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
     },
   ];
 
-  /** The Xomware agent fleet, rendered in the "Meet the Agents" section. */
-  agents: Agent[] = AGENTS;
-
   get webApps(): AppCard[] {
     return this.apps.filter(a => a.platform === 'web');
   }
 
   get iosApps(): AppCard[] {
     return this.apps.filter(a => a.platform === 'ios');
-  }
-
-  @HostListener('window:scroll')
-  onScroll(): void {
-    this.isScrolled = window.scrollY > 50;
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as Node | null;
-    if (this.reportMenuOpen) {
-      const wrapper = this.host.nativeElement.querySelector('.report-menu-wrapper');
-      if (wrapper && target && !wrapper.contains(target)) {
-        this.reportMenuOpen = false;
-      }
-    }
-    if (this.userMenuOpen) {
-      const userWrapper = this.host.nativeElement.querySelector('.user-menu-wrapper');
-      if (userWrapper && target && !userWrapper.contains(target)) {
-        this.userMenuOpen = false;
-      }
-    }
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    this.reportMenuOpen = false;
-    this.userMenuOpen = false;
-  }
-
-  toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
-  }
-
-  closeMenu(): void {
-    this.menuOpen = false;
-  }
-
-  toggleReportMenu(event: Event): void {
-    event.stopPropagation();
-    this.reportMenuOpen = !this.reportMenuOpen;
-  }
-
-  closeReportMenu(): void {
-    this.reportMenuOpen = false;
   }
 
   ngAfterViewInit(): void {
@@ -289,7 +171,7 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
   ngOnDestroy(): void {
     ScrollTrigger.getAll().forEach(t => t.kill());
     this.userSub?.unsubscribe();
-    this.profileSub?.unsubscribe();
+    this.tickerSub?.unsubscribe();
   }
 
   private initScrollAnimations(): void {
@@ -341,27 +223,6 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
       }
     });
 
-    // Agent cards stagger in as the grid enters the viewport
-    const agentGrid = document.querySelector('.agents-grid');
-    if (agentGrid) {
-      const agentCards = gsap.utils.toArray<Element>('.agent-card', agentGrid);
-      if (agentCards.length) {
-        gsap.set(agentCards, { opacity: 0, y: 60 });
-        gsap.to(agentCards, {
-          scrollTrigger: {
-            trigger: agentGrid,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
-          opacity: 1,
-          y: 0,
-          stagger: 0.1,
-          duration: 0.7,
-          ease: 'power3.out',
-        });
-      }
-    }
-
     // Footer slide in
     gsap.from('.footer-inner', {
       scrollTrigger: {
@@ -375,7 +236,6 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
       ease: 'power2.out',
     });
 
-    // Refresh ScrollTrigger after all animations are set up
     ScrollTrigger.refresh();
   }
 }

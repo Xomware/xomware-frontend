@@ -2,13 +2,18 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { MusicProfile } from '../../models/music.model';
+import { MusicProfile, MusicRange } from '../../models/music.model';
 import { MusicService } from '../../services/music.service';
 
 type LoadState = 'loading' | 'loaded' | 'error';
 export type MusicTab = 'now' | 'radar' | 'wrapped';
 
 const VALID_TABS: MusicTab[] = ['now', 'radar', 'wrapped'];
+
+interface RangeOption {
+  label: string;
+  value: MusicRange;
+}
 
 @Component({
   selector: 'app-music',
@@ -25,6 +30,16 @@ export class MusicComponent implements OnInit, OnDestroy {
   state: LoadState = 'loading';
   profile: MusicProfile | null = null;
   errorMessage = '';
+
+  // ── Time-range switcher ────────────────────────────
+  selectedRange: MusicRange = 'short_term';
+  rangeLoading = false;
+
+  rangeOptions: RangeOption[] = [
+    { label: 'Last 4 weeks', value: 'short_term' },
+    { label: '6 months', value: 'medium_term' },
+    { label: 'All time', value: 'long_term' },
+  ];
 
   private sub?: Subscription;
   private querySub?: Subscription;
@@ -87,30 +102,44 @@ export class MusicComponent implements OnInit, OnDestroy {
     event.preventDefault();
     this.selectTab(tabs[next]);
 
-    // Move focus to the newly active tab button.
     const tabEl = document.querySelector<HTMLButtonElement>(
       `[data-tab="${tabs[next]}"]`,
     );
     tabEl?.focus();
   }
 
+  // ── Time-range switcher ────────────────────────────
+
+  selectRange(range: MusicRange): void {
+    if (this.selectedRange === range || this.rangeLoading) return;
+    this.selectedRange = range;
+    this.load(range);
+  }
+
   // ── Now tab: data loading ──────────────────────────
 
-  load(): void {
-    this.state = 'loading';
+  load(range: MusicRange = this.selectedRange): void {
+    // First load: full loading state. Subsequent (range switch): inline rangeLoading.
+    if (this.state !== 'loaded') {
+      this.state = 'loading';
+    } else {
+      this.rangeLoading = true;
+    }
     this.errorMessage = '';
     this.sub?.unsubscribe();
     this.sub = this.musicService
-      .getPublicTopItems(environment.musicProfileUserId)
+      .getPublicTopItems(environment.musicProfileUserId, range)
       .subscribe({
         next: (data) => {
           this.profile = data;
           this.state = 'loaded';
+          this.rangeLoading = false;
         },
         error: () => {
           this.errorMessage =
             'Could not load listening stats. The backend may be unavailable.';
           this.state = 'error';
+          this.rangeLoading = false;
         },
       });
   }

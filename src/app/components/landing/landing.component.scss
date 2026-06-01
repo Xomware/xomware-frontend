@@ -12,170 +12,6 @@
   // Orbs are handled by .bg-orbs overflow:hidden instead
 }
 
-// ── Sticky Nav (Glass Morphism) ──────────────────
-.sticky-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  padding: $spacing-md $spacing-xl;
-  transition: all $transition-base;
-
-  &.scrolled {
-    background: $bg-glass-heavy;
-    backdrop-filter: $glass-blur;
-    -webkit-backdrop-filter: $glass-blur;
-    border-bottom: 1px solid $glass-border;
-    padding: $spacing-sm $spacing-xl;
-  }
-}
-
-.nav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  text-decoration: none;
-  color: $text-primary;
-}
-
-.nav-logo {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-}
-
-.nav-wordmark {
-  font-weight: $font-weight-bold;
-  font-size: 1rem;
-  letter-spacing: 0.12em;
-  color: $text-primary;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: $spacing-lg;
-}
-
-.nav-link {
-  color: $text-secondary;
-  font-size: 0.875rem;
-  font-weight: $font-weight-medium;
-  text-decoration: none;
-  transition: color $transition-fast;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  &:hover {
-    color: $text-primary;
-  }
-}
-
-.nav-icon {
-  width: 16px;
-  height: 16px;
-}
-
-// ── Report Issue dropdown ────────────────────────
-.report-menu-wrapper {
-  position: relative;
-  display: inline-flex;
-}
-
-.report-menu-trigger {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font: inherit;
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 4px;
-    border-radius: $radius-sm;
-  }
-}
-
-.report-menu-caret {
-  width: 14px;
-  height: 14px;
-  transition: transform $transition-fast;
-
-  &.open {
-    transform: rotate(180deg);
-  }
-}
-
-.report-menu {
-  position: absolute;
-  top: calc(100% + #{$spacing-sm});
-  right: 0;
-  min-width: 240px;
-  padding: $spacing-sm;
-  background: rgba(15, 17, 25, 0.95);
-  border: 1px solid $glass-border;
-  border-radius: $radius-md;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  z-index: 100;
-  animation: fadeIn 0.15s ease-out;
-}
-
-.report-menu-header {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: $text-secondary;
-  padding: $spacing-sm $spacing-md $spacing-xs;
-}
-
-.report-menu-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: $spacing-sm $spacing-md;
-  border-radius: $radius-sm;
-  text-decoration: none;
-  color: $text-primary;
-  transition: background $transition-fast, color $transition-fast;
-
-  &:hover,
-  &:focus-visible {
-    background: rgba($brand-cyan, 0.1);
-    color: $brand-cyan;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: -2px;
-  }
-}
-
-.report-menu-label {
-  font-size: 0.875rem;
-  font-weight: $font-weight-medium;
-}
-
-.report-menu-repo {
-  font-size: 0.7rem;
-  color: $text-secondary;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-}
-
-
 // ── Profile / Hero Section ───────────────────────
 .hero {
   width: 100%;
@@ -935,165 +771,24 @@
   50% { transform: translateY(5px); }
 }
 
-// ── Hamburger Menu ──────────────────────────────
-.nav-hamburger {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  width: 36px;
-  height: 36px;
-  padding: 6px;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: $radius-md;
-  cursor: pointer;
-  z-index: 1002;
-  transition: border-color $transition-base;
+// ── Landing-page now playing pill ───────────────
+.hero-now-playing-wrap {
+  margin-top: $spacing-xl;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 
-  &:hover {
-    border-color: $glass-border-hover;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 2px;
-  }
-
-  .hamburger-line {
+  // The component renders nothing when not playing, so no empty-space cost.
+  app-now-playing {
     display: block;
-    width: 100%;
-    height: 2px;
-    background: $text-primary;
-    border-radius: 2px;
-    transition: all $transition-base;
-    transform-origin: center;
-  }
-
-  &.open {
-    .hamburger-line:nth-child(1) {
-      transform: translateY(7px) rotate(45deg);
-    }
-    .hamburger-line:nth-child(2) {
-      opacity: 0;
-      transform: scaleX(0);
-    }
-    .hamburger-line:nth-child(3) {
-      transform: translateY(-7px) rotate(-45deg);
-    }
   }
 }
 
-// ── Mobile Menu Overlay ─────────────────────────
-.mobile-menu-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 999;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity $transition-base, visibility $transition-base;
-
-  &.open {
-    opacity: 1;
-    visibility: visible;
-  }
-}
-
-.mobile-menu {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 280px;
-  max-width: 80vw;
-  height: 100%;
-  background: $bg-surface;
-  border-left: 1px solid $glass-border;
-  padding: $spacing-4xl $spacing-xl $spacing-xl;
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  transform: translateX(100%);
-  transition: transform $transition-base;
-
-  .open & {
-    transform: translateX(0);
-  }
-}
-
-.mobile-menu-link {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  color: $text-secondary;
-  font-size: 1.1rem;
-  font-weight: $font-weight-medium;
-  text-decoration: none;
-  padding: $spacing-md $spacing-sm;
-  border-radius: $radius-md;
-  transition: color $transition-fast, background $transition-fast;
-
-  &:hover,
-  &:focus-visible {
-    color: $text-primary;
-    background: rgba(255, 255, 255, 0.05);
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: -2px;
-  }
-}
-
-.mobile-menu-icon {
-  width: 20px;
-  height: 20px;
-}
-
-.mobile-menu-section {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: $spacing-md;
-  padding-top: $spacing-md;
-  border-top: 1px solid $glass-border;
-}
-
-.mobile-menu-section-label {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: $text-secondary;
-  padding: 0 $spacing-sm $spacing-xs;
-}
-
-.mobile-menu-sublink {
-  color: $text-secondary;
-  font-size: 0.95rem;
-  text-decoration: none;
-  padding: $spacing-sm $spacing-lg;
-  border-radius: $radius-sm;
-  transition: color $transition-fast, background $transition-fast;
-
-  &:hover,
-  &:focus-visible {
-    color: $text-primary;
-    background: rgba(255, 255, 255, 0.05);
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: -2px;
-  }
+// ── Landing-page ticker ──────────────────────────
+.landing-ticker-wrap {
+  width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 // ── Responsive ───────────────────────────────────
@@ -1104,18 +799,6 @@
 }
 
 @media (max-width: $breakpoint-md) {
-  .nav-links {
-    display: none;
-  }
-
-  .nav-hamburger {
-    display: flex;
-  }
-
-  .mobile-menu-overlay {
-    display: block;
-  }
-
   .profile-name {
     font-size: clamp(1.6rem, 6vw, 2.2rem);
   }
@@ -1182,16 +865,6 @@
   }
 }
 
-@media (max-width: $breakpoint-sm) {
-  .sticky-nav {
-    padding: $spacing-sm $spacing-md;
-
-    &.scrolled {
-      padding: $spacing-xs $spacing-md;
-    }
-  }
-}
-
 // ── Reduced Motion ───────────────────────────────
 @media (prefers-reduced-motion: reduce) {
   .badge-dot,
@@ -1215,111 +888,3 @@
   }
 }
 
-// ── Sign-in / User menu (auth) ───────────────────
-.nav-link-signin {
-  padding: 8px 16px;
-  border: 1px solid rgba($brand-cyan, 0.5);
-  border-radius: $radius-pill;
-  color: $brand-cyan;
-  transition: all $transition-fast;
-
-  &:hover {
-    background: rgba($brand-cyan, 0.1);
-    border-color: $brand-cyan;
-    color: $brand-cyan-light;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan-light;
-    outline-offset: 2px;
-  }
-}
-
-.user-menu-wrapper {
-  position: relative;
-  display: inline-flex;
-}
-
-.user-menu-trigger {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 4px 12px 4px 4px;
-  border-radius: $radius-pill;
-  cursor: pointer;
-  font: inherit;
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-sm;
-  transition: all $transition-fast;
-
-  &:hover {
-    border-color: rgba($brand-cyan, 0.5);
-    color: $text-primary;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan-light;
-    outline-offset: 2px;
-  }
-}
-
-.user-menu-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, $meals-coral, color-mix(in srgb, $meals-coral 70%, $brand-cyan-dark));
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-  color: $text-primary;
-  font-size: 0.8rem;
-  font-weight: $font-weight-bold;
-
-  &.has-image {
-    background: $bg-card;
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-}
-
-.user-menu-avatar-initial {
-  line-height: 1;
-}
-
-.user-menu-handle {
-  font-size: 0.85rem;
-  font-weight: $font-weight-medium;
-  color: $text-primary;
-  margin-right: 4px;
-}
-
-.user-menu {
-  min-width: 180px;
-}
-
-.user-menu-signout {
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-}
-
-.mobile-menu-signout {
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-}

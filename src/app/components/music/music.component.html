@@ -1,20 +1,6 @@
 <div class="music-page">
-  <!-- Lightweight header — own brand + back link (locked: option b) -->
-  <header class="music-header">
-    <div class="music-header-inner">
-      <a routerLink="/" class="music-header-brand" aria-label="Back to xomware.com">
-        <img
-          src="assets/img/xomware-icon-transparent-background.png"
-          alt="Xomware"
-          class="music-header-logo"
-        />
-        <span class="music-header-wordmark">XOMWARE</span>
-      </a>
-      <a routerLink="/" class="music-back-link" aria-label="Back to xomware.com">
-        &larr; Back to xomware.com
-      </a>
-    </div>
-  </header>
+  <!-- Shared site navbar -->
+  <app-nav></app-nav>
 
   <!-- Hero / page title -->
   <section class="music-hero">
@@ -105,6 +91,11 @@
     [class.music-tabpanel--visible]="activeTab === 'now'"
     [attr.hidden]="activeTab !== 'now' ? '' : null"
   >
+    <!-- Now Playing card -->
+    <div class="music-now-playing-wrap">
+      <app-now-playing [showWhenIdle]="true"></app-now-playing>
+    </div>
+
     <!-- Loading state -->
     <div class="music-loading" *ngIf="state === 'loading'" aria-live="polite" aria-label="Loading listening stats">
       <div class="music-loading-inner">
@@ -136,13 +127,34 @@
 
     <!-- Loaded state -->
     <ng-container *ngIf="state === 'loaded' && profile">
-      <!-- Meta: window + updated timestamp -->
+      <!-- Meta: window + range switcher + updated timestamp -->
       <div class="music-meta">
         <span class="music-meta-window">{{ profile.windowLabel }}</span>
+
+        <!-- Time-range toggle (segmented control) -->
+        <div
+          class="range-switcher"
+          role="group"
+          aria-label="Time range"
+        >
+          <button
+            *ngFor="let opt of rangeOptions"
+            type="button"
+            class="range-btn"
+            [class.range-btn--active]="selectedRange === opt.value"
+            [attr.aria-pressed]="selectedRange === opt.value"
+            [disabled]="rangeLoading"
+            (click)="selectRange(opt.value)"
+          >{{ opt.label }}</button>
+        </div>
+
         <span class="music-meta-updated">Updated {{ relativeTime(profile.updatedAt) }}</span>
+        <span *ngIf="rangeLoading" class="range-loading" aria-live="polite" aria-label="Loading stats for new range">
+          <span class="range-loading-dot"></span>
+        </span>
       </div>
 
-      <!-- Ticker — Now tab only -->
+      <!-- Ticker — full-bleed, reflects the current range -->
       <app-music-ticker [profile]="profile" [nowPlaying]="null"></app-music-ticker>
 
       <main class="music-content">
