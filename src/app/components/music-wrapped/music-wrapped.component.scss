@@ -1,0 +1,488 @@
+@import 'styles/variables';
+
+// ── Coming soon ───────────────────────────────────────
+.wrapped-coming-soon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-4xl $spacing-xl;
+}
+
+.wrapped-coming-soon-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  text-align: center;
+  max-width: 400px;
+}
+
+.wrapped-coming-soon-icon {
+  width: 40px;
+  height: 40px;
+  color: $brand-cyan;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.wrapped-coming-soon-title {
+  font-size: 20px;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.wrapped-coming-soon-body {
+  font-size: 14px;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin: 0;
+}
+
+// ── Loading skeletons ─────────────────────────────────
+.wrapped-loading {
+  padding: $spacing-2xl 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3xl;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.skeleton {
+  background: $bg-card;
+  border-radius: $radius-md;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+
+  &.skeleton-chips {
+    height: 36px;
+    width: 320px;
+    max-width: 100%;
+    border-radius: $radius-pill;
+  }
+
+  &.skeleton-heading {
+    height: 28px;
+    width: 180px;
+    border-radius: $radius-sm;
+  }
+}
+
+.skeleton-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.skeleton-cards {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.skeleton-card {
+  height: 64px;
+  border-radius: $radius-md;
+}
+
+// ── Error state ──────────────────────────────────────
+.wrapped-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-4xl $spacing-xl;
+}
+
+.wrapped-error-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  text-align: center;
+}
+
+.wrapped-error-icon {
+  width: 40px;
+  height: 40px;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.wrapped-error-msg {
+  color: $text-secondary;
+  font-size: 15px;
+  max-width: 360px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.wrapped-retry-btn {
+  background: $brand-cyan;
+  color: $bg-dark;
+  border: none;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-xl;
+  font-size: 14px;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: background $transition-fast, transform $transition-fast;
+
+  &:hover {
+    background: $brand-cyan-light;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 3px;
+  }
+}
+
+// ── Empty state ───────────────────────────────────────
+.wrapped-empty {
+  color: $text-muted;
+  font-size: 14px;
+  font-style: italic;
+  margin: $spacing-2xl 0;
+  text-align: center;
+}
+
+// ── Month selector chips ──────────────────────────────
+.month-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xl;
+}
+
+.month-chip {
+  font-size: 13px;
+  font-weight: $font-weight-medium;
+  font-family: $font-stack;
+  color: $text-secondary;
+  background: $bg-card;
+  border: 1px solid $glass-border;
+  border-radius: $radius-pill;
+  padding: $spacing-xs $spacing-md;
+  cursor: pointer;
+  transition:
+    background $transition-fast,
+    color $transition-fast,
+    border-color $transition-fast;
+
+  &:hover {
+    background: $bg-card-hover;
+    color: $text-primary;
+    border-color: $glass-border-hover;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+  }
+
+  &--active {
+    background: $brand-cyan-subtle;
+    color: $brand-cyan;
+    border-color: rgba(0, 180, 216, 0.3);
+
+    &:hover {
+      background: rgba(0, 180, 216, 0.14);
+      color: $brand-cyan-light;
+    }
+  }
+}
+
+// ── Playlist CTA ─────────────────────────────────────
+.wrapped-playlist-row {
+  margin-bottom: $spacing-3xl;
+}
+
+.wrapped-playlist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  background: #1db954;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: $font-weight-semibold;
+  padding: $spacing-sm $spacing-xl;
+  border-radius: $radius-md;
+  transition: background $transition-fast, transform $transition-fast;
+
+  &:hover {
+    background: #1ed760;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1db954;
+    outline-offset: 3px;
+    border-radius: $radius-md;
+  }
+}
+
+.wrapped-playlist-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+// ── Section shared ───────────────────────────────────
+.wrapped-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-4xl;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.wrapped-section-title {
+  font-size: 20px;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin: 0;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $glass-border;
+}
+
+.wrapped-section-empty {
+  color: $text-muted;
+  font-size: 14px;
+  font-style: italic;
+  margin: 0;
+}
+
+// ── Tracks list (mirrors music.component.scss) ────────
+.tracks-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.track-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.track-rank {
+  font-size: 13px;
+  font-weight: $font-weight-bold;
+  color: $text-muted;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.track-link {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex: 1;
+  text-decoration: none;
+  color: $text-primary;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: $bg-card;
+    color: $brand-cyan-light;
+
+    .track-ext-icon {
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+    border-radius: $radius-md;
+  }
+}
+
+.track-art {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.track-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.track-name {
+  font-size: 15px;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-artist {
+  font-size: 13px;
+  color: $text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-ext-icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  color: $text-muted;
+  flex-shrink: 0;
+  transition: opacity $transition-fast;
+}
+
+// ── Artists list (mirrors music.component.scss) ───────
+.artists-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.artist-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.artist-rank {
+  font-size: 13px;
+  font-weight: $font-weight-bold;
+  color: $text-muted;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.artist-link {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex: 1;
+  text-decoration: none;
+  color: $text-primary;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: $bg-card;
+    color: $brand-cyan-light;
+
+    .track-ext-icon {
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+    border-radius: $radius-md;
+  }
+}
+
+.artist-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.artist-name {
+  font-size: 15px;
+  font-weight: $font-weight-medium;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Genres list (mirrors music.component.scss) ────────
+.genres-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.genre-item {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.genre-bar-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.genre-rank {
+  font-size: 13px;
+  font-weight: $font-weight-bold;
+  color: $text-muted;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.genre-name {
+  font-size: 15px;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  flex: 1;
+}
+
+.genre-count {
+  font-size: 12px;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
+  min-width: 28px;
+  text-align: right;
+}
+
+.genre-bar-track {
+  height: 4px;
+  background: $bg-card;
+  border-radius: $radius-pill;
+  overflow: hidden;
+  margin-left: calc(20px + #{$spacing-sm});
+}
+
+.genre-bar-fill {
+  height: 100%;
+  background: $cyan-accent;
+  border-radius: $radius-pill;
+  transition: width $transition-slow;
+}

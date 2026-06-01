@@ -1,0 +1,56 @@
+<div class="ticker-wrap" aria-label="Scrolling music highlights" role="region">
+  <!-- Now-playing slot (v2 — null in v1) -->
+  <div class="now-playing-slot" *ngIf="nowPlaying" aria-label="Now playing">
+    <ng-content></ng-content>
+  </div>
+
+  <div class="ticker-track" *ngIf="items.length > 0" aria-hidden="true">
+    <!-- Two identical rows make a seamless loop -->
+    <div class="ticker-row ticker-row--a">
+      <a
+        *ngFor="let item of items"
+        [href]="item.url"
+        target="_blank"
+        rel="noopener"
+        class="ticker-item"
+        [class.ticker-item--track]="item.type === 'track'"
+        [class.ticker-item--artist]="item.type === 'artist'"
+        tabindex="-1"
+      >
+        <img
+          [src]="item.imageUrl"
+          [alt]="item.type === 'track' ? item.label + ' album art' : item.label + ' artist photo'"
+          class="ticker-item-img"
+          loading="lazy"
+        />
+        <span class="ticker-item-text">
+          <span class="ticker-item-label">{{ item.label }}</span>
+          <span class="ticker-item-sub">{{ item.sub }}</span>
+        </span>
+      </a>
+    </div>
+    <div class="ticker-row ticker-row--b" aria-hidden="true">
+      <a
+        *ngFor="let item of items"
+        [href]="item.url"
+        target="_blank"
+        rel="noopener"
+        class="ticker-item"
+        [class.ticker-item--track]="item.type === 'track'"
+        [class.ticker-item--artist]="item.type === 'artist'"
+        tabindex="-1"
+      >
+        <img
+          [src]="item.imageUrl"
+          [alt]="item.type === 'track' ? item.label + ' album art' : item.label + ' artist photo'"
+          class="ticker-item-img"
+          loading="lazy"
+        />
+        <span class="ticker-item-text">
+          <span class="ticker-item-label">{{ item.label }}</span>
+          <span class="ticker-item-sub">{{ item.sub }}</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</div>
