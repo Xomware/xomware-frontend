@@ -1,7 +1,8 @@
 <ng-container *ngIf="isVisible">
-  <!-- Active: playing track card -->
+
+  <!-- ── Playing: actively playing track ──────────────────── -->
   <div
-    *ngIf="state?.isPlaying && state?.track; else idleState"
+    *ngIf="state?.source === 'playing' && state?.track; else recentOrIdle"
     class="now-playing"
     aria-label="Now playing"
     role="region"
@@ -36,7 +37,7 @@
         <span class="now-playing-artist">{{ state!.track!.artist }}</span>
       </div>
 
-      <!-- Progress bar (only on /music, where durationMs is meaningful) -->
+      <!-- Progress bar (only when durationMs available) -->
       <div
         *ngIf="state!.durationMs"
         class="now-playing-progress-wrap"
@@ -66,20 +67,75 @@
     </a>
   </div>
 
-  <!-- Idle: "not playing" placeholder (only shown when showWhenIdle=true) -->
-  <ng-template #idleState>
-    <div class="now-playing now-playing--idle" role="region" aria-label="Not playing right now">
-      <div class="now-playing-inner now-playing-inner--idle">
-        <div class="now-playing-art-wrap now-playing-art-wrap--idle" aria-hidden="true">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="now-playing-idle-icon">
-            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
-          </svg>
+  <!-- ── Recent / Idle fallback ────────────────────────────── -->
+  <ng-template #recentOrIdle>
+
+    <!-- Recent: last-played track (no bars, no progress) -->
+    <div
+      *ngIf="state?.source === 'recent' && state?.track; else idleState"
+      class="now-playing now-playing--recent"
+      aria-label="Last played"
+      role="region"
+    >
+      <a
+        [href]="state!.track!.url"
+        target="_blank"
+        rel="noopener"
+        class="now-playing-inner"
+        [attr.aria-label]="state!.track!.name + ' by ' + state!.track!.artist + ' — last played, open on Spotify'"
+      >
+        <!-- Album art (no animated bars) -->
+        <div class="now-playing-art-wrap">
+          <img
+            [src]="state!.track!.albumArt"
+            [alt]="state!.track!.name + ' album art'"
+            class="now-playing-art"
+            loading="eager"
+          />
         </div>
+
+        <!-- Track info -->
         <div class="now-playing-info">
-          <span class="now-playing-label">Spotify</span>
-          <span class="now-playing-track now-playing-track--idle">Not playing right now</span>
+          <span class="now-playing-label now-playing-label--recent">
+            Last played
+            <span
+              *ngIf="state!.playedAt"
+              class="now-playing-played-at"
+            >{{ relativeTime(state!.playedAt!) }}</span>
+          </span>
+          <span class="now-playing-track">{{ state!.track!.name }}</span>
+          <span class="now-playing-artist">{{ state!.track!.artist }}</span>
+        </div>
+
+        <!-- Spotify icon -->
+        <svg
+          class="now-playing-spotify-icon"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" fill="currentColor"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- None / idle: show only when showWhenIdle=true (/music placement) -->
+    <ng-template #idleState>
+      <div class="now-playing now-playing--idle" role="region" aria-label="Not playing right now">
+        <div class="now-playing-inner now-playing-inner--idle">
+          <div class="now-playing-art-wrap now-playing-art-wrap--idle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="now-playing-idle-icon">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="now-playing-info">
+            <span class="now-playing-label">Spotify</span>
+            <span class="now-playing-track now-playing-track--idle">Not playing right now</span>
+          </div>
         </div>
       </div>
-    </div>
+    </ng-template>
+
   </ng-template>
+
 </ng-container>
