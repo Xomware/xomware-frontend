@@ -12,7 +12,7 @@ export const environment = {
   musicProfileUserId: '12146721999',
   musicSurfaces: {
     now: 'live',
-    radar: 'coming-soon',
-    wrapped: 'coming-soon',
+    radar: 'live',
+    wrapped: 'live',
   } as { now: 'live' | 'mock' | 'coming-soon'; radar: 'live' | 'mock' | 'coming-soon'; wrapped: 'live' | 'mock' | 'coming-soon' },
 };
