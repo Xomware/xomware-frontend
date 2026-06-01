@@ -15,7 +15,12 @@ interface TickerTrackItem {
 interface TickerDividerItem {
   kind: 'divider';
   label: string;
-  timeframe: string;
+}
+
+/** A single leading timeframe label shown once at the front of the sequence. */
+interface TickerTimeframeItem {
+  kind: 'timeframe';
+  label: string;
 }
 
 /** The "Powered by Xomify" badge shown at each group boundary. */
@@ -23,7 +28,7 @@ interface TickerBadgeItem {
   kind: 'badge';
 }
 
-export type TickerSegment = TickerTrackItem | TickerDividerItem | TickerBadgeItem;
+export type TickerSegment = TickerTrackItem | TickerDividerItem | TickerTimeframeItem | TickerBadgeItem;
 
 const XOMIFY_URL = 'https://xomify.xomware.com';
 const XOMIFY_LOGO = 'assets/img/xomify-logo.png';
@@ -63,9 +68,14 @@ export class MusicTickerComponent {
     const tf = this.timeframeLabel;
     const result: TickerSegment[] = [];
 
+    // ── Leading timeframe label (once, at the front) ─
+    if (tf) {
+      result.push({ kind: 'timeframe', label: tf });
+    }
+
     // ── TOP TRACKS ──────────────────────────────────
     if (this.profile.topTracks.length > 0) {
-      result.push({ kind: 'divider', label: 'TOP TRACKS', timeframe: tf });
+      result.push({ kind: 'divider', label: 'TOP TRACKS' });
       for (const t of this.profile.topTracks) {
         result.push({
           kind: 'item',
@@ -81,7 +91,7 @@ export class MusicTickerComponent {
 
     // ── TOP ARTISTS ─────────────────────────────────
     if (this.profile.topArtists.length > 0) {
-      result.push({ kind: 'divider', label: 'TOP ARTISTS', timeframe: tf });
+      result.push({ kind: 'divider', label: 'TOP ARTISTS' });
       for (const a of this.profile.topArtists) {
         result.push({
           kind: 'item',
@@ -97,7 +107,7 @@ export class MusicTickerComponent {
 
     // ── TOP GENRES ──────────────────────────────────
     if (this.profile.topGenres.length > 0) {
-      result.push({ kind: 'divider', label: 'TOP GENRES', timeframe: tf });
+      result.push({ kind: 'divider', label: 'TOP GENRES' });
       for (const g of this.profile.topGenres) {
         result.push({
           kind: 'item',
@@ -121,6 +131,10 @@ export class MusicTickerComponent {
 
   isDivider(s: TickerSegment): s is TickerDividerItem {
     return s.kind === 'divider';
+  }
+
+  isTimeframe(s: TickerSegment): s is TickerTimeframeItem {
+    return s.kind === 'timeframe';
   }
 
   isBadge(s: TickerSegment): s is TickerBadgeItem {

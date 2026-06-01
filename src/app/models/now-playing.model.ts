@@ -10,4 +10,8 @@ export interface NowPlayingState {
   track: NowPlayingTrack | null;
   progressMs: number | null;
   durationMs: number | null;
+  /** 'playing' = actively playing; 'recent' = last played fallback; 'none' = nothing available. */
+  source: 'playing' | 'recent' | 'none';
+  /** ISO timestamp set when source === 'recent'. */
+  playedAt: string | null;
 }

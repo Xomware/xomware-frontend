@@ -6,10 +6,11 @@
     <div class="ticker-row ticker-row--a">
       <ng-container *ngFor="let seg of segments">
 
-        <!-- Category divider / label -->
+        <!-- Leading timeframe label — rendered once at the front of the sequence -->
+        <span class="ticker-timeframe" *ngIf="isTimeframe(seg)">{{ seg.label }}</span>
+
+        <!-- Category divider / label (no timeframe prefix) -->
         <span class="ticker-divider" *ngIf="isDivider(seg)">
-          <span class="ticker-divider-timeframe">{{ seg.timeframe }}</span>
-          <span class="ticker-divider-sep" aria-hidden="true">·</span>
           <span class="ticker-divider-label">{{ seg.label }}</span>
         </span>
 
@@ -64,9 +65,9 @@
     <div class="ticker-row ticker-row--b" aria-hidden="true">
       <ng-container *ngFor="let seg of segments">
 
+        <span class="ticker-timeframe" *ngIf="isTimeframe(seg)">{{ seg.label }}</span>
+
         <span class="ticker-divider" *ngIf="isDivider(seg)">
-          <span class="ticker-divider-timeframe">{{ seg.timeframe }}</span>
-          <span class="ticker-divider-sep" aria-hidden="true">·</span>
           <span class="ticker-divider-label">{{ seg.label }}</span>
         </span>
 

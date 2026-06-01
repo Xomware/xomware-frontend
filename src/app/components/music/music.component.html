@@ -138,10 +138,8 @@
 
     <!-- Loaded state -->
     <ng-container *ngIf="state === 'loaded' && profile">
-      <!-- Meta: window + range switcher + updated timestamp -->
+      <!-- Meta: range switcher + updated timestamp -->
       <div class="music-meta">
-        <span class="music-meta-window">{{ profile.windowLabel }}</span>
-
         <!-- Time-range toggle (segmented control) -->
         <div
           class="range-switcher"

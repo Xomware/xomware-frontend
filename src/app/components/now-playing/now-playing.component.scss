@@ -8,6 +8,11 @@
   &--idle {
     opacity: 0.55;
   }
+
+  &--recent {
+    // Slightly dimmed vs actively playing — still readable, not idle-level fade
+    opacity: 0.85;
+  }
 }
 
 .now-playing-inner {
@@ -124,11 +129,27 @@
 }
 
 .now-playing-label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
   font-size: 10px;
   font-weight: $font-weight-semibold;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: $brand-cyan;
+
+  &--recent {
+    color: $text-muted;
+  }
+}
+
+.now-playing-played-at {
+  font-size: 10px;
+  font-weight: $font-weight-medium;
+  text-transform: none;
+  letter-spacing: 0;
+  color: $text-muted;
+  opacity: 0.7;
 }
 
 .now-playing-track {
@@ -201,7 +222,7 @@
   }
 }
 
-// ── Compact landing pill variant ─────────────────────
-// The landing uses this component with showWhenIdle=false,
-// so we only see it when something is playing.
-// No extra variant styles needed — the default card works.
+// ── Landing placement notes ───────────────────────────
+// showWhenIdle=false (landing): visible when source==='playing' OR source==='recent'
+//   → landing will almost always show either "Now playing" or "Last played"
+// showWhenIdle=true (/music): also shows the idle placeholder when source==='none'

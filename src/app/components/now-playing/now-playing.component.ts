@@ -19,6 +19,8 @@ const IDLE_STATE: NowPlayingState = {
   track: null,
   progressMs: null,
   durationMs: null,
+  source: 'none',
+  playedAt: null,
 };
 
 /**
@@ -71,9 +73,37 @@ export class NowPlayingComponent implements OnInit, OnDestroy {
     return Math.min(100, (this.state.progressMs / this.state.durationMs) * 100);
   }
 
+  /**
+   * Show whenever there is a track (playing or recent).
+   * When source === 'none', only show if showWhenIdle (the /music page idle placeholder).
+   */
   get isVisible(): boolean {
     if (!this.state) return false;
-    if (this.state.isPlaying && this.state.track) return true;
+    if (this.state.track) return true;
     return this.showWhenIdle;
+  }
+
+  /** Human-readable relative time from an ISO string (e.g. "2h ago"). */
+  relativeTime(iso: string): string {
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const diffMins = Math.floor(diffMs / 60_000);
+
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 30) return `${diffDays} days ago`;
+
+    const diffWeeks = Math.floor(diffDays / 7);
+    if (diffWeeks === 1) return '1 week ago';
+    if (diffWeeks < 8) return `${diffWeeks} weeks ago`;
+
+    const diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths === 1) return '1 month ago';
+    return `${diffMonths} months ago`;
   }
 }
