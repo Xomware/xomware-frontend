@@ -5,7 +5,7 @@ import { TopArtist, TopGenre, TopTrack } from '../../models/music.model';
 import { WrappedArchive, WrappedMonth } from '../../models/wrapped.model';
 import { WrappedService } from '../../services/wrapped.service';
 
-type LoadState = 'loading' | 'loaded' | 'error';
+type LoadState = 'loading' | 'loaded' | 'error' | 'coming-soon';
 
 @Component({
   selector: 'app-music-wrapped',
@@ -31,6 +31,10 @@ export class MusicWrappedComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    if (environment.musicSurfaces.wrapped === 'coming-soon') {
+      this.state = 'coming-soon';
+      return;
+    }
     this.load();
   }
 

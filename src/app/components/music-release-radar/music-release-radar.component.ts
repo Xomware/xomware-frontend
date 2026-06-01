@@ -4,7 +4,7 @@ import { environment } from '../../../environments/environment';
 import { RadarProfile, RadarRelease } from '../../models/release-radar.model';
 import { ReleaseRadarService } from '../../services/release-radar.service';
 
-type LoadState = 'loading' | 'loaded' | 'error';
+type LoadState = 'loading' | 'loaded' | 'error' | 'coming-soon';
 
 @Component({
   selector: 'app-music-release-radar',
@@ -21,6 +21,10 @@ export class MusicReleaseRadarComponent implements OnInit, OnDestroy {
   constructor(private radarService: ReleaseRadarService) {}
 
   ngOnInit(): void {
+    if (environment.musicSurfaces.radar === 'coming-soon') {
+      this.state = 'coming-soon';
+      return;
+    }
     this.load();
   }
 

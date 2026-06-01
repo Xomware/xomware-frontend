@@ -9,29 +9,26 @@ import { WRAPPED_MOCK } from './wrapped.mock';
  * Fetches Dom's monthly wrapped archive from the Xomify public wrapped
  * endpoint. All data is read-only, no auth.
  *
- * Base URL: `environment.usersApiUrl` (`api.xomware.com` family).
+ * Base URL: `environment.musicApiUrl` (`api.xomify.xomware.com`).
  * Path: `GET /music/public-wrapped?userId=<id>`
  *
- * Set `environment.useMockMusicData = true` to return the local mock fixture
- * instead of hitting the network (default in v1 while the backend endpoint
- * is pending).
- *
- * Cross-repo blocker: the live endpoint (`GET /music/public-wrapped`)
- * does not exist yet. It must be built in xomify-backend before flipping
- * `useMockMusicData` to false. See docs/features/music-section/PLAN.md.
+ * Surface mode is driven by `environment.musicSurfaces.wrapped`:
+ *   'live'         — calls the live endpoint (backend not yet built)
+ *   'mock'         — returns the local fixture
+ *   'coming-soon'  — callers should never reach this; the component gates it
  */
 @Injectable({ providedIn: 'root' })
 export class WrappedService {
-  private readonly baseUrl = `${environment.usersApiUrl}/music`;
+  private readonly baseUrl = `${environment.musicApiUrl}/music`;
 
   constructor(private http: HttpClient) {}
 
   /**
    * Returns the public wrapped archive for the given userId.
-   * Returns the mock fixture when `environment.useMockMusicData` is true.
+   * Returns the mock fixture when `environment.musicSurfaces.wrapped === 'mock'`.
    */
   getPublicWrapped(userId: string): Observable<WrappedArchive> {
-    if (environment.useMockMusicData) {
+    if (environment.musicSurfaces.wrapped === 'mock') {
       return of(WRAPPED_MOCK);
     }
     return this.http.get<WrappedArchive>(

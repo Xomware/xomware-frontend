@@ -1,3 +1,16 @@
+<!-- Coming soon state -->
+<div class="radar-coming-soon" *ngIf="state === 'coming-soon'" aria-label="Release Radar coming soon">
+  <div class="radar-coming-soon-inner">
+    <svg viewBox="0 0 24 24" class="radar-coming-soon-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4.83L17 8v4.55c0 2.87-1.93 5.57-5 6.84-3.07-1.27-5-3.97-5-6.84V8l5-2.17z" fill="currentColor"/>
+    </svg>
+    <h2 class="radar-coming-soon-title">Release Radar is coming soon</h2>
+    <p class="radar-coming-soon-body">
+      Weekly new-release picks based on your listening history — powered by Xomify.
+    </p>
+  </div>
+</div>
+
 <!-- Loading state -->
 <div class="radar-loading" *ngIf="state === 'loading'" aria-live="polite" aria-label="Loading release radar">
   <div class="skeleton-grid">

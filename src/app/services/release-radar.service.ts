@@ -9,29 +9,26 @@ import { RELEASE_RADAR_MOCK } from './release-radar.mock';
  * Fetches this week's new releases for a given user's taste profile from the
  * Xomify public release-radar endpoint. All data is read-only, no auth.
  *
- * Base URL: `environment.usersApiUrl` (`api.xomware.com` family).
+ * Base URL: `environment.musicApiUrl` (`api.xomify.xomware.com`).
  * Path: `GET /music/public-release-radar?userId=<id>`
  *
- * Set `environment.useMockMusicData = true` to return the local mock fixture
- * instead of hitting the network (default in v1 while the backend endpoint
- * is pending).
- *
- * Cross-repo blocker: the live endpoint (`GET /music/public-release-radar`)
- * does not exist yet. It must be built in xomify-backend before flipping
- * `useMockMusicData` to false. See docs/features/music-section/PLAN.md.
+ * Surface mode is driven by `environment.musicSurfaces.radar`:
+ *   'live'         — calls the live endpoint (backend not yet built)
+ *   'mock'         — returns the local fixture
+ *   'coming-soon'  — callers should never reach this; the component gates it
  */
 @Injectable({ providedIn: 'root' })
 export class ReleaseRadarService {
-  private readonly baseUrl = `${environment.usersApiUrl}/music`;
+  private readonly baseUrl = `${environment.musicApiUrl}/music`;
 
   constructor(private http: HttpClient) {}
 
   /**
    * Returns the public release-radar snapshot for the given userId.
-   * Returns the mock fixture when `environment.useMockMusicData` is true.
+   * Returns the mock fixture when `environment.musicSurfaces.radar === 'mock'`.
    */
   getPublicReleaseRadar(userId: string): Observable<RadarProfile> {
-    if (environment.useMockMusicData) {
+    if (environment.musicSurfaces.radar === 'mock') {
       return of(RELEASE_RADAR_MOCK);
     }
     return this.http.get<RadarProfile>(
