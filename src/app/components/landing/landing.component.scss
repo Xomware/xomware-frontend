@@ -791,6 +791,20 @@
   flex-shrink: 0;
 }
 
+// ── Music snapshot section (between hero and apps) ────
+// Moved outside .hero-content so the hero ScrollTrigger fade does not
+// affect this element. Sits as its own in-flow block after the hero.
+.music-snapshot-section {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 $spacing-xl $spacing-3xl;
+
+  @media (max-width: $breakpoint-md) {
+    padding: 0 $spacing-md $spacing-2xl;
+  }
+}
+
 // ── Responsive ───────────────────────────────────
 @media (max-width: $breakpoint-lg) {
   .cards-container {

@@ -6,6 +6,7 @@
       <span class="nav-wordmark">XOMWARE</span>
     </a>
     <div class="nav-links">
+      <a routerLink="/" class="nav-link">Home</a>
       <a routerLink="/" fragment="apps" class="nav-link">Apps</a>
       <a routerLink="/music" class="nav-link">Music</a>
       <a href="https://github.com/Xomware" target="_blank" rel="noopener" class="nav-link nav-link-github">
@@ -109,6 +110,7 @@
 <!-- Mobile Menu Overlay -->
 <div class="mobile-menu-overlay" [class.open]="menuOpen" (click)="closeMenu()">
   <nav class="mobile-menu" aria-label="Mobile navigation" (click)="$event.stopPropagation()">
+    <a routerLink="/" class="mobile-menu-link" (click)="closeMenu()">Home</a>
     <a routerLink="/" fragment="apps" class="mobile-menu-link" (click)="closeMenu()">Apps</a>
     <a routerLink="/music" class="mobile-menu-link" (click)="closeMenu()">Music</a>
     <a href="https://github.com/Xomware" target="_blank" rel="noopener" class="mobile-menu-link" (click)="closeMenu()">
