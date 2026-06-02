@@ -334,6 +334,7 @@
   display: flex;
   align-items: center;
   gap: $spacing-md;
+  min-width: 0;
 }
 
 .track-rank {
@@ -350,6 +351,7 @@
   align-items: center;
   gap: $spacing-md;
   flex: 1;
+  min-width: 0; // lets .track-name ellipsis engage instead of overflowing the column
   text-decoration: none;
   color: $text-primary;
   padding: $spacing-sm $spacing-md;
