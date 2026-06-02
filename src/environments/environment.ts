@@ -10,7 +10,6 @@ export const environment = {
   cognitoDomain: 'xomware-auth.auth.us-east-1.amazoncognito.com',
   ga4MeasurementId: '',
   musicProfileUserId: '12146721999',
-  xomifyWebUrl: 'https://xomify.xomware.com',
   musicSurfaces: {
     now: 'live',
     radar: 'live',

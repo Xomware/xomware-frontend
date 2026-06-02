@@ -177,7 +177,7 @@
   // We keep them in the DOM after activation so state is preserved.
   &--content {
     padding: $spacing-3xl $spacing-xl;
-    max-width: 900px;
+    max-width: 1320px;
     margin: 0 auto;
     width: 100%;
 
@@ -418,7 +418,7 @@
 // dashboard rather than a scrolling list.
 // Mobile: stack columns, with a quick-jump chip row above them.
 .music-content {
-  max-width: 1100px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: $spacing-3xl $spacing-xl;
   width: 100%;
@@ -455,7 +455,7 @@
   background: rgba(20, 20, 40, 0.45);
   border: 1px solid $glass-border;
   border-radius: $radius-lg;
-  padding: $spacing-xl;
+  padding: $spacing-lg;
 }
 
 .music-section-title {
@@ -552,11 +552,6 @@
   min-width: 0; // lets .track-name ellipsis engage instead of overflowing the column
   text-decoration: none;
   color: $text-primary;
-  background: none;
-  border: none;
-  font-family: $font-stack;
-  cursor: pointer;
-  text-align: left;
   padding: $spacing-sm $spacing-md;
   border-radius: $radius-md;
   transition: background $transition-fast, color $transition-fast;
@@ -565,7 +560,7 @@
     background: $bg-card;
     color: $brand-cyan-light;
 
-    .track-chevron-icon {
+    .track-ext-icon {
       opacity: 1;
     }
   }
@@ -617,15 +612,6 @@
   transition: opacity $transition-fast;
 }
 
-.track-chevron-icon {
-  width: 14px;
-  height: 14px;
-  opacity: 0;
-  color: $text-muted;
-  flex-shrink: 0;
-  transition: opacity $transition-fast;
-}
-
 // ── Artists list ─────────────────────────────────────
 .artists-list {
   list-style: none;
@@ -658,11 +644,6 @@
   flex: 1;
   text-decoration: none;
   color: $text-primary;
-  background: none;
-  border: none;
-  font-family: $font-stack;
-  cursor: pointer;
-  text-align: left;
   padding: $spacing-sm $spacing-md;
   border-radius: $radius-md;
   transition: background $transition-fast, color $transition-fast;
@@ -671,7 +652,7 @@
     background: $bg-card;
     color: $brand-cyan-light;
 
-    .track-chevron-icon {
+    .track-ext-icon {
       opacity: 1;
     }
   }
