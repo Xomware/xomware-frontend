@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { MusicProfile, MusicRange } from '../../models/music.model';
+import { MusicDetailItem, MusicProfile, MusicRange } from '../../models/music.model';
 import { MusicService } from '../../services/music.service';
 
 type LoadState = 'loading' | 'loaded' | 'error';
@@ -30,6 +30,9 @@ export class MusicComponent implements OnInit, OnDestroy {
   state: LoadState = 'loading';
   profile: MusicProfile | null = null;
   errorMessage = '';
+
+  // ── Detail modal ───────────────────────────────────
+  detailItem: MusicDetailItem | null = null;
 
   // ── Time-range switcher ────────────────────────────
   selectedRange: MusicRange = 'short_term';
@@ -142,6 +145,12 @@ export class MusicComponent implements OnInit, OnDestroy {
           this.rangeLoading = false;
         },
       });
+  }
+
+  // ── Detail modal ───────────────────────────────────
+
+  openDetail(item: MusicDetailItem): void {
+    this.detailItem = item;
   }
 
   /** Returns a human-readable relative time string for the given ISO date. */

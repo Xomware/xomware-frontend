@@ -552,6 +552,11 @@
   min-width: 0; // lets .track-name ellipsis engage instead of overflowing the column
   text-decoration: none;
   color: $text-primary;
+  background: none;
+  border: none;
+  font-family: $font-stack;
+  cursor: pointer;
+  text-align: left;
   padding: $spacing-sm $spacing-md;
   border-radius: $radius-md;
   transition: background $transition-fast, color $transition-fast;
@@ -560,7 +565,7 @@
     background: $bg-card;
     color: $brand-cyan-light;
 
-    .track-ext-icon {
+    .track-chevron-icon {
       opacity: 1;
     }
   }
@@ -612,6 +617,15 @@
   transition: opacity $transition-fast;
 }
 
+.track-chevron-icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  color: $text-muted;
+  flex-shrink: 0;
+  transition: opacity $transition-fast;
+}
+
 // ── Artists list ─────────────────────────────────────
 .artists-list {
   list-style: none;
@@ -644,6 +658,11 @@
   flex: 1;
   text-decoration: none;
   color: $text-primary;
+  background: none;
+  border: none;
+  font-family: $font-stack;
+  cursor: pointer;
+  text-align: left;
   padding: $spacing-sm $spacing-md;
   border-radius: $radius-md;
   transition: background $transition-fast, color $transition-fast;
@@ -652,7 +671,7 @@
     background: $bg-card;
     color: $brand-cyan-light;
 
-    .track-ext-icon {
+    .track-chevron-icon {
       opacity: 1;
     }
   }
