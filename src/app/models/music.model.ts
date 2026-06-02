@@ -21,14 +21,6 @@ export interface TopGenre {
 /** Stub kept for ticker component input compatibility. */
 export interface NowPlaying {}
 
-export interface MusicDetailItem {
-  kind: 'track' | 'artist';
-  name: string;
-  subtitle: string | null;
-  image: string;
-  spotifyUrl: string;
-}
-
 export interface MusicProfile {
   topTracks: TopTrack[];
   topArtists: TopArtist[];
