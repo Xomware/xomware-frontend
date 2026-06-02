@@ -29,6 +29,7 @@ import { MusicWrappedComponent } from './components/music-wrapped/music-wrapped.
 import { AppNavComponent } from './components/nav/app-nav.component';
 import { NowPlayingComponent } from './components/now-playing/now-playing.component';
 import { MusicSnapshotComponent } from './components/music-snapshot/music-snapshot.component';
+import { MusicDetailModalComponent } from './components/music-detail-modal/music-detail-modal.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { MusicSnapshotComponent } from './components/music-snapshot/music-snapsh
     AppNavComponent,
     NowPlayingComponent,
     MusicSnapshotComponent,
+    MusicDetailModalComponent,
   ],
   imports: [
     BrowserModule,

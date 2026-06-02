@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { TopArtist, TopGenre, TopTrack } from '../../models/music.model';
+import { MusicDetailItem, TopArtist, TopGenre, TopTrack } from '../../models/music.model';
 import { WrappedArchive, WrappedMonth } from '../../models/wrapped.model';
 import { WrappedService } from '../../services/wrapped.service';
 
@@ -17,6 +17,9 @@ export class MusicWrappedComponent implements OnInit, OnDestroy {
   archive: WrappedArchive | null = null;
   selectedMonthKey = '';
   errorMessage = '';
+
+  // ── Detail modal ───────────────────────────────────
+  detailItem: MusicDetailItem | null = null;
 
   private sub?: Subscription;
 
@@ -83,6 +86,12 @@ export class MusicWrappedComponent implements OnInit, OnDestroy {
 
   trackByGenre(_index: number, genre: TopGenre): string {
     return genre.genre;
+  }
+
+  // ── Detail modal ───────────────────────────────────
+
+  openDetail(item: MusicDetailItem): void {
+    this.detailItem = item;
   }
 
   /** Returns a human-readable relative time string for the given ISO date. */

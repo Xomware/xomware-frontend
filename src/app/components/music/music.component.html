@@ -190,12 +190,11 @@
           <ol class="tracks-list" *ngIf="profile.topTracks.length > 0">
             <li *ngFor="let track of profile.topTracks; let i = index" class="track-item">
               <span class="track-rank" aria-hidden="true">{{ i + 1 }}</span>
-              <a
-                [href]="track.url"
-                target="_blank"
-                rel="noopener"
+              <button
+                type="button"
                 class="track-link"
-                [attr.aria-label]="track.name + ' by ' + track.artist + ' — open on Spotify'"
+                [attr.aria-label]="track.name + ' by ' + track.artist + ' — view details'"
+                (click)="openDetail({ kind: 'track', name: track.name, subtitle: track.artist, image: track.albumArt, spotifyUrl: track.url })"
               >
                 <img
                   [src]="track.albumArt"
@@ -207,10 +206,10 @@
                   <span class="track-name">{{ track.name }}</span>
                   <span class="track-artist">{{ track.artist }}</span>
                 </span>
-                <svg viewBox="0 0 24 24" class="track-ext-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="currentColor"/>
+                <svg viewBox="0 0 24 24" class="track-chevron-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
                 </svg>
-              </a>
+              </button>
             </li>
           </ol>
         </section>
@@ -224,12 +223,11 @@
           <ol class="artists-list" *ngIf="profile.topArtists.length > 0">
             <li *ngFor="let artist of profile.topArtists; let i = index" class="artist-item">
               <span class="artist-rank" aria-hidden="true">{{ i + 1 }}</span>
-              <a
-                [href]="artist.url"
-                target="_blank"
-                rel="noopener"
+              <button
+                type="button"
                 class="artist-link"
-                [attr.aria-label]="artist.name + ' — open on Spotify'"
+                [attr.aria-label]="artist.name + ' — view details'"
+                (click)="openDetail({ kind: 'artist', name: artist.name, subtitle: 'Artist', image: artist.image, spotifyUrl: artist.url })"
               >
                 <img
                   [src]="artist.image"
@@ -238,10 +236,10 @@
                   loading="lazy"
                 />
                 <span class="artist-name">{{ artist.name }}</span>
-                <svg viewBox="0 0 24 24" class="track-ext-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="currentColor"/>
+                <svg viewBox="0 0 24 24" class="track-chevron-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
                 </svg>
-              </a>
+              </button>
             </li>
           </ol>
         </section>
@@ -309,6 +307,12 @@
   >
     <app-music-wrapped></app-music-wrapped>
   </div>
+
+  <!-- Detail modal -->
+  <app-music-detail-modal
+    [item]="detailItem"
+    (close)="detailItem = null"
+  ></app-music-detail-modal>
 
   <!-- Footer -->
   <footer class="music-footer">
