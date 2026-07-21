@@ -186,6 +186,21 @@
   }
 }
 
+// Banner-forward treatment for apps whose logo is a wide wordmark/banner
+// (roughly 3:2) rather than a square icon — set via AppCard.logoStyle
+// === 'banner'. Taller, wider slot so the wordmark reads at a legible
+// size instead of getting squashed into the default square icon slot.
+// Deliberately distinct from the icon treatment: mixing banner + icon
+// cards in the same grid is intentional (only some apps have a banner
+// asset yet), not a layout bug.
+.card-logo--banner {
+  height: 140px;
+
+  img {
+    max-width: 100%;
+  }
+}
+
 .card-name {
   font-size: 1.1rem;
   font-weight: $font-weight-bold;

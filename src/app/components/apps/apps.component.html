@@ -33,7 +33,7 @@
             <span class="status-dot"></span>
             {{ app.status === 'live' ? 'Live' : 'Coming Soon' }}
           </span>
-          <div class="card-logo">
+          <div class="card-logo" [class.card-logo--banner]="app.logoStyle === 'banner'">
             <img [src]="app.logo" [alt]="app.name + ' logo'" loading="lazy" />
           </div>
           <div class="card-content">
@@ -71,7 +71,7 @@
             <span class="status-dot"></span>
             {{ app.status === 'live' ? 'Live' : 'Coming Soon' }}
           </span>
-          <div class="card-logo">
+          <div class="card-logo" [class.card-logo--banner]="app.logoStyle === 'banner'">
             <img [src]="app.logo" [alt]="app.name + ' logo'" loading="lazy" />
           </div>
           <div class="card-content">
