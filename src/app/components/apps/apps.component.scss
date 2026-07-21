@@ -1,0 +1,94 @@
+@import 'styles/variables';
+@import 'styles/app-cards';
+
+.apps-page {
+  min-height: 100vh;
+  background: $bg-dark;
+  color: $text-primary;
+  font-family: $font-stack;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Hero ─────────────────────────────────────────────
+.apps-hero {
+  background: $hero-gradient;
+  padding: calc(#{$spacing-4xl} + var(--nav-h)) $spacing-xl $spacing-2xl;
+  text-align: center;
+
+  @media (max-width: $breakpoint-md) {
+    padding: calc(#{$spacing-3xl} + var(--nav-h)) $spacing-md $spacing-xl;
+  }
+}
+
+.apps-hero-inner {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.apps-hero-title {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: $font-weight-extrabold;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 $spacing-md;
+  background: linear-gradient(135deg, $text-primary 0%, $brand-cyan-light 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.apps-hero-subtitle {
+  font-size: 16px;
+  color: $text-secondary;
+  margin: 0;
+}
+
+// ── App directory section (uses shared .apps-section / .cards-container /
+// .app-card / .platform-heading / .ios-whitelist-* from styles/app-cards) ──
+.apps-section {
+  margin: 0 auto;
+}
+
+// ── Footer ───────────────────────────────────────────
+.apps-footer {
+  margin-top: auto;
+  border-top: 1px solid $glass-border;
+  padding: $spacing-xl;
+}
+
+.apps-footer-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.apps-footer-copy {
+  font-size: 13px;
+  color: $text-muted;
+}
+
+.apps-footer-link {
+  font-size: 13px;
+  color: $text-secondary;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $brand-cyan;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}

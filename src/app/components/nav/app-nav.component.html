@@ -7,7 +7,7 @@
     </a>
     <div class="nav-links">
       <a routerLink="/" class="nav-link">Home</a>
-      <a routerLink="/" fragment="apps" class="nav-link">Apps</a>
+      <a routerLink="/apps" class="nav-link">Apps</a>
       <a routerLink="/music" class="nav-link">Music</a>
       <a href="https://github.com/Xomware" target="_blank" rel="noopener" class="nav-link nav-link-github">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="nav-icon" aria-hidden="true">
@@ -111,7 +111,7 @@
 <div class="mobile-menu-overlay" [class.open]="menuOpen" (click)="closeMenu()">
   <nav class="mobile-menu" aria-label="Mobile navigation" (click)="$event.stopPropagation()">
     <a routerLink="/" class="mobile-menu-link" (click)="closeMenu()">Home</a>
-    <a routerLink="/" fragment="apps" class="mobile-menu-link" (click)="closeMenu()">Apps</a>
+    <a routerLink="/apps" class="mobile-menu-link" (click)="closeMenu()">Apps</a>
     <a routerLink="/music" class="mobile-menu-link" (click)="closeMenu()">Music</a>
     <a href="https://github.com/Xomware" target="_blank" rel="noopener" class="mobile-menu-link" (click)="closeMenu()">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="mobile-menu-icon" aria-hidden="true">

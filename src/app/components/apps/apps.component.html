@@ -1,0 +1,99 @@
+<div class="apps-page">
+  <!-- Ambient backdrop — same blobs as landing/music (position:fixed, pointer-events:none) -->
+  <app-monster></app-monster>
+
+  <!-- Shared site navbar — always-scrolled so the solid background is immediate
+       (no tall hero here, transparent nav would make links unreadable at the top) -->
+  <app-nav [alwaysScrolled]="true"></app-nav>
+
+  <!-- Hero / page title -->
+  <header class="apps-hero">
+    <div class="apps-hero-inner">
+      <span class="section-eyebrow">&#9889; The Suite</span>
+      <h1 class="apps-hero-title">Apps by Xomware</h1>
+      <p class="apps-hero-subtitle">Products &amp; projects from the Xomware workshop.</p>
+    </div>
+  </header>
+
+  <!-- App directory -->
+  <main class="apps-section" aria-label="App directory">
+    <!-- Web Apps -->
+    <h2 class="platform-heading">Web Apps</h2>
+    <div class="cards-container">
+      <ng-container *ngFor="let app of webApps; let i = index">
+        <a class="app-card glass-card"
+           [style.--app-color]="app.color"
+           [style.--app-rgb]="app.colorRgb"
+           [href]="app.url"
+           target="_blank"
+           rel="noopener"
+        >
+          <div class="card-glow" aria-hidden="true"></div>
+          <span class="card-status" [class.live]="app.status === 'live'" [class.coming-soon]="app.status === 'coming-soon'">
+            <span class="status-dot"></span>
+            {{ app.status === 'live' ? 'Live' : 'Coming Soon' }}
+          </span>
+          <div class="card-logo">
+            <img [src]="app.logo" [alt]="app.name + ' logo'" loading="lazy" />
+          </div>
+          <div class="card-content">
+            <h3 class="card-name">{{ app.name }}</h3>
+            <p class="card-description">{{ app.description }}</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-tag">{{ app.tag }}</span>
+            <svg class="card-arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+            </svg>
+          </div>
+        </a>
+      </ng-container>
+    </div>
+
+    <!-- iOS Apps -->
+    <h2 class="platform-heading platform-heading--ios">iOS Apps <span class="platform-badge">TestFlight</span></h2>
+    <p class="ios-whitelist-note">
+      TestFlight builds &mdash; email
+      <a href="mailto:dominickj.giordano@gmail.com" class="ios-whitelist-link">dominickj.giordano&#64;gmail.com</a>
+      to be whitelisted.
+    </p>
+    <div class="cards-container">
+      <ng-container *ngFor="let app of iosApps; let i = index">
+        <a class="app-card glass-card"
+           [style.--app-color]="app.color"
+           [style.--app-rgb]="app.colorRgb"
+           [href]="app.url"
+           target="_blank"
+           rel="noopener"
+        >
+          <div class="card-glow" aria-hidden="true"></div>
+          <span class="card-status" [class.live]="app.status === 'live'" [class.coming-soon]="app.status === 'coming-soon'">
+            <span class="status-dot"></span>
+            {{ app.status === 'live' ? 'Live' : 'Coming Soon' }}
+          </span>
+          <div class="card-logo">
+            <img [src]="app.logo" [alt]="app.name + ' logo'" loading="lazy" />
+          </div>
+          <div class="card-content">
+            <h3 class="card-name">{{ app.name }}</h3>
+            <p class="card-description">{{ app.description }}</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-tag">{{ app.tag }}</span>
+            <svg class="card-arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+            </svg>
+          </div>
+        </a>
+      </ng-container>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="apps-footer">
+    <div class="apps-footer-inner">
+      <span class="apps-footer-copy">&copy; 2026 Xomware. All rights reserved.</span>
+      <a routerLink="/privacy" class="apps-footer-link">Privacy</a>
+    </div>
+  </footer>
+</div>

@@ -4,11 +4,10 @@ import { switchMap, startWith, catchError } from 'rxjs/operators';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CognitoService, XomUser } from '../../services/cognito.service';
-import { MusicService } from '../../services/music.service';
 import { NowPlayingService } from '../../services/now-playing.service';
-import { MusicProfile } from '../../models/music.model';
 import { NowPlayingState } from '../../models/now-playing.model';
 import { environment } from '../../../environments/environment';
+import { AppCard, APPS } from '../../data/apps.data';
 
 const IDLE_STATE: NowPlayingState = {
   isPlaying: false,
@@ -19,19 +18,10 @@ const IDLE_STATE: NowPlayingState = {
   playedAt: null,
 };
 
-gsap.registerPlugin(ScrollTrigger);
+/** Names of the apps featured in the landing's compact "Browse all apps" teaser. */
+const FEATURED_APP_NAMES = ['Xomify', 'Xomper', 'Xom Appétit'];
 
-interface AppCard {
-  name: string;
-  description: string;
-  color: string;
-  colorRgb: string;
-  url: string;
-  logo: string;
-  tag: string;
-  status: 'live' | 'coming-soon';
-  platform: 'web' | 'ios';
-}
+gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-landing',
@@ -40,34 +30,27 @@ interface AppCard {
 })
 export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
   user: XomUser | null = null;
-  landingTickerProfile: MusicProfile | null = null;
   nowPlayingState: NowPlayingState | null = null;
 
+  /** A handful of live web apps shown in the landing teaser — see /apps for the full grid. */
+  featuredApps: AppCard[] = APPS.filter(
+    (a) => a.platform === 'web' && FEATURED_APP_NAMES.includes(a.name),
+  );
+
   private userSub?: Subscription;
-  private tickerSub?: Subscription;
   private nowPlayingSub?: Subscription;
 
   constructor(
     private cognito: CognitoService,
-    private musicService: MusicService,
     private nowPlayingService: NowPlayingService,
   ) {}
 
   ngOnInit(): void {
     this.userSub = this.cognito.user$.subscribe((u) => (this.user = u));
 
-    // Fetch top-items once for the ticker and snapshot module (short_term default).
-    this.tickerSub = this.musicService
-      .getPublicTopItems(environment.musicProfileUserId)
-      .subscribe({
-        next: (data) => (this.landingTickerProfile = data),
-        error: () => {
-          // Silently skip the ticker/snapshot if the fetch fails.
-          this.landingTickerProfile = null;
-        },
-      });
-
-    // Poll now-playing for the snapshot module (25s interval, same as /music).
+    // Poll now-playing for the compact hero widget (25s interval, same
+    // cadence as /music). This is the same data source that used to feed
+    // the (now removed) full-size music snapshot module — no new fetch.
     this.nowPlayingSub = interval(25_000)
       .pipe(
         startWith(0),
@@ -80,127 +63,6 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
       .subscribe((s) => (this.nowPlayingState = s));
   }
 
-  apps: AppCard[] = [
-    {
-      name: 'Xomify',
-      description: 'Your Spotify stats, wrapped your way. Top songs, artists, genres & more.',
-      color: '#9c0abf',
-      colorRgb: '156, 10, 191',
-      url: 'https://xomify.xomware.com',
-      logo: 'assets/img/xomify-logo.png',
-      tag: 'Web App',
-      status: 'live',
-      platform: 'web',
-    },
-    {
-      name: 'XomCloud',
-      description: 'Your SoundCloud library, organized. Discover and manage your music collection.',
-      color: '#ff6b35',
-      colorRgb: '255, 107, 53',
-      url: 'https://xomcloud.xomware.com',
-      logo: 'assets/img/xomcloud-logo.png',
-      tag: 'Web App',
-      status: 'live',
-      platform: 'web',
-    },
-    {
-      name: 'Xomper',
-      description: 'Fantasy football analytics. Track your dynasty league, players & matchups.',
-      color: '#00ffab',
-      colorRgb: '0, 255, 171',
-      url: 'https://xomper.xomware.com',
-      logo: 'assets/img/xomper-logo.jpg',
-      tag: 'Web App',
-      status: 'live',
-      platform: 'web',
-    },
-    {
-      name: 'Sun God Derby',
-      description: "Grant's annual Kentucky Derby pool. Tail or fade his picks, climb the leaderboard.",
-      color: '#C8102E',
-      colorRgb: '200, 16, 46',
-      url: 'https://derby.xomware.com',
-      logo: 'assets/img/sun-god-derby-banner.png',
-      tag: 'Web App',
-      status: 'live',
-      platform: 'web',
-    },
-    {
-      name: 'Xom Appétit',
-      description: 'Home-cooking tracker with recipes, ingredients & macros. Rated by three loud chefs.',
-      color: '#ff6b6b',
-      colorRgb: '255, 107, 107',
-      url: 'https://xomappetit.xomware.com',
-      logo: 'assets/img/xomappetit-banner.png',
-      tag: 'Web App',
-      status: 'live',
-      platform: 'web',
-    },
-    {
-      name: 'Xomforms',
-      description: 'Group availability scheduler — When2meet done right. Drag-paint your availability, see the best time instantly.',
-      color: '#4caf50',
-      colorRgb: '76, 175, 80',
-      url: 'https://xomforms.xomware.com',
-      logo: 'assets/img/xomforms-placeholder.svg',
-      tag: 'Web App',
-      status: 'live',
-      platform: 'web',
-    },
-    {
-      name: 'Xomify',
-      description: 'Your Spotify stats on iOS. Native app available on TestFlight.',
-      color: '#9c0abf',
-      colorRgb: '156, 10, 191',
-      url: 'https://testflight.apple.com/join/5CQaJ2mB',
-      logo: 'assets/img/xomify-logo.png',
-      tag: 'iOS · TestFlight',
-      status: 'live',
-      platform: 'ios',
-    },
-    {
-      name: 'Xomper',
-      description: 'Fantasy football analytics on iOS. Native app coming soon.',
-      color: '#00ffab',
-      colorRgb: '0, 255, 171',
-      url: 'https://xomper.xomware.com',
-      logo: 'assets/img/xomper-logo.jpg',
-      tag: 'iOS · Coming Soon',
-      status: 'coming-soon',
-      platform: 'ios',
-    },
-    {
-      name: 'XomFit',
-      description: 'Social fitness & lifting tracker. Challenge friends, follow AI workout plans.',
-      color: '#34C759',
-      colorRgb: '52, 199, 89',
-      url: 'https://testflight.apple.com/join/xttcUQwT',
-      logo: 'assets/img/xomfit-banner.png',
-      tag: 'iOS · TestFlight',
-      status: 'live',
-      platform: 'ios',
-    },
-    {
-      name: 'Float',
-      description: 'Real-time deals for bars & restaurants. Live happy hours near you.',
-      color: '#FFB800',
-      colorRgb: '255, 184, 0',
-      url: 'https://float.xomware.com',
-      logo: 'assets/img/float-placeholder.svg',
-      tag: 'iOS · Coming Soon',
-      status: 'coming-soon',
-      platform: 'ios',
-    },
-  ];
-
-  get webApps(): AppCard[] {
-    return this.apps.filter(a => a.platform === 'web');
-  }
-
-  get iosApps(): AppCard[] {
-    return this.apps.filter(a => a.platform === 'ios');
-  }
-
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.initScrollAnimations();
@@ -210,7 +72,6 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
   ngOnDestroy(): void {
     ScrollTrigger.getAll().forEach(t => t.kill());
     this.userSub?.unsubscribe();
-    this.tickerSub?.unsubscribe();
     this.nowPlayingSub?.unsubscribe();
   }
 

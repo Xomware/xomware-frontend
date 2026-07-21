@@ -1,4 +1,5 @@
 @import 'styles/variables';
+@import 'styles/app-cards';
 
 .landing {
   min-height: 100vh;
@@ -265,6 +266,104 @@
   height: 18px;
 }
 
+// ── Hero: compact now-playing widget ─────────────
+// Sits below the CTA row, inside .hero-content (so it fades with the rest
+// of the hero on scroll, same as everything else here). Fixed-size art
+// wrapper + info column so toggling between playing/last-played/hidden
+// never causes the CTA above or scroll-hint below to jump.
+.hero-now-playing {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-md;
+  max-width: 360px;
+  margin: $spacing-lg auto 0;
+  padding: $spacing-sm $spacing-lg $spacing-sm $spacing-sm;
+  @include glass-card;
+  border-radius: $radius-pill;
+  text-align: left;
+  text-decoration: none;
+  color: $text-primary;
+  transition: all $transition-base;
+  animation: fadeIn 0.8s ease-out 0.4s both;
+
+  &:hover,
+  &:focus-visible {
+    @include glass-card-hover;
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 3px;
+  }
+}
+
+.hero-now-playing-art-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.hero-now-playing-art {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-sm;
+  object-fit: cover;
+  display: block;
+}
+
+// Subtle pulsing ring — only rendered when actively playing.
+.hero-now-playing-pulse {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px $bg-dark, 0 0 6px rgba(16, 185, 129, 0.6);
+  animation: heroPulse 2s ease-in-out infinite;
+}
+
+@keyframes heroPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.8); }
+}
+
+.hero-now-playing-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hero-now-playing-label {
+  font-size: 0.7rem;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $brand-cyan;
+}
+
+.hero-now-playing-track {
+  font-size: 0.85rem;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+
+.hero-now-playing-artist {
+  font-size: 0.78rem;
+  color: $text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+
 // ── Scroll Hint ──────────────────────────────────
 .scroll-hint {
   display: flex;
@@ -287,390 +386,27 @@
   }
 }
 
-// ── Section Headers ──────────────────────────────
-.section-header {
-  text-align: center;
-  margin-bottom: $spacing-2xl;
-}
-
-.section-eyebrow {
-  display: inline-block;
-  font-size: 0.8rem;
-  font-weight: $font-weight-bold;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: $brand-cyan;
-  margin-bottom: $spacing-sm;
-}
-
-.section-title {
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  font-weight: $font-weight-extrabold;
-  color: $text-primary;
-  margin-bottom: $spacing-sm;
-  letter-spacing: -0.01em;
-}
-
-.section-subtitle {
-  font-size: 1rem;
-  color: $text-secondary;
-}
-
-// ── App Cards (Glass Morphism) ───────────────────
-.apps-section {
+// ── Apps teaser section ───────────────────────────
+// Compact preview of the full /apps directory. Reuses .section-header /
+// .cards-container / .app-card / .card-* from styles/app-cards (imported
+// at the top of this file) so the teaser cards render identically to the
+// full grid on /apps.
+.apps-teaser-section {
   width: 100%;
-  max-width: 1100px;
+  max-width: 900px;
   padding: $spacing-3xl $spacing-xl;
   position: relative;
   z-index: 1;
+
+  .cards-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-// Anonymous gate — full-viewport centered card. Replaces the entire
-// landing for signed-out visitors. Brand mark + sign-in CTA only.
-.anon-gate {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
+.apps-teaser-cta {
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: $spacing-xl;
-}
-
-.anon-gate-card {
-  width: 100%;
-  max-width: 420px;
-  padding: $spacing-2xl;
-  background: rgba(24, 24, 27, 0.7);
-  border: 1px solid rgba(0, 180, 216, 0.2);
-  border-radius: 16px;
-  text-align: center;
-  backdrop-filter: blur(12px);
-}
-
-.anon-gate-mark {
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-sm;
-  margin-bottom: $spacing-md;
-
-  img {
-    width: 32px;
-    height: 32px;
-  }
-}
-
-.anon-gate-wordmark {
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  color: $brand-cyan;
-}
-
-.anon-gate-tagline {
-  color: #a1a1aa;
-  font-size: 15px;
-  line-height: 1.5;
-  margin: 0 0 $spacing-lg;
-}
-
-.anon-gate-actions {
-  display: flex;
-  gap: $spacing-md;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: $spacing-lg;
-}
-
-.anon-gate-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #d4d4d8;
-  background: transparent;
-  transition: all 150ms ease;
-
-  &:hover,
-  &:focus-visible {
-    border-color: $brand-cyan;
-    color: #fafafa;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 2px;
-  }
-
-  &.primary {
-    background: linear-gradient(90deg, $brand-cyan, #48cae4);
-    border-color: transparent;
-    color: #0a0a0b;
-
-    &:hover,
-    &:focus-visible {
-      filter: brightness(1.05);
-      color: #0a0a0b;
-    }
-  }
-}
-
-.anon-gate-link {
-  display: inline-block;
-  font-size: 12px;
-  color: #71717a;
-  text-decoration: none;
-  transition: color 150ms ease;
-
-  &:hover,
-  &:focus-visible {
-    color: $brand-cyan;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
-}
-
-.cards-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: $spacing-lg;
-}
-
-.app-card {
-  --app-color: #{$brand-cyan};
-  --app-rgb: 0, 180, 216;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: $spacing-xl $spacing-lg $spacing-lg;
-  @include glass-card;
-  text-decoration: none;
-  color: $text-primary;
-  transition: all $transition-base;
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-
-  .card-glow {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at center, rgba(var(--app-rgb), 0.06), transparent 60%);
-    opacity: 0;
-    transition: opacity $transition-slow;
-    pointer-events: none;
-  }
-
-  &:hover {
-    transform: translateY(-8px);
-    @include glass-card-hover;
-
-    .card-glow {
-      opacity: 1;
-    }
-
-    .card-logo img {
-      transform: scale(1.08);
-      filter: drop-shadow(0 0 16px rgba(var(--app-rgb), 0.4));
-    }
-
-    .card-arrow {
-      opacity: 1;
-      transform: translateX(0);
-      color: var(--app-color);
-    }
-
-    .card-name {
-      color: var(--app-color);
-    }
-  }
-}
-
-// ── Card Status Badge ────────────────────────────
-.card-status {
-  position: absolute;
-  top: $spacing-sm;
-  right: $spacing-sm;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  font-size: 0.65rem;
-  font-weight: $font-weight-semibold;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  border-radius: $radius-pill;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: $text-secondary;
-  z-index: 2;
-  pointer-events: none;
-
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  &.live {
-    color: #10b981;
-    border-color: rgba(16, 185, 129, 0.2);
-    background: rgba(16, 185, 129, 0.08);
-
-    .status-dot {
-      background: #10b981;
-      box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
-      animation: statusPulse 2s ease-in-out infinite;
-    }
-  }
-
-  &.coming-soon {
-    color: #f59e0b;
-    border-color: rgba(245, 158, 11, 0.2);
-    background: rgba(245, 158, 11, 0.08);
-
-    .status-dot {
-      background: #f59e0b;
-      box-shadow: 0 0 6px rgba(245, 158, 11, 0.3);
-    }
-  }
-}
-
-@keyframes statusPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.75); }
-}
-
-.card-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: $spacing-md;
-  width: 100%;
-  height: 80px;
-
-  img {
-    max-width: 90%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    transition: all $transition-base;
-  }
-}
-
-.card-name {
-  font-size: 1.1rem;
-  font-weight: $font-weight-bold;
-  margin-bottom: $spacing-xs;
-  transition: color $transition-base;
-}
-
-.card-description {
-  font-size: 0.85rem;
-  color: $text-secondary;
-  line-height: 1.5;
-  margin-bottom: $spacing-md;
-}
-
-.card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: auto;
-}
-
-.card-tag {
-  font-size: 0.7rem;
-  font-weight: $font-weight-medium;
-  color: $text-muted;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 3px $spacing-sm;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: $radius-sm;
-}
-
-.card-arrow {
-  opacity: 0;
-  transform: translateX(-6px);
-  transition: all $transition-base;
-  color: $text-muted;
-  width: 20px;
-  height: 20px;
-}
-
-// ── Platform Section Headings ────────────────────
-.platform-heading {
-  font-size: 1rem;
-  font-weight: $font-weight-semibold;
-  color: $text-secondary;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: $spacing-lg;
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-
-  &--ios {
-    margin-top: $spacing-3xl;
-  }
-}
-
-.platform-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  background: rgba($brand-cyan, 0.08);
-  border: 1px solid rgba($brand-cyan, 0.2);
-  border-radius: $radius-pill;
-  font-size: 0.65rem;
-  font-weight: $font-weight-semibold;
-  letter-spacing: 0.1em;
-  color: $brand-cyan;
-  text-transform: uppercase;
-  vertical-align: middle;
-}
-
-// ── iOS Whitelist Note ────────────────────────────
-.ios-whitelist-note {
-  font-size: 0.85rem;
-  color: $text-muted;
-  margin-bottom: $spacing-xl;
-  line-height: 1.5;
-}
-
-.ios-whitelist-link {
-  color: $brand-cyan;
-  text-decoration: none;
-  font-weight: $font-weight-medium;
-  transition: color $transition-fast;
-
-  &:hover {
-    color: $brand-cyan-light;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
+  margin-top: $spacing-2xl;
 }
 
 // ── Footer ───────────────────────────────────────
@@ -771,47 +507,10 @@
   50% { transform: translateY(5px); }
 }
 
-// ── Landing: sticky ticker (top, under fixed nav) ────
-// Fixed nav is z:1000. Ticker sticks directly under it.
-.landing-ticker-top {
-  position: sticky;
-  top: var(--nav-h);
-  z-index: 90;
-  // Push in-flow content below the nav so the ticker is the first thing
-  // seen after the nav; the margin-top accounts for the fixed nav offset.
-  margin-top: var(--nav-h);
-  overflow: visible; // allow ticker's full-bleed breakout
-}
-
-// Spacer so the hero starts below both the fixed nav AND sticky ticker.
-// Height = ticker height (defined in --ticker-h). Only rendered when the
-// ticker has data (same *ngIf as .landing-ticker-top).
-.landing-ticker-spacer {
-  height: var(--ticker-h);
-  flex-shrink: 0;
-}
-
-// ── Music snapshot section (between hero and apps) ────
-// Moved outside .hero-content so the hero ScrollTrigger fade does not
-// affect this element. Sits as its own in-flow block after the hero.
-.music-snapshot-section {
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 $spacing-xl $spacing-3xl;
-
-  @media (max-width: $breakpoint-md) {
-    padding: 0 $spacing-md $spacing-2xl;
-  }
-}
-
 // ── Responsive ───────────────────────────────────
-@media (max-width: $breakpoint-lg) {
-  .cards-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
+// Note: .cards-container / .app-card responsive rules live in
+// styles/app-cards (shared with /apps) — only landing-specific overrides
+// live here.
 @media (max-width: $breakpoint-md) {
   .profile-name {
     font-size: clamp(1.6rem, 6vw, 2.2rem);
@@ -821,52 +520,14 @@
     gap: $spacing-sm;
   }
 
-  .platform-heading--ios {
-    margin-top: $spacing-2xl;
-  }
-
   .hero-ctas {
     flex-direction: column;
     align-items: center;
   }
 
-  .cards-container {
-    grid-template-columns: 1fr;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-
-  .app-card {
-    flex-direction: row;
-    text-align: left;
-    padding: $spacing-lg;
-    gap: $spacing-md;
-
-    .card-logo {
-      margin-bottom: 0;
-      flex-shrink: 0;
-      width: auto;
-
-      img {
-        width: auto;
-        max-width: 100px;
-        max-height: 50px;
-      }
-    }
-
-    .card-content {
-      flex: 1;
-    }
-
-    .card-footer {
-      display: none;
-    }
-
-    .card-arrow {
-      opacity: 0.5;
-      transform: translateX(0);
-      flex-shrink: 0;
-    }
+  .hero-now-playing {
+    width: 100%;
+    max-width: 100%;
   }
 
   .footer-links {
@@ -883,7 +544,8 @@
 @media (prefers-reduced-motion: reduce) {
   .badge-dot,
   .scroll-arrow,
-  .status-dot {
+  .status-dot,
+  .hero-now-playing-pulse {
     animation: none !important;
   }
 
@@ -892,6 +554,7 @@
   .hero-title,
   .hero-subtitle,
   .hero-ctas,
+  .hero-now-playing,
   .profile-headshot,
   .profile-name,
   .profile-role,

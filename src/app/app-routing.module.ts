@@ -15,6 +15,7 @@ import { ProfileComponent } from './components/auth/profile/profile.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { PrivacyComponent } from './components/privacy/privacy.component';
 import { MusicComponent } from './components/music/music.component';
+import { AppsComponent } from './components/apps/apps.component';
 
 const routes: Routes = [
   // Landing is intentionally public so Google OAuth verification can confirm
@@ -24,6 +25,8 @@ const routes: Routes = [
   { path: 'privacy', component: PrivacyComponent },
   // Public route — Dom's listening stats, no auth required
   { path: 'music', component: MusicComponent },
+  // Public route — the full app directory, no auth required
+  { path: 'apps', component: AppsComponent },
   { path: 'auth/sign-in', component: SignInComponent },
   { path: 'auth/sign-up', component: SignUpComponent },
   { path: 'auth/verify', component: VerifyComponent },

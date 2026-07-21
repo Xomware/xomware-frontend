@@ -24,16 +24,6 @@
   <!-- Shared site navbar -->
   <app-nav></app-nav>
 
-  <!-- ── Music ticker — sticky under fixed nav ──────────── -->
-  <!-- Rendered once at the top; stays pinned while scrolling. Positioned
-       here (above the hero) so it pins correctly in the sticky stack:
-       fixed nav → sticky ticker → hero content scrolls under both. -->
-  <div class="landing-ticker-top" *ngIf="landingTickerProfile" aria-label="Music ticker">
-    <app-music-ticker [profile]="landingTickerProfile" [nowPlaying]="null"></app-music-ticker>
-  </div>
-  <!-- Spacer so hero content starts below the sticky ticker -->
-  <div class="landing-ticker-spacer" *ngIf="landingTickerProfile"></div>
-
   <!-- Hero / Profile Section -->
   <header class="hero" id="hero">
     <div class="hero-content">
@@ -110,11 +100,31 @@
         </a>
       </div>
       <div class="hero-ctas">
-        <a routerLink="/" fragment="apps" class="btn-primary">
+        <a routerLink="/apps" class="btn-primary">
           Explore Apps
           <svg viewBox="0 0 24 24" class="btn-icon"><path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z" fill="currentColor"/></svg>
         </a>
       </div>
+
+      <!-- Compact now-playing widget — subtle pulse when actively playing,
+           shows last-played when idle, hidden entirely when there's no
+           track data at all. Links through to the full /music page. -->
+      <a
+        routerLink="/music"
+        class="hero-now-playing"
+        *ngIf="nowPlayingState?.track as track"
+        [attr.aria-label]="(nowPlayingState?.isPlaying ? 'Now playing: ' : 'Last played: ') + track.name + ' by ' + track.artist + ' — view music stats'"
+      >
+        <span class="hero-now-playing-art-wrap">
+          <img [src]="track.albumArt" [alt]="''" class="hero-now-playing-art" loading="lazy" />
+          <span class="hero-now-playing-pulse" *ngIf="nowPlayingState?.isPlaying" aria-hidden="true"></span>
+        </span>
+        <span class="hero-now-playing-info">
+          <span class="hero-now-playing-label">{{ nowPlayingState?.isPlaying ? 'Now playing' : 'Last played' }}</span>
+          <span class="hero-now-playing-track">{{ track.name }}</span>
+          <span class="hero-now-playing-artist">{{ track.artist }}</span>
+        </span>
+      </a>
     </div>
     <!-- Scroll hint -->
     <div class="scroll-hint">
@@ -125,28 +135,16 @@
     </div>
   </header>
 
-  <!-- Music snapshot — outside .hero-content so it is NOT faded by the
-       hero ScrollTrigger (which targets .hero-content only). Sits in its
-       own section between the hero and the app cards. -->
-  <section class="music-snapshot-section" *ngIf="landingTickerProfile" aria-label="Now playing">
-    <app-music-snapshot
-      [profile]="landingTickerProfile"
-      [nowPlayingState]="nowPlayingState"
-    ></app-music-snapshot>
-  </section>
-
-  <!-- App Cards Section -->
-  <section class="apps-section" id="apps">
+  <!-- Apps teaser — compact preview of the full /apps directory. -->
+  <section class="apps-teaser-section" id="apps">
     <div class="section-header">
       <span class="section-eyebrow">&#9889; The Suite</span>
       <h2 class="section-title">Apps by Xomware</h2>
       <p class="section-subtitle">Products &amp; projects from the Xomware workshop.</p>
     </div>
 
-    <!-- Web Apps -->
-    <h3 class="platform-heading">Web Apps</h3>
     <div class="cards-container">
-      <ng-container *ngFor="let app of webApps; let i = index">
+      <ng-container *ngFor="let app of featuredApps; let i = index">
         <a class="app-card glass-card"
            [style.--app-color]="app.color"
            [style.--app-rgb]="app.colorRgb"
@@ -154,7 +152,7 @@
            [href]="app.url"
            target="_blank"
            rel="noopener"
->
+        >
           <div class="card-glow" aria-hidden="true"></div>
           <span class="card-status" [class.live]="app.status === 'live'" [class.coming-soon]="app.status === 'coming-soon'">
             <span class="status-dot"></span>
@@ -177,43 +175,11 @@
       </ng-container>
     </div>
 
-    <!-- iOS Apps -->
-    <h3 class="platform-heading platform-heading--ios">iOS Apps <span class="platform-badge">TestFlight</span></h3>
-    <p class="ios-whitelist-note">
-      TestFlight builds &mdash; email
-      <a href="mailto:dominickj.giordano@gmail.com" class="ios-whitelist-link">dominickj.giordano&#64;gmail.com</a>
-      to be whitelisted.
-    </p>
-    <div class="cards-container">
-      <ng-container *ngFor="let app of iosApps; let i = index">
-        <a class="app-card glass-card"
-           [style.--app-color]="app.color"
-           [style.--app-rgb]="app.colorRgb"
-           [style.animation-delay]="(i * 0.1) + 's'"
-           [href]="app.url"
-           target="_blank"
-           rel="noopener"
->
-          <div class="card-glow" aria-hidden="true"></div>
-          <span class="card-status" [class.live]="app.status === 'live'" [class.coming-soon]="app.status === 'coming-soon'">
-            <span class="status-dot"></span>
-            {{ app.status === 'live' ? 'Live' : 'Coming Soon' }}
-          </span>
-          <div class="card-logo">
-            <img [src]="app.logo" [alt]="app.name + ' logo'" loading="lazy" />
-          </div>
-          <div class="card-content">
-            <h3 class="card-name">{{ app.name }}</h3>
-            <p class="card-description">{{ app.description }}</p>
-          </div>
-          <div class="card-footer">
-            <span class="card-tag">{{ app.tag }}</span>
-            <svg class="card-arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
-            </svg>
-          </div>
-        </a>
-      </ng-container>
+    <div class="apps-teaser-cta">
+      <a routerLink="/apps" class="btn-secondary">
+        Browse all apps
+        <svg viewBox="0 0 24 24" class="btn-icon"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>
+      </a>
     </div>
   </section>
 

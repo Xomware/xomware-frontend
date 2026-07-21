@@ -23,6 +23,7 @@ import { PrivacyComponent } from './components/privacy/privacy.component';
 import { AvatarPickerComponent } from './components/avatar-picker/avatar-picker.component';
 import { StockAvatarComponent } from './components/avatar-picker/stock-avatar.component';
 import { MusicComponent } from './components/music/music.component';
+import { AppsComponent } from './components/apps/apps.component';
 import { MusicTickerComponent } from './components/music-ticker/music-ticker.component';
 import { MusicReleaseRadarComponent } from './components/music-release-radar/music-release-radar.component';
 import { MusicWrappedComponent } from './components/music-wrapped/music-wrapped.component';
@@ -49,6 +50,7 @@ import { MusicSnapshotComponent } from './components/music-snapshot/music-snapsh
     AvatarPickerComponent,
     StockAvatarComponent,
     MusicComponent,
+    AppsComponent,
     MusicTickerComponent,
     MusicReleaseRadarComponent,
     MusicWrappedComponent,
