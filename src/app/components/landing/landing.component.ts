@@ -137,6 +137,17 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
       platform: 'web',
     },
     {
+      name: 'Xomforms',
+      description: 'Group availability scheduler — When2meet done right. Drag-paint your availability, see the best time instantly.',
+      color: '#4caf50',
+      colorRgb: '76, 175, 80',
+      url: 'https://xomforms.xomware.com',
+      logo: 'assets/img/xomforms-placeholder.svg',
+      tag: 'Web App',
+      status: 'live',
+      platform: 'web',
+    },
+    {
       name: 'Xomify',
       description: 'Your Spotify stats on iOS. Native app available on TestFlight.',
       color: '#9c0abf',
