@@ -8,12 +8,19 @@ export interface AppCard {
   tag: string;
   status: 'live' | 'coming-soon';
   platform: 'web' | 'ios';
+  /**
+   * Set to 'banner' when `logo` is a wide wordmark/banner asset (roughly
+   * 3:2) rather than a square icon. Cards render a taller, wider logo
+   * area for these so the banner reads cleanly instead of getting
+   * squashed into the default square icon slot. Omit for square icons.
+   */
+  logoStyle?: 'banner';
 }
 
 /**
  * Single source of truth for the Xomware app directory. Consumed by
- * AppsComponent (full /apps grid) and LandingComponent (compact teaser).
- * Add new apps here — both surfaces pick the change up automatically.
+ * AppsComponent (full /apps grid) and LandingComponent (full grid, same
+ * data). Add new apps here — both surfaces pick the change up automatically.
  */
 export const APPS: AppCard[] = [
   {
@@ -77,7 +84,8 @@ export const APPS: AppCard[] = [
     color: '#4caf50',
     colorRgb: '76, 175, 80',
     url: 'https://xomforms.xomware.com',
-    logo: 'assets/img/xomforms-icon.png',
+    logo: 'assets/img/xomforms-banner.png',
+    logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
     platform: 'web',

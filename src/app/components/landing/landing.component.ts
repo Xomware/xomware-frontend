@@ -4,7 +4,9 @@ import { switchMap, startWith, catchError } from 'rxjs/operators';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CognitoService, XomUser } from '../../services/cognito.service';
+import { MusicService } from '../../services/music.service';
 import { NowPlayingService } from '../../services/now-playing.service';
+import { MusicProfile } from '../../models/music.model';
 import { NowPlayingState } from '../../models/now-playing.model';
 import { environment } from '../../../environments/environment';
 import { AppCard, APPS } from '../../data/apps.data';
@@ -18,9 +20,6 @@ const IDLE_STATE: NowPlayingState = {
   playedAt: null,
 };
 
-/** Names of the apps featured in the landing's compact "Browse all apps" teaser. */
-const FEATURED_APP_NAMES = ['Xomify', 'Xomper', 'Xom Appétit'];
-
 gsap.registerPlugin(ScrollTrigger);
 
 @Component({
@@ -30,27 +29,37 @@ gsap.registerPlugin(ScrollTrigger);
 })
 export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
   user: XomUser | null = null;
+  landingTickerProfile: MusicProfile | null = null;
   nowPlayingState: NowPlayingState | null = null;
 
-  /** A handful of live web apps shown in the landing teaser — see /apps for the full grid. */
-  featuredApps: AppCard[] = APPS.filter(
-    (a) => a.platform === 'web' && FEATURED_APP_NAMES.includes(a.name),
-  );
+  /** Full app directory — see src/app/data/apps.data.ts (shared with /apps). */
+  apps: AppCard[] = APPS;
 
   private userSub?: Subscription;
+  private tickerSub?: Subscription;
   private nowPlayingSub?: Subscription;
 
   constructor(
     private cognito: CognitoService,
+    private musicService: MusicService,
     private nowPlayingService: NowPlayingService,
   ) {}
 
   ngOnInit(): void {
     this.userSub = this.cognito.user$.subscribe((u) => (this.user = u));
 
-    // Poll now-playing for the compact hero widget (25s interval, same
-    // cadence as /music). This is the same data source that used to feed
-    // the (now removed) full-size music snapshot module — no new fetch.
+    // Fetch top-items once for the ticker and snapshot module (short_term default).
+    this.tickerSub = this.musicService
+      .getPublicTopItems(environment.musicProfileUserId)
+      .subscribe({
+        next: (data) => (this.landingTickerProfile = data),
+        error: () => {
+          // Silently skip the ticker/snapshot if the fetch fails.
+          this.landingTickerProfile = null;
+        },
+      });
+
+    // Poll now-playing for the snapshot module (25s interval, same as /music).
     this.nowPlayingSub = interval(25_000)
       .pipe(
         startWith(0),
@@ -63,6 +72,14 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
       .subscribe((s) => (this.nowPlayingState = s));
   }
 
+  get webApps(): AppCard[] {
+    return this.apps.filter(a => a.platform === 'web');
+  }
+
+  get iosApps(): AppCard[] {
+    return this.apps.filter(a => a.platform === 'ios');
+  }
+
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.initScrollAnimations();
@@ -72,6 +89,7 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
   ngOnDestroy(): void {
     ScrollTrigger.getAll().forEach(t => t.kill());
     this.userSub?.unsubscribe();
+    this.tickerSub?.unsubscribe();
     this.nowPlayingSub?.unsubscribe();
   }
 

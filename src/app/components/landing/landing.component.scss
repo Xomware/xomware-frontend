@@ -13,6 +13,120 @@
   // Orbs are handled by .bg-orbs overflow:hidden instead
 }
 
+// Anonymous gate — full-viewport centered card. Replaces the entire
+// landing for signed-out visitors. Brand mark + sign-in CTA only.
+.anon-gate {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl;
+}
+
+.anon-gate-card {
+  width: 100%;
+  max-width: 420px;
+  padding: $spacing-2xl;
+  background: rgba(24, 24, 27, 0.7);
+  border: 1px solid rgba(0, 180, 216, 0.2);
+  border-radius: 16px;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+
+.anon-gate-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+
+  img {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.anon-gate-wordmark {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: $brand-cyan;
+}
+
+.anon-gate-tagline {
+  color: #a1a1aa;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 $spacing-lg;
+}
+
+.anon-gate-actions {
+  display: flex;
+  gap: $spacing-md;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-lg;
+}
+
+.anon-gate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #d4d4d8;
+  background: transparent;
+  transition: all 150ms ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $brand-cyan;
+    color: #fafafa;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+  }
+
+  &.primary {
+    background: linear-gradient(90deg, $brand-cyan, #48cae4);
+    border-color: transparent;
+    color: #0a0a0b;
+
+    &:hover,
+    &:focus-visible {
+      filter: brightness(1.05);
+      color: #0a0a0b;
+    }
+  }
+}
+
+.anon-gate-link {
+  display: inline-block;
+  font-size: 12px;
+  color: #71717a;
+  text-decoration: none;
+  transition: color 150ms ease;
+
+  &:hover,
+  &:focus-visible {
+    color: $brand-cyan;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
 // ── Profile / Hero Section ───────────────────────
 .hero {
   width: 100%;
@@ -266,104 +380,6 @@
   height: 18px;
 }
 
-// ── Hero: compact now-playing widget ─────────────
-// Sits below the CTA row, inside .hero-content (so it fades with the rest
-// of the hero on scroll, same as everything else here). Fixed-size art
-// wrapper + info column so toggling between playing/last-played/hidden
-// never causes the CTA above or scroll-hint below to jump.
-.hero-now-playing {
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-md;
-  max-width: 360px;
-  margin: $spacing-lg auto 0;
-  padding: $spacing-sm $spacing-lg $spacing-sm $spacing-sm;
-  @include glass-card;
-  border-radius: $radius-pill;
-  text-align: left;
-  text-decoration: none;
-  color: $text-primary;
-  transition: all $transition-base;
-  animation: fadeIn 0.8s ease-out 0.4s both;
-
-  &:hover,
-  &:focus-visible {
-    @include glass-card-hover;
-    transform: translateY(-2px);
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 3px;
-  }
-}
-
-.hero-now-playing-art-wrap {
-  position: relative;
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-}
-
-.hero-now-playing-art {
-  width: 40px;
-  height: 40px;
-  border-radius: $radius-sm;
-  object-fit: cover;
-  display: block;
-}
-
-// Subtle pulsing ring — only rendered when actively playing.
-.hero-now-playing-pulse {
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 2px $bg-dark, 0 0 6px rgba(16, 185, 129, 0.6);
-  animation: heroPulse 2s ease-in-out infinite;
-}
-
-@keyframes heroPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.8); }
-}
-
-.hero-now-playing-info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.hero-now-playing-label {
-  font-size: 0.7rem;
-  font-weight: $font-weight-semibold;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: $brand-cyan;
-}
-
-.hero-now-playing-track {
-  font-size: 0.85rem;
-  font-weight: $font-weight-medium;
-  color: $text-primary;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 260px;
-}
-
-.hero-now-playing-artist {
-  font-size: 0.78rem;
-  color: $text-secondary;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 260px;
-}
-
 // ── Scroll Hint ──────────────────────────────────
 .scroll-hint {
   display: flex;
@@ -386,28 +402,44 @@
   }
 }
 
-// ── Apps teaser section ───────────────────────────
-// Compact preview of the full /apps directory. Reuses .section-header /
-// .cards-container / .app-card / .card-* from styles/app-cards (imported
-// at the top of this file) so the teaser cards render identically to the
-// full grid on /apps.
-.apps-teaser-section {
-  width: 100%;
-  max-width: 900px;
-  padding: $spacing-3xl $spacing-xl;
-  position: relative;
-  z-index: 1;
+// ── Landing: sticky ticker (top, under fixed nav) ────
+// Fixed nav is z:1000. Ticker sticks directly under it.
+.landing-ticker-top {
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 90;
+  // Push in-flow content below the nav so the ticker is the first thing
+  // seen after the nav; the margin-top accounts for the fixed nav offset.
+  margin-top: var(--nav-h);
+  overflow: visible; // allow ticker's full-bleed breakout
+}
 
-  .cards-container {
-    grid-template-columns: repeat(3, 1fr);
+// Spacer so the hero starts below both the fixed nav AND sticky ticker.
+// Height = ticker height (defined in --ticker-h). Only rendered when the
+// ticker has data (same *ngIf as .landing-ticker-top).
+.landing-ticker-spacer {
+  height: var(--ticker-h);
+  flex-shrink: 0;
+}
+
+// ── Music snapshot section (between hero and apps) ────
+// Moved outside .hero-content so the hero ScrollTrigger fade does not
+// affect this element. Sits as its own in-flow block after the hero.
+.music-snapshot-section {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 $spacing-xl $spacing-3xl;
+
+  @media (max-width: $breakpoint-md) {
+    padding: 0 $spacing-md $spacing-2xl;
   }
 }
 
-.apps-teaser-cta {
-  display: flex;
-  justify-content: center;
-  margin-top: $spacing-2xl;
-}
+// Note: .apps-section / .section-header / .cards-container / .app-card /
+// .card-* / .platform-heading / .ios-whitelist-* all come from the shared
+// styles/app-cards partial (imported at the top of this file) — kept in
+// sync with /apps automatically.
 
 // ── Footer ───────────────────────────────────────
 .footer {
@@ -525,11 +557,6 @@
     align-items: center;
   }
 
-  .hero-now-playing {
-    width: 100%;
-    max-width: 100%;
-  }
-
   .footer-links {
     flex-wrap: wrap;
     gap: $spacing-sm;
@@ -544,8 +571,7 @@
 @media (prefers-reduced-motion: reduce) {
   .badge-dot,
   .scroll-arrow,
-  .status-dot,
-  .hero-now-playing-pulse {
+  .status-dot {
     animation: none !important;
   }
 
@@ -554,7 +580,6 @@
   .hero-title,
   .hero-subtitle,
   .hero-ctas,
-  .hero-now-playing,
   .profile-headshot,
   .profile-name,
   .profile-role,
