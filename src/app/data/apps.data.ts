@@ -79,7 +79,7 @@ export const APPS: AppCard[] = [
     platform: 'web',
   },
   {
-    name: 'Xomforms',
+    name: 'Xom Forms',
     description: 'Group availability scheduler — When2meet done right. Drag-paint your availability, see the best time instantly.',
     color: '#4caf50',
     colorRgb: '76, 175, 80',
