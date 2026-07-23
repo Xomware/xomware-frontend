@@ -91,7 +91,7 @@ export const APPS: AppCard[] = [
     platform: 'web',
   },
   {
-    name: 'Xomtracks',
+    name: 'Xom Tracks',
     description: 'Every song your group shares across iMessage — Spotify, SoundCloud & Apple Music — in one cover-art feed.',
     color: '#ff3750',
     colorRgb: '255, 55, 80',
