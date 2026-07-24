@@ -6,9 +6,9 @@ import { MusicProfile, MusicRange } from '../../models/music.model';
 import { MusicService } from '../../services/music.service';
 
 type LoadState = 'loading' | 'loaded' | 'error';
-export type MusicTab = 'now' | 'radar' | 'wrapped';
+export type MusicTab = 'now' | 'radar' | 'wrapped' | 'xomtracks';
 
-const VALID_TABS: MusicTab[] = ['now', 'radar', 'wrapped'];
+const VALID_TABS: MusicTab[] = ['now', 'radar', 'wrapped', 'xomtracks'];
 
 interface RangeOption {
   label: string;

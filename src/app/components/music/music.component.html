@@ -88,6 +88,24 @@
         </svg>
         Wrapped
       </button>
+      <button
+        type="button"
+        role="tab"
+        class="music-tab"
+        data-tab="xomtracks"
+        [class.music-tab--active]="activeTab === 'xomtracks'"
+        [attr.aria-selected]="activeTab === 'xomtracks'"
+        [attr.tabindex]="activeTab === 'xomtracks' ? 0 : -1"
+        id="tab-xomtracks"
+        aria-controls="tabpanel-xomtracks"
+        (click)="selectTab('xomtracks')"
+        (keydown)="onTabKeydown($event)"
+      >
+        <svg viewBox="0 0 24 24" class="music-tab-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/>
+        </svg>
+        Xomtracks
+      </button>
     </div>
   </nav>
 
@@ -308,6 +326,19 @@
     [attr.hidden]="activeTab !== 'wrapped' ? '' : null"
   >
     <app-music-wrapped></app-music-wrapped>
+  </div>
+
+  <!-- Xomtracks panel — lazy: only rendered after first activation -->
+  <div
+    *ngIf="activatedTabs.has('xomtracks')"
+    id="tabpanel-xomtracks"
+    role="tabpanel"
+    aria-labelledby="tab-xomtracks"
+    class="music-tabpanel music-tabpanel--content"
+    [class.music-tabpanel--visible]="activeTab === 'xomtracks'"
+    [attr.hidden]="activeTab !== 'xomtracks' ? '' : null"
+  >
+    <app-music-xomtracks></app-music-xomtracks>
   </div>
 
   <!-- Footer -->

@@ -1,0 +1,393 @@
+@import 'styles/variables';
+
+// ── Coming soon ───────────────────────────────────────
+.xomtracks-coming-soon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-4xl $spacing-xl;
+}
+
+.xomtracks-coming-soon-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  text-align: center;
+  max-width: 400px;
+}
+
+.xomtracks-coming-soon-icon {
+  width: 40px;
+  height: 40px;
+  color: $xomtracks-red;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.xomtracks-coming-soon-title {
+  font-size: 20px;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.xomtracks-coming-soon-body {
+  font-size: 14px;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin: 0;
+}
+
+// ── Loading skeletons ─────────────────────────────────
+.xomtracks-loading {
+  padding: $spacing-2xl 0;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.skeleton-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $spacing-xl;
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+  }
+}
+
+.skeleton-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.skeleton {
+  background: $bg-card;
+  border-radius: $radius-md;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+
+  &.skeleton-heading {
+    height: 24px;
+    width: 160px;
+    margin-bottom: $spacing-sm;
+    border-radius: $radius-sm;
+  }
+
+  &.skeleton-row {
+    height: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none !important;
+  }
+}
+
+// ── Error state ──────────────────────────────────────
+.xomtracks-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-4xl $spacing-xl;
+}
+
+.xomtracks-error-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  text-align: center;
+}
+
+.xomtracks-error-icon {
+  width: 40px;
+  height: 40px;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.xomtracks-error-msg {
+  color: $text-secondary;
+  font-size: 15px;
+  max-width: 360px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.xomtracks-retry-btn {
+  background: $xomtracks-red;
+  color: $text-primary;
+  border: none;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-xl;
+  font-size: 14px;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: background $transition-fast, transform $transition-fast;
+
+  &:hover {
+    background: lighten($xomtracks-red, 8%);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $xomtracks-red;
+    outline-offset: 3px;
+  }
+}
+
+// ── Subtitle ──────────────────────────────────────────
+.xomtracks-subtitle {
+  color: $text-secondary;
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 720px;
+  margin: 0 0 $spacing-lg;
+}
+
+// ── Playlist links ────────────────────────────────────
+.xomtracks-playlists {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin-bottom: $spacing-2xl;
+}
+
+.xomtracks-playlist-link {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  background: $bg-card;
+  border: 1px solid $glass-border;
+  border-radius: $radius-pill;
+  color: $text-primary;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: $font-weight-semibold;
+  transition:
+    background $transition-fast,
+    border-color $transition-fast,
+    transform $transition-fast;
+
+  &:hover {
+    background: rgba($xomtracks-red, 0.12);
+    border-color: rgba($xomtracks-red, 0.35);
+    transform: translateY(-1px);
+
+    .xomtracks-playlist-ext-icon {
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $xomtracks-red;
+    outline-offset: 2px;
+  }
+}
+
+.xomtracks-playlist-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: $xomtracks-red;
+}
+
+.xomtracks-playlist-ext-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: $text-muted;
+  opacity: 0;
+  transition: opacity $transition-fast;
+}
+
+// ── Recent-shares columns ─────────────────────────────
+.xomtracks-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $spacing-xl;
+  align-items: start;
+  margin-bottom: $spacing-2xl;
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+  }
+}
+
+.xomtracks-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  background: rgba(20, 20, 40, 0.45);
+  border: 1px solid $glass-border;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+}
+
+.xomtracks-section-title {
+  font-size: 18px;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin: 0;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $glass-border;
+}
+
+.xomtracks-section-empty {
+  color: $text-muted;
+  font-size: 14px;
+  font-style: italic;
+  margin: 0;
+}
+
+// ── Share list ────────────────────────────────────────
+.share-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.share-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  min-width: 0;
+  padding: $spacing-sm $spacing-xs;
+  border-radius: $radius-md;
+}
+
+.share-art {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+  display: block;
+}
+
+.share-art--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg-card;
+  color: $text-muted;
+}
+
+.share-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.share-name {
+  font-size: 14px;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.share-artist {
+  font-size: 12px;
+  color: $text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.share-meta {
+  font-size: 11px;
+  color: $text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+// Platform badges — real product brand colors (not xomware design tokens).
+.share-platform-badge {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: $radius-sm;
+  line-height: 1;
+  color: #fff;
+
+  &--spotify {
+    background: #1db954;
+  }
+
+  &--soundcloud {
+    background: #ff5500;
+  }
+
+  &--apple {
+    background: #fa243c;
+  }
+}
+
+// ── CTA ───────────────────────────────────────────────
+.xomtracks-cta {
+  display: flex;
+  justify-content: center;
+  padding-top: $spacing-md;
+  border-top: 1px solid $glass-border;
+}
+
+.xomtracks-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  background: $xomtracks-red;
+  color: #fff;
+  text-decoration: none;
+  border-radius: $radius-pill;
+  padding: $spacing-sm $spacing-xl;
+  font-size: 14px;
+  font-weight: $font-weight-semibold;
+  transition: background $transition-fast, transform $transition-fast;
+
+  &:hover {
+    background: lighten($xomtracks-red, 6%);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $xomtracks-red;
+    outline-offset: 3px;
+  }
+}
+
+.xomtracks-cta-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}

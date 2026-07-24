@@ -27,6 +27,7 @@ import { AppsComponent } from './components/apps/apps.component';
 import { MusicTickerComponent } from './components/music-ticker/music-ticker.component';
 import { MusicReleaseRadarComponent } from './components/music-release-radar/music-release-radar.component';
 import { MusicWrappedComponent } from './components/music-wrapped/music-wrapped.component';
+import { MusicXomtracksComponent } from './components/music-xomtracks/music-xomtracks.component';
 import { AppNavComponent } from './components/nav/app-nav.component';
 import { NowPlayingComponent } from './components/now-playing/now-playing.component';
 import { MusicSnapshotComponent } from './components/music-snapshot/music-snapshot.component';
@@ -54,6 +55,7 @@ import { MusicSnapshotComponent } from './components/music-snapshot/music-snapsh
     MusicTickerComponent,
     MusicReleaseRadarComponent,
     MusicWrappedComponent,
+    MusicXomtracksComponent,
     AppNavComponent,
     NowPlayingComponent,
     MusicSnapshotComponent,
