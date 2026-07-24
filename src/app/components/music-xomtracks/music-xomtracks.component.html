@@ -1,0 +1,138 @@
+<!-- Coming soon state -->
+<div class="xomtracks-coming-soon" *ngIf="state === 'coming-soon'" aria-label="Xomtracks showcase coming soon">
+  <div class="xomtracks-coming-soon-inner">
+    <svg viewBox="0 0 24 24" class="xomtracks-coming-soon-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/>
+    </svg>
+    <h2 class="xomtracks-coming-soon-title">Xomtracks is coming soon</h2>
+    <p class="xomtracks-coming-soon-body">
+      Every song shared across Dom's group chats, tracked in one feed — powered by Xomtracks.
+    </p>
+  </div>
+</div>
+
+<!-- Loading state -->
+<div class="xomtracks-loading" *ngIf="state === 'loading'" aria-live="polite" aria-label="Loading Xomtracks showcase">
+  <div class="skeleton-columns">
+    <div class="skeleton-section">
+      <div class="skeleton skeleton-heading"></div>
+      <div class="skeleton skeleton-row" *ngFor="let i of [1,2,3,4,5]"></div>
+    </div>
+    <div class="skeleton-section">
+      <div class="skeleton skeleton-heading"></div>
+      <div class="skeleton skeleton-row" *ngFor="let i of [1,2,3,4,5]"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Error state -->
+<div class="xomtracks-error" *ngIf="state === 'error'" role="alert">
+  <div class="xomtracks-error-inner">
+    <svg viewBox="0 0 24 24" class="xomtracks-error-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+    </svg>
+    <p class="xomtracks-error-msg">{{ errorMessage }}</p>
+    <button type="button" class="xomtracks-retry-btn" (click)="load()">Try again</button>
+  </div>
+</div>
+
+<!-- Loaded state -->
+<ng-container *ngIf="state === 'loaded'">
+  <p class="xomtracks-subtitle">
+    Every song shared across Dom's group chats — Spotify, SoundCloud &amp; Apple Music, all in one feed.
+  </p>
+
+  <!-- Playlist links -->
+  <nav class="xomtracks-playlists" aria-label="Rolling playlists">
+    <a
+      *ngFor="let playlist of playlists"
+      [href]="playlist.url"
+      target="_blank"
+      rel="noopener"
+      class="xomtracks-playlist-link"
+    >
+      <svg viewBox="0 0 24 24" class="xomtracks-playlist-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
+      </svg>
+      <span class="xomtracks-playlist-label">{{ playlist.label }}</span>
+      <svg viewBox="0 0 24 24" class="xomtracks-playlist-ext-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="currentColor"/>
+      </svg>
+    </a>
+  </nav>
+
+  <!-- Recent shares -->
+  <div class="xomtracks-columns">
+    <section class="xomtracks-section" aria-labelledby="xomtracks-with-me-heading">
+      <h2 id="xomtracks-with-me-heading" class="xomtracks-section-title">Shared With Me</h2>
+      <p class="xomtracks-section-empty" *ngIf="sharedWithMe.length === 0">
+        No shares yet.
+      </p>
+      <ol class="share-list" *ngIf="sharedWithMe.length > 0">
+        <li *ngFor="let share of sharedWithMe; trackBy: trackByShare" class="share-item">
+          <img
+            *ngIf="share.albumArtUrl"
+            [src]="share.albumArtUrl"
+            [alt]="displayTitle(share) + ' album art'"
+            class="share-art"
+            loading="lazy"
+          />
+          <span *ngIf="!share.albumArtUrl" class="share-art share-art--placeholder" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span class="share-info">
+            <span class="share-name">{{ displayTitle(share) }}</span>
+            <span class="share-artist">{{ displayArtist(share) }}</span>
+            <span class="share-meta">from {{ displaySharer(share) }} &middot; {{ relativeTime(share.date) }}</span>
+          </span>
+          <span class="share-platform-badge" [class]="'share-platform-badge--' + share.platform">
+            {{ platformLabel(share.platform) }}
+          </span>
+        </li>
+      </ol>
+    </section>
+
+    <section class="xomtracks-section" aria-labelledby="xomtracks-by-me-heading">
+      <h2 id="xomtracks-by-me-heading" class="xomtracks-section-title">Shared By Me</h2>
+      <p class="xomtracks-section-empty" *ngIf="sharedByMe.length === 0">
+        No shares yet.
+      </p>
+      <ol class="share-list" *ngIf="sharedByMe.length > 0">
+        <li *ngFor="let share of sharedByMe; trackBy: trackByShare" class="share-item">
+          <img
+            *ngIf="share.albumArtUrl"
+            [src]="share.albumArtUrl"
+            [alt]="displayTitle(share) + ' album art'"
+            class="share-art"
+            loading="lazy"
+          />
+          <span *ngIf="!share.albumArtUrl" class="share-art share-art--placeholder" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span class="share-info">
+            <span class="share-name">{{ displayTitle(share) }}</span>
+            <span class="share-artist">{{ displayArtist(share) }}</span>
+            <span class="share-meta">{{ relativeTime(share.date) }}</span>
+          </span>
+          <span class="share-platform-badge" [class]="'share-platform-badge--' + share.platform">
+            {{ platformLabel(share.platform) }}
+          </span>
+        </li>
+      </ol>
+    </section>
+  </div>
+
+  <!-- CTA -->
+  <div class="xomtracks-cta">
+    <a [href]="xomifyUrl" target="_blank" rel="noopener" class="xomtracks-cta-btn">
+      View more in Xomify
+      <svg viewBox="0 0 24 24" class="xomtracks-cta-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="currentColor"/>
+      </svg>
+    </a>
+  </div>
+</ng-container>
