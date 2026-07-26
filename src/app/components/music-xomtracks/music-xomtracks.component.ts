@@ -29,9 +29,11 @@ export class MusicXomtracksComponent implements OnInit, OnDestroy {
   errorMessage = '';
 
   readonly xomifyUrl = environment.xomifyWebUrl;
-  // Deep-links straight to the Xomtracks feature inside xomify (the full,
-  // sortable feed + ratings), not just the xomify app root.
-  readonly xomtracksFeatureUrl = `${environment.xomifyWebUrl}/xomtracks`;
+  // Deep-links straight to the Xomtracks (Shares) feature inside xomify (the
+  // full, sortable feed + ratings), not just the xomify app root. The route
+  // itself was renamed from /xomtracks to /shares; xomify still redirects
+  // the old path, but point at the canonical one here.
+  readonly xomtracksFeatureUrl = `${environment.xomifyWebUrl}/shares`;
   readonly playlists: PlaylistLink[] = [
     { label: 'Shared With Me — Rolling Playlist', url: environment.xomtracksPlaylists.in },
     { label: 'Shared By Me — Rolling Playlist', url: environment.xomtracksPlaylists.out },
