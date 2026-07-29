@@ -67,7 +67,7 @@ export class MusicXomtracksComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.errorMessage =
-          'Could not load the Xomtracks showcase. The backend may be unavailable.';
+          'Could not load the Shares showcase. The backend may be unavailable.';
         this.state = 'error';
       },
     });
