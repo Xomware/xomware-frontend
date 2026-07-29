@@ -155,67 +155,6 @@
   margin: 0 0 $spacing-lg;
 }
 
-// ── Playlist links ────────────────────────────────────
-.xomtracks-playlists {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-md;
-  margin-bottom: $spacing-2xl;
-}
-
-.xomtracks-playlist-link {
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-sm;
-  padding: $spacing-sm $spacing-lg;
-  background: $bg-card;
-  border: 1px solid $glass-border;
-  border-radius: $radius-pill;
-  color: $text-primary;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: $font-weight-semibold;
-  transition:
-    background $transition-fast,
-    border-color $transition-fast,
-    transform $transition-fast;
-
-  &:hover {
-    background: rgba($xomtracks-red, 0.12);
-    border-color: rgba($xomtracks-red, 0.35);
-    transform: translateY(-1px);
-
-    .xomtracks-playlist-ext-icon {
-      opacity: 1;
-    }
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  &:focus-visible {
-    outline: 2px solid $xomtracks-red;
-    outline-offset: 2px;
-  }
-}
-
-.xomtracks-playlist-icon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  color: $xomtracks-red;
-}
-
-.xomtracks-playlist-ext-icon {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-  color: $text-muted;
-  opacity: 0;
-  transition: opacity $transition-fast;
-}
-
 // ── Recent-shares columns ─────────────────────────────
 .xomtracks-columns {
   display: grid;
@@ -306,6 +245,23 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.share-name--link {
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover,
+  &:focus-visible {
+    color: $xomtracks-red;
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $xomtracks-red;
+    outline-offset: 2px;
+    border-radius: $radius-sm;
+  }
 }
 
 .share-artist {

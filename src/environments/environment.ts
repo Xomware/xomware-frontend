@@ -15,13 +15,6 @@ export const environment = {
   // Explicit override for GET /shares/recent — see xomtracks-showcase.service.ts
   // for why this is passed instead of relying on the backend's default scoping.
   xomtracksOwnerId: 'dominickj.giordano@gmail.com',
-  // Rolling playlists have no listing API yet — static Spotify playlist URLs
-  // (ids are stable once created; only playlist *contents* roll weekly).
-  // Follow-up: xomtracks-backend could expose these via /shares/recent's meta.
-  xomtracksPlaylists: {
-    in: 'https://open.spotify.com/playlist/1EovEoa2MJO7tX4qPEvnsr',
-    out: 'https://open.spotify.com/playlist/12rO1QHPLvJ4L3Gehi7PPX',
-  },
   musicSurfaces: {
     now: 'live',
     radar: 'live',

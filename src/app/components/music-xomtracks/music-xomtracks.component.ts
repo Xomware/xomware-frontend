@@ -6,11 +6,6 @@ import { XomtracksShowcaseService } from '../../services/xomtracks-showcase.serv
 
 type LoadState = 'loading' | 'loaded' | 'error' | 'coming-soon';
 
-interface PlaylistLink {
-  label: string;
-  url: string;
-}
-
 const PLATFORM_LABELS: Record<string, string> = {
   spotify: 'Spotify',
   soundcloud: 'SoundCloud',
@@ -34,10 +29,6 @@ export class MusicXomtracksComponent implements OnInit, OnDestroy {
   // itself was renamed from /xomtracks to /shares; xomify still redirects
   // the old path, but point at the canonical one here.
   readonly xomtracksFeatureUrl = `${environment.xomifyWebUrl}/shares`;
-  readonly playlists: PlaylistLink[] = [
-    { label: 'Shared With Me — Rolling Playlist', url: environment.xomtracksPlaylists.in },
-    { label: 'Shared By Me — Rolling Playlist', url: environment.xomtracksPlaylists.out },
-  ];
 
   private sub?: Subscription;
 
@@ -93,6 +84,23 @@ export class MusicXomtracksComponent implements OnInit, OnDestroy {
 
   platformLabel(platform: string): string {
     return PLATFORM_LABELS[platform] ?? platform;
+  }
+
+  /**
+   * Resolves the URL a share's title should link out to, or `null` if we
+   * don't have enough to build one (renders as plain text in that case).
+   * `/shares/recent` doesn't return a direct track URL as of writing —
+   * this prefers an explicit `url`/`sourceUrl` from the payload the moment
+   * the backend adds one, and falls back to deriving an open.spotify.com
+   * link from a Spotify track id if the platform is Spotify.
+   */
+  shareUrl(share: ShareCard): string | null {
+    if (share.url) return share.url;
+    if (share.sourceUrl) return share.sourceUrl;
+    if (share.platform === 'spotify' && share.spotifyId) {
+      return `https://open.spotify.com/track/${share.spotifyId}`;
+    }
+    return null;
   }
 
   /** Returns a human-readable relative time string for an epoch-seconds date. */

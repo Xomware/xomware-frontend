@@ -42,25 +42,6 @@
     Every song shared across Dom's group chats — Spotify, SoundCloud &amp; Apple Music, all in one feed.
   </p>
 
-  <!-- Playlist links -->
-  <nav class="xomtracks-playlists" aria-label="Rolling playlists">
-    <a
-      *ngFor="let playlist of playlists"
-      [href]="playlist.url"
-      target="_blank"
-      rel="noopener"
-      class="xomtracks-playlist-link"
-    >
-      <svg viewBox="0 0 24 24" class="xomtracks-playlist-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
-      </svg>
-      <span class="xomtracks-playlist-label">{{ playlist.label }}</span>
-      <svg viewBox="0 0 24 24" class="xomtracks-playlist-ext-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="currentColor"/>
-      </svg>
-    </a>
-  </nav>
-
   <!-- Recent shares -->
   <div class="xomtracks-columns">
     <section class="xomtracks-section" aria-labelledby="xomtracks-with-me-heading">
@@ -83,7 +64,17 @@
             </svg>
           </span>
           <span class="share-info">
-            <span class="share-name">{{ displayTitle(share) }}</span>
+            <a
+              *ngIf="shareUrl(share) as url; else sharedWithMeTitle"
+              [href]="url"
+              target="_blank"
+              rel="noopener"
+              class="share-name share-name--link"
+              [attr.aria-label]="displayTitle(share) + ' — open on ' + platformLabel(share.platform)"
+            >{{ displayTitle(share) }}</a>
+            <ng-template #sharedWithMeTitle>
+              <span class="share-name">{{ displayTitle(share) }}</span>
+            </ng-template>
             <span class="share-artist">{{ displayArtist(share) }}</span>
             <span class="share-meta">from {{ displaySharer(share) }} &middot; {{ relativeTime(share.date) }}</span>
           </span>
@@ -114,7 +105,17 @@
             </svg>
           </span>
           <span class="share-info">
-            <span class="share-name">{{ displayTitle(share) }}</span>
+            <a
+              *ngIf="shareUrl(share) as url; else sharedByMeTitle"
+              [href]="url"
+              target="_blank"
+              rel="noopener"
+              class="share-name share-name--link"
+              [attr.aria-label]="displayTitle(share) + ' — open on ' + platformLabel(share.platform)"
+            >{{ displayTitle(share) }}</a>
+            <ng-template #sharedByMeTitle>
+              <span class="share-name">{{ displayTitle(share) }}</span>
+            </ng-template>
             <span class="share-artist">{{ displayArtist(share) }}</span>
             <span class="share-meta">{{ relativeTime(share.date) }}</span>
           </span>

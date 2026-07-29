@@ -331,13 +331,15 @@
   align-items: center;
   gap: $spacing-sm;
   padding: 4px $spacing-sm;
+  min-width: 0;
 }
 
 .snapshot-genre-name {
   font-size: 13px;
   font-weight: $font-weight-medium;
   color: $text-primary;
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -347,6 +349,7 @@
 .snapshot-genre-count {
   font-size: 11px;
   color: $text-muted;
+  flex-shrink: 0;
   min-width: 20px;
   text-align: right;
 }
