@@ -29,6 +29,12 @@ export class MusicXomtracksComponent implements OnInit, OnDestroy {
   // itself was renamed from /xomtracks to /shares; xomify still redirects
   // the old path, but point at the canonical one here.
   readonly xomtracksFeatureUrl = `${environment.xomifyWebUrl}/shares`;
+  // Fixed rolling playlists that back each column — not surfaced via the
+  // API, so linked directly. Same two playlists as the pill buttons this
+  // component used to render before they were dropped for being unneeded
+  // chrome; these are the subtle-link replacement.
+  readonly sharedWithMePlaylistUrl = 'https://open.spotify.com/playlist/1EovEoa2MJO7tX4qPEvnsr';
+  readonly sharedByMePlaylistUrl = 'https://open.spotify.com/playlist/12rO1QHPLvJ4L3Gehi7PPX';
 
   private sub?: Subscription;
 

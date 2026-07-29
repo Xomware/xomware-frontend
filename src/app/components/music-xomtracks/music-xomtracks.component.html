@@ -45,7 +45,21 @@
   <!-- Recent shares -->
   <div class="xomtracks-columns">
     <section class="xomtracks-section" aria-labelledby="xomtracks-with-me-heading">
-      <h2 id="xomtracks-with-me-heading" class="xomtracks-section-title">Shared With Me</h2>
+      <div class="xomtracks-section-header">
+        <h2 id="xomtracks-with-me-heading" class="xomtracks-section-title">Shared With Me</h2>
+        <a
+          [href]="sharedWithMePlaylistUrl"
+          target="_blank"
+          rel="noopener"
+          class="xomtracks-playlist-link"
+          aria-label="Open the Shared With Me rolling playlist on Spotify"
+        >
+          <svg viewBox="0 0 24 24" class="xomtracks-playlist-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
+          </svg>
+          Open in Spotify
+        </a>
+      </div>
       <p class="xomtracks-section-empty" *ngIf="sharedWithMe.length === 0">
         No shares yet.
       </p>
@@ -86,7 +100,21 @@
     </section>
 
     <section class="xomtracks-section" aria-labelledby="xomtracks-by-me-heading">
-      <h2 id="xomtracks-by-me-heading" class="xomtracks-section-title">Shared By Me</h2>
+      <div class="xomtracks-section-header">
+        <h2 id="xomtracks-by-me-heading" class="xomtracks-section-title">Shared By Me</h2>
+        <a
+          [href]="sharedByMePlaylistUrl"
+          target="_blank"
+          rel="noopener"
+          class="xomtracks-playlist-link"
+          aria-label="Open the Shared By Me rolling playlist on Spotify"
+        >
+          <svg viewBox="0 0 24 24" class="xomtracks-playlist-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
+          </svg>
+          Open in Spotify
+        </a>
+      </div>
       <p class="xomtracks-section-empty" *ngIf="sharedByMe.length === 0">
         No shares yet.
       </p>
