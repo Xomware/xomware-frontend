@@ -17,6 +17,17 @@ export interface ShareCard {
   direction: ShareDirection;
   /** Epoch seconds (source: messageDate). */
   date: number;
+  /**
+   * Direct link to the track on its source platform. Not yet returned by
+   * `/shares/recent` as of writing — modeled here (and its fallbacks below)
+   * so the hub showcase can link share titles the moment the backend adds
+   * one of these fields, without another frontend change.
+   */
+  url?: string | null;
+  /** Alternate field name some xomtracks-backend responses use for the above. */
+  sourceUrl?: string | null;
+  /** Spotify track id, if resolved — used to derive an open.spotify.com link when `url`/`sourceUrl` are absent. */
+  spotifyId?: string | null;
 }
 
 /** The `data` payload of the `/shares/recent` envelope response. */

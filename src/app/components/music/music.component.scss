@@ -713,13 +713,15 @@
   font-size: 15px;
   font-weight: $font-weight-medium;
   color: $text-primary;
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .genre-count {
   font-size: 12px;
   font-weight: $font-weight-medium;
   color: $text-muted;
+  flex-shrink: 0;
   min-width: 28px;
   text-align: right;
 }
