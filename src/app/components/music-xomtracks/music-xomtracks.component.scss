@@ -179,13 +179,49 @@
   padding: $spacing-lg;
 }
 
+.xomtracks-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $spacing-sm;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $glass-border;
+}
+
 .xomtracks-section-title {
   font-size: 18px;
   font-weight: $font-weight-bold;
   color: $text-primary;
   margin: 0;
-  padding-bottom: $spacing-sm;
-  border-bottom: 1px solid $glass-border;
+}
+
+.xomtracks-playlist-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  color: $text-muted;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: $font-weight-medium;
+  transition: color $transition-fast;
+
+  &:hover,
+  &:focus-visible {
+    color: $xomtracks-red;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $xomtracks-red;
+    outline-offset: 2px;
+    border-radius: $radius-sm;
+  }
+}
+
+.xomtracks-playlist-icon {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
 }
 
 .xomtracks-section-empty {
