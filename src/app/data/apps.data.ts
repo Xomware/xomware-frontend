@@ -91,18 +91,6 @@ export const APPS: AppCard[] = [
     platform: 'web',
   },
   {
-    name: 'Shares',
-    description: 'Every song your group shares across iMessage — Spotify, SoundCloud & Apple Music — in one cover-art feed. Now part of Xomify.',
-    color: '#ff3750',
-    colorRgb: '255, 55, 80',
-    url: 'https://xomify.xomware.com/shares',
-    logo: 'assets/img/xomtracks-banner.png',
-    logoStyle: 'banner',
-    tag: 'Web App',
-    status: 'live',
-    platform: 'web',
-  },
-  {
     name: 'Xomify',
     description: 'Your Spotify stats on iOS. Native app available on TestFlight.',
     color: '#9c0abf',

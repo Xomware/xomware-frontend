@@ -2,7 +2,7 @@
 
 .snapshot {
   width: 100%;
-  max-width: 900px;
+  max-width: 1100px;
   margin: $spacing-3xl auto 0;
   padding: $spacing-xl;
   background: rgba(20, 20, 40, 0.5);
@@ -226,6 +226,17 @@
   }
 }
 
+// Grid items default to `min-width: auto`, which means they refuse to
+// shrink below their content's min-content size. Genre names use
+// `white-space: nowrap`, so a long name (e.g. "Future Bass") contributes
+// its full unwrapped width to that min-content calc — expanding this
+// column past its 1fr share and pushing the count off the card's edge.
+// `min-width: 0` overrides that so the ellipsis/flex rules below can
+// actually clip content within the column's real (1fr) width.
+.snapshot-col {
+  min-width: 0;
+}
+
 .snapshot-col-heading {
   font-size: 11px;
   font-weight: $font-weight-bold;
@@ -329,6 +340,7 @@
 .snapshot-genre-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: $spacing-sm;
   padding: 4px $spacing-sm;
   min-width: 0;
