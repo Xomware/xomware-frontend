@@ -15,6 +15,12 @@ export interface AppCard {
    * squashed into the default square icon slot. Omit for square icons.
    */
   logoStyle?: 'banner';
+  /**
+   * Internal tool — surfaced only inside the admin portal, never on the public
+   * /apps grid or the landing page. The app's own API is the real gate; this
+   * flag just keeps a private tool off a public directory.
+   */
+  adminOnly?: boolean;
 }
 
 /**
@@ -133,5 +139,17 @@ export const APPS: AppCard[] = [
     tag: 'iOS · Coming Soon',
     status: 'coming-soon',
     platform: 'ios',
+  },
+  {
+    name: 'Xomcron',
+    description: 'Scheduled tasks and trackers. Price watches, card credits, AWS spend.',
+    color: '#2563eb',
+    colorRgb: '37, 99, 235',
+    url: 'https://crons.xomware.com',
+    logo: 'assets/img/xomcron-logo.svg',
+    tag: 'Internal',
+    status: 'live',
+    platform: 'web',
+    adminOnly: true,
   },
 ];
