@@ -14,7 +14,9 @@ import { AppCard, APPS } from '../../data/apps.data';
   styleUrls: ['./apps.component.scss'],
 })
 export class AppsComponent {
-  apps: AppCard[] = APPS;
+  // This route is public, so internal tools must never reach it. Filtered at
+  // the source rather than per-getter so a future getter can't leak one.
+  apps: AppCard[] = APPS.filter((a) => !a.adminOnly);
 
   get webApps(): AppCard[] {
     return this.apps.filter((a) => a.platform === 'web');

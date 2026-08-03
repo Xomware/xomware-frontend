@@ -12,6 +12,29 @@
   </header>
 
   <main class="admin-content">
+    <!-- Internal tools — private apps kept off the public directory. -->
+    <section
+      class="internal-tools"
+      *ngIf="internalTools.length"
+      aria-labelledby="internal-tools-heading"
+    >
+      <h2 id="internal-tools-heading" class="internal-tools-heading">Internal tools</h2>
+      <div class="internal-tools-grid">
+        <a
+          class="internal-tool"
+          *ngFor="let tool of internalTools"
+          [href]="tool.url"
+          rel="noopener"
+        >
+          <img class="internal-tool-logo" [src]="tool.logo" [alt]="tool.name" />
+          <span class="internal-tool-body">
+            <span class="internal-tool-name">{{ tool.name }}</span>
+            <span class="internal-tool-desc">{{ tool.description }}</span>
+          </span>
+        </a>
+      </div>
+    </section>
+
     <div class="admin-grid">
       <!-- Events card -->
       <section class="card events-card" aria-labelledby="events-heading">

@@ -32,8 +32,11 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
   landingTickerProfile: MusicProfile | null = null;
   nowPlayingState: NowPlayingState | null = null;
 
-  /** Full app directory — see src/app/data/apps.data.ts (shared with /apps). */
-  apps: AppCard[] = APPS;
+  /**
+   * Public app directory — see src/app/data/apps.data.ts (shared with /apps).
+   * Internal tools (`adminOnly`) are excluded; they surface in /admin only.
+   */
+  apps: AppCard[] = APPS.filter((a) => !a.adminOnly);
 
   private userSub?: Subscription;
   private tickerSub?: Subscription;

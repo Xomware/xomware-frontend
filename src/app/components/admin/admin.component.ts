@@ -8,6 +8,7 @@ import {
   EventsListResponse,
 } from '../../services/admin.service';
 import { CognitoService } from '../../services/cognito.service';
+import { AppCard, APPS } from '../../data/apps.data';
 
 @Component({
   selector: 'app-admin',
@@ -27,6 +28,12 @@ export class AdminComponent implements OnInit {
   cost: CostSummaryResponse | null = null;
   costLoading = false;
   costError = '';
+
+  /**
+   * Internal tools, kept off the public directory. This route is already
+   * behind adminGuard, and each tool gates independently on its own API.
+   */
+  readonly internalTools: AppCard[] = APPS.filter((a) => a.adminOnly);
 
   constructor(
     private admin: AdminService,
