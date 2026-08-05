@@ -16,13 +16,20 @@ Do not run the migration without this.
 ## Usage
 
 ```bash
-npm run build:prod          # baselines run against the production build
 npm run test:visual         # compare against committed baselines
 npm run test:visual:update  # accept current rendering as the new baseline
 ```
 
-Always rebuild before running — the tests serve `dist/`, not `ng serve`. Dev-mode
-CSS and bundling differ from what ships.
+**No manual build step.** The Playwright `webServer` runs `npm run build:visual`
+itself. This is deliberate: `dist/` is shared with `npm run build:prod`, so
+running a production build — something you'd naturally do before committing —
+silently leaves the wrong bundle in place. That bundle has `musicSurfaces:
+'live'`, so every music surface hangs on the stubbed API and renders skeletons
+forever. It presents as *flaky screenshots*, not as an obvious error, and it cost
+real time to diagnose. The suite now owns its own input.
+
+`reuseExistingServer` is `false` for the same reason — a leftover server from a
+previous run serves the previous build.
 
 When a diff is expected (you intentionally changed type), review the diff images
 in `test-results/` first, then run `test:visual:update` and commit the new PNGs
@@ -43,9 +50,19 @@ The net was checked both directions before being committed:
   track or changed stat read as a visual regression.
 - **Google Fonts is allowed through.** These tests exist to detect type metric
   changes, so the real Inter face has to load.
-- **Reduced motion is forced and the timeline is settled.** Playwright's
-  `animations: 'disabled'` only freezes CSS animations; GSAP and ScrollTrigger
-  drive entrance animation from JS and would otherwise be captured mid-fade.
+- **Reduced motion is set at the context level**, in `playwright.config.ts`, not
+  inside the test. Setting it after navigation left a window where the music
+  ticker's infinite marquee had already started, so it could be captured at
+  different offsets between runs — a ~1-in-7 single-test failure that was
+  painful to pin down. Playwright's `animations: 'disabled'` only freezes CSS
+  animations; GSAP and ScrollTrigger drive entrance animation from JS.
+- **Loading skeletons must clear before capture.** `networkidle` is not enough:
+  mock surfaces resolve with no network activity, so idle fires immediately and
+  the screenshot can land on a half-rendered page (`/music` flapped between
+  1386px and 900px of content). The check counts `:visible` skeletons only —
+  once a music tab is activated it stays in the DOM, so inactive panels keep
+  their skeleton nodes and a global count never reaches zero.
+- **Page height must stabilise** for three consecutive polls before capture.
 - `maxDiffPixels: 150` — an **absolute** count, not a ratio.
 
   This started as `maxDiffPixelRatio: 0.01` and that was far too coarse: 1% of a

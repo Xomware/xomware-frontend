@@ -304,11 +304,11 @@
   letter-spacing: $tracking-tight;
 }
 
+// The one accent moment in the hero. Solid rather than a gradient fade: a
+// single flat accent colour is what reads as deliberate; a two-stop fade on
+// text is the dated part, not the colour itself.
 .hero-gradient-text {
-  background: $cyan-accent;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: $brand-cyan;
 }
 
 .hero-subtitle {

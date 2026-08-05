@@ -62,12 +62,43 @@ async function stubBackend(page: Page): Promise<void> {
  * Forcing reduced-motion plus settling the timeline avoids mid-fade captures.
  */
 async function settle(page: Page): Promise<void> {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+  // reducedMotion is set at context level in playwright.config.ts.
   await page.waitForLoadState('networkidle');
   await page.evaluate(() => document.fonts.ready);
+
+  // Loading skeletons must clear before capture. networkidle is not enough on
+  // /music: the mock surfaces resolve without any network activity, so idle
+  // fires immediately and the screenshot could land on a half-rendered page.
+  // That showed up as /music flapping between 1386px and 900px of content —
+  // pure flake that looked like a real diff.
+  // `:visible` matters — once a music tab has been activated it stays in the
+  // DOM, so inactive panels keep their skeleton nodes. Counting them globally
+  // never reaches zero.
+  await expect(
+    page.locator('.skeleton:visible, .skeleton-cards:visible, .skeleton-row:visible'),
+  ).toHaveCount(0, { timeout: 10_000 });
+
   // GSAP entrance animations on the landing hero run ~0.7s with staggered
   // delays up to 0.25s.
   await page.waitForTimeout(1200);
+
+  // Height must stop changing before we capture, otherwise a late render can
+  // land between the measurement and the screenshot.
+  await page.waitForFunction(
+    () => {
+      const w = window as unknown as { __h?: number; __stable?: number };
+      const h = document.body.scrollHeight;
+      if (w.__h === h) {
+        w.__stable = (w.__stable ?? 0) + 1;
+      } else {
+        w.__h = h;
+        w.__stable = 0;
+      }
+      return (w.__stable ?? 0) >= 3;
+    },
+    undefined,
+    { polling: 100, timeout: 10_000 },
+  );
 }
 
 for (const route of ROUTES) {

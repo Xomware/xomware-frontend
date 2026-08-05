@@ -37,10 +37,7 @@
     font-weight: $font-weight-extrabold;
     letter-spacing: $tracking-tight;
     margin: 0 0 8px;
-    background: linear-gradient(90deg, #00b4d8, #48cae4);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: $text-primary;
   }
 
   .updated {
