@@ -1,0 +1,32 @@
+"on":
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+name: CI
+
+# Nothing gated merges to master before this workflow existed —
+# deploy-frontend.yml only runs *after* a push or a merged PR, by which point
+# master has already auto-deployed to S3/CloudFront. This runs at PR time.
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check design-token drift
+        run: npm run lint:css
+
+      - name: Production build
+        run: npm run build:prod
