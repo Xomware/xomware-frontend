@@ -60,7 +60,7 @@
 
 .anon-gate-tagline {
   color: #a1a1aa;
-  font-size: 15px;
+  font-size: $text-sm;
   line-height: 1.5;
   margin: 0 0 $spacing-lg;
 }
@@ -113,7 +113,7 @@
 
 .anon-gate-link {
   display: inline-block;
-  font-size: 12px;
+  font-size: $text-2xs;
   color: #71717a;
   text-decoration: none;
   transition: color 150ms ease;
@@ -170,12 +170,12 @@
   font-weight: $font-weight-extrabold;
   color: $text-primary;
   margin-bottom: $spacing-sm;
-  letter-spacing: -0.02em;
+  letter-spacing: $tracking-tight;
   animation: fadeIn 0.7s ease-out 0.1s both;
 }
 
 .profile-role {
-  font-size: 1rem;
+  font-size: $text-base;
   color: $text-secondary;
   margin-bottom: $spacing-md;
   animation: fadeIn 0.7s ease-out 0.15s both;
@@ -199,7 +199,7 @@
 }
 
 .profile-bio {
-  font-size: 1.05rem;
+  font-size: $text-base;
   color: $text-secondary;
   line-height: 1.65;
   max-width: 520px;
@@ -228,9 +228,9 @@
   border: 1px solid $glass-border;
   color: $text-secondary;
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
-  letter-spacing: 0.01em;
+  letter-spacing: $tracking-normal;
   transition: all $transition-base;
 
   &:hover {
@@ -271,7 +271,7 @@
   background: $brand-cyan-subtle;
   border: 1px solid rgba($brand-cyan, 0.2);
   border-radius: $radius-pill;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   font-weight: $font-weight-medium;
   color: $brand-cyan;
   margin-bottom: $spacing-xl;
@@ -298,7 +298,7 @@
   line-height: 1.15;
   margin-bottom: $spacing-lg;
   animation: fadeIn 0.8s ease-out 0.1s both;
-  letter-spacing: -0.02em;
+  letter-spacing: $tracking-tight;
 }
 
 .hero-gradient-text {
@@ -309,7 +309,7 @@
 }
 
 .hero-subtitle {
-  font-size: 1.15rem;
+  font-size: $text-md;
   color: $text-secondary;
   line-height: 1.6;
   margin-bottom: $spacing-xl;
@@ -344,7 +344,7 @@
   background: $brand-cyan;
   color: $bg-dark;
   font-weight: $font-weight-semibold;
-  font-size: 0.95rem;
+  font-size: $text-base;
   border-radius: $radius-pill;
   text-decoration: none;
   transition: all $transition-base;
@@ -365,7 +365,7 @@
   background: transparent;
   color: $text-secondary;
   font-weight: $font-weight-medium;
-  font-size: 0.95rem;
+  font-size: $text-base;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: $radius-pill;
   text-decoration: none;
@@ -390,8 +390,8 @@
   align-items: center;
   gap: 6px;
   color: $text-muted;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   opacity: 0.5;
   animation: fadeIn 1s ease-out 1s both;
@@ -482,13 +482,13 @@
 
 .footer-name {
   font-weight: $font-weight-bold;
-  font-size: 0.9rem;
-  letter-spacing: 0.1em;
+  font-size: $text-sm;
+  letter-spacing: $tracking-wide;
   color: $text-primary;
 }
 
 .footer-tagline {
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: $text-muted;
 }
 
@@ -502,7 +502,7 @@
   align-items: center;
   gap: 6px;
   color: $text-secondary;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   text-decoration: none;
   transition: color $transition-fast;
@@ -527,7 +527,7 @@
 }
 
 .footer-copy {
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   color: $text-muted;
 }
 

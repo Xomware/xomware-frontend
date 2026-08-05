@@ -37,13 +37,13 @@
 
 .preview-label {
   margin: 0;
-  font-size: 14px;
+  font-size: $text-sm;
   color: #d4d4d8;
 }
 
 .preview-hint {
   margin: 4px 0 0;
-  font-size: 12px;
+  font-size: $text-2xs;
   color: #71717a;
 }
 
@@ -55,7 +55,7 @@
   background: #18181b;
   border: 1px solid #27272a;
   color: #fafafa;
-  font-size: 13px;
+  font-size: $text-xs;
   text-align: center;
   cursor: pointer;
   transition: all 150ms ease;
@@ -77,15 +77,15 @@
 
 .upload-error {
   margin: 6px 0 0;
-  font-size: 12px;
+  font-size: $text-2xs;
   color: #ff9598;
 }
 
 .section-label {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: $tracking-wide;
   color: #71717a;
   margin-bottom: 8px;
 }

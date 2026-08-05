@@ -13,13 +13,13 @@
   margin-bottom: $spacing-xs;
 
   h2 {
-    font-size: 1.3rem;
+    font-size: $text-lg;
     color: $text-primary;
   }
 }
 
 .section-subtitle {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: $text-muted;
   margin-bottom: $spacing-lg;
 }
@@ -31,7 +31,7 @@
   padding: $spacing-xs $spacing-md;
   border-radius: $radius-md;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   transition: all $transition-fast;
 
   &:hover:not(:disabled) {
@@ -56,7 +56,7 @@
   align-items: center;
   justify-content: space-between;
   color: #ff4d6d;
-  font-size: 0.85rem;
+  font-size: $text-sm;
 }
 
 .retry-btn {
@@ -66,14 +66,14 @@
   padding: $spacing-xs $spacing-sm;
   border-radius: $radius-sm;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
 }
 
 .loading-state {
   text-align: center;
   color: $text-muted;
   padding: $spacing-2xl;
-  font-size: 0.9rem;
+  font-size: $text-sm;
 }
 
 // --- Workspace Grid ---
@@ -126,15 +126,15 @@
 }
 
 .card-name {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: $text-base;
+  font-weight: $font-weight-bold;
   color: $text-primary;
   font-family: 'SF Mono', monospace;
   flex: 1;
 }
 
 .card-version {
-  font-size: 0.7rem;
+  font-size: $text-3xs;
   color: $text-muted;
   background: rgba(255, 255, 255, 0.05);
   padding: 2px 8px;
@@ -153,17 +153,17 @@
 }
 
 .stat-value {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: $text-md;
+  font-weight: $font-weight-bold;
   color: $brand-cyan;
   font-family: 'SF Mono', monospace;
 }
 
 .stat-label {
-  font-size: 0.65rem;
+  font-size: $text-3xs;
   color: $text-muted;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: $tracking-wide;
 }
 
 .card-footer {
@@ -172,7 +172,7 @@
 }
 
 .card-modified {
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   color: $text-muted;
 }
 
@@ -184,8 +184,8 @@
   margin-bottom: $spacing-lg;
 
   h2 {
-    font-size: 1.3rem;
-    font-weight: 700;
+    font-size: $text-lg;
+    font-weight: $font-weight-bold;
     font-family: 'SF Mono', monospace;
   }
 }
@@ -197,7 +197,7 @@
   padding: $spacing-xs $spacing-sm;
   border-radius: $radius-sm;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   transition: all $transition-fast;
 
   &:hover {
@@ -223,7 +223,7 @@
 }
 
 .detail-meta {
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: $text-muted;
   margin-left: auto;
 }
@@ -246,21 +246,21 @@
 
 .summary-value {
   display: block;
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: $text-lg;
+  font-weight: $font-weight-bold;
   color: $brand-cyan;
 
   &.monospace {
     font-family: 'SF Mono', monospace;
-    font-size: 0.9rem;
+    font-size: $text-sm;
   }
 }
 
 .summary-label {
-  font-size: 0.7rem;
+  font-size: $text-3xs;
   color: $text-muted;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: $tracking-wide;
 }
 
 // --- Detail Tabs ---
@@ -278,7 +278,7 @@
   color: $text-muted;
   padding: $spacing-xs $spacing-md;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   border-radius: $radius-sm $radius-sm 0 0;
   transition: all $transition-fast;
 
@@ -307,7 +307,7 @@
   border-radius: $radius-md;
   color: $text-primary;
   padding: $spacing-sm $spacing-md;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   font-family: 'SF Mono', monospace;
   outline: none;
 
@@ -322,7 +322,7 @@
 }
 
 .filter-count {
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   color: $text-muted;
   white-space: nowrap;
 }
@@ -342,10 +342,10 @@
   padding: $spacing-sm $spacing-md;
   background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 0.7rem;
+  font-size: $text-3xs;
   color: $text-muted;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: $tracking-wide;
   position: sticky;
   top: 0;
 }
@@ -355,7 +355,7 @@
   grid-template-columns: 2fr 1.5fr 1fr;
   padding: $spacing-sm $spacing-md;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: $text-secondary;
   cursor: pointer;
   transition: background $transition-fast;
@@ -373,22 +373,22 @@
 .resource-provider {
   color: $text-muted;
   margin-right: 2px;
-  font-size: 0.7rem;
+  font-size: $text-3xs;
 }
 
 .col-type {
   font-family: 'SF Mono', monospace;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
 }
 
 .col-name {
   font-family: 'SF Mono', monospace;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
 }
 
 .col-module {
   color: $text-muted;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
 }
 
 // --- Resource Detail Panel ---
@@ -409,7 +409,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 
   h3 {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     font-family: 'SF Mono', monospace;
     color: $brand-cyan;
   }
@@ -420,7 +420,7 @@
   border: none;
   color: $text-muted;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: $text-base;
   padding: 0 $spacing-xs;
 
   &:hover {
@@ -448,14 +448,14 @@
 .attr-key {
   min-width: 200px;
   font-family: 'SF Mono', monospace;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   color: $text-muted;
   flex-shrink: 0;
 }
 
 .attr-value {
   font-family: 'SF Mono', monospace;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   color: $text-secondary;
   word-break: break-all;
   white-space: pre-wrap;
@@ -488,14 +488,14 @@
 .output-key {
   min-width: 200px;
   font-family: 'SF Mono', monospace;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: $brand-cyan;
   flex-shrink: 0;
 }
 
 .output-value {
   font-family: 'SF Mono', monospace;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: $text-secondary;
   word-break: break-all;
 
@@ -509,7 +509,7 @@
   text-align: center;
   padding: $spacing-lg;
   color: $text-muted;
-  font-size: 0.85rem;
+  font-size: $text-sm;
 }
 
 // --- Responsive ---

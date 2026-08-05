@@ -41,28 +41,28 @@
 }
 
 .profile-avatar-initial {
-  font-size: 3rem;
+  font-size: $text-5xl;
   font-weight: $font-weight-bold;
   color: $text-primary;
   line-height: 1;
-  letter-spacing: 0.02em;
+  letter-spacing: $tracking-normal;
 }
 
 .profile-handle {
-  font-size: 1.5rem;
+  font-size: $text-xl;
   font-weight: $font-weight-bold;
   color: $text-primary;
   margin: 0;
 }
 
 .profile-display-name {
-  font-size: 1rem;
+  font-size: $text-base;
   color: $text-secondary;
   margin: 0;
 }
 
 .profile-email {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: $text-muted;
   margin: $spacing-xs 0 0;
   word-break: break-all;
@@ -78,9 +78,9 @@
   border: 1px solid rgba(0, 180, 216, 0.25);
   border-radius: $radius-pill;
   color: $brand-cyan-light;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   font-weight: $font-weight-semibold;
-  letter-spacing: 0.04em;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
 
   &.private {
@@ -120,16 +120,16 @@
 }
 
 .stat-value {
-  font-size: 1.25rem;
+  font-size: $text-lg;
   font-weight: $font-weight-bold;
   color: $text-primary;
   font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
-  font-size: 0.7rem;
+  font-size: $text-2xs;
   color: $text-muted;
-  letter-spacing: 0.06em;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
 }
 
@@ -180,7 +180,7 @@
 }
 
 .edit-modal-title {
-  font-size: 1.25rem;
+  font-size: $text-lg;
   font-weight: $font-weight-bold;
   color: $text-primary;
   margin: 0;
@@ -196,7 +196,7 @@
   border: 1px solid transparent;
   border-radius: $radius-sm;
   color: $text-secondary;
-  font-size: 1.5rem;
+  font-size: $text-xl;
   line-height: 1;
   cursor: pointer;
   transition: all $transition-base;
@@ -254,7 +254,7 @@
   }
 
   .profile-avatar-initial {
-    font-size: 1.75rem;
+    font-size: $text-2xl;
   }
 
   &.has-image {
@@ -322,7 +322,7 @@
   flex-direction: column;
   gap: 2px;
   color: $text-primary;
-  font-size: 0.9rem;
+  font-size: $text-sm;
 
   strong {
     font-weight: $font-weight-semibold;
@@ -331,5 +331,5 @@
 
 .visibility-option-hint {
   color: $text-secondary;
-  font-size: 0.8rem;
+  font-size: $text-xs;
 }
