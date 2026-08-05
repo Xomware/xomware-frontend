@@ -107,8 +107,22 @@
   margin-bottom: $spacing-md;
 }
 
+// Monogram badge. Replaced an emoji glyph; the tabular sizing and fixed box
+// keep rows aligned regardless of which two letters land here.
 .card-icon {
-  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: $radius-md;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-wide;
+  color: $text-secondary;
 }
 
 .card-name {
@@ -193,7 +207,19 @@
 }
 
 .detail-icon {
-  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: $radius-md;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-wide;
+  color: $text-secondary;
 }
 
 .detail-meta {
