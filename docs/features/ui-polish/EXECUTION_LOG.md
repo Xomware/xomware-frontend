@@ -113,6 +113,109 @@ product's actual identity. Changing it here would desync from the real app.
 
 ---
 
+## Final state (updated 2026-08-05, after PRs #155-161)
+
+**xomware-frontend is done.** Token violations 289 -> 0, enforced directly by
+stylelint (the ratchet was retired once the count hit zero). 23 visual baselines
+including hover. Merged and deployed across PRs #155, #156, #157, #158, #159,
+#160, #161.
+
+Everything in "Deliberately not done" below was subsequently completed except
+where noted. Kept for the record of what the risk calls were at the time.
+
+### Bugs found and fixed along the way
+1. **iOS double-tap** - every app card needed two taps to open, because :hover
+   was ungated on touch.
+2. **Mobile horizontal overflow** on /music?tab=xomtracks - 458px of content in
+   a 390px viewport. Mobile grid used `1fr` where desktop correctly used
+   `minmax(0, 1fr)`.
+3. **Faux-bold wordmark** - font-weight 900 with no 900 face loaded.
+
+### Corrections to RESEARCH.md
+The research doc was wrong in three places, all corrected inline and all found
+by reading the code rather than the CSS counts:
+- Per-app colour is hover-only; the grid is monochrome at rest (§3.3)
+- 400/500 weights were already in use via variables (§3.6)
+- "18 glows" conflated elevation shadows and focus rings; the real count is ~9 (§3.4)
+
+**Treat the original claims in RESEARCH.md with suspicion. The verified ones are
+marked CORRECTED.**
+
+### Visual-suite lessons
+- `maxDiffPixelRatio: 0.01` was far too coarse - 1% of a tall page is ~25,000
+  pixels, so glow removals and a heading losing its gradient passed silently.
+  Now an absolute `maxDiffPixels: 150`.
+- `dist/` is shared with `build:prod`, so a production build left the wrong
+  bundle in place and poisoned baselines. The suite now builds its own input.
+- An element screenshot clips to the border box and excludes `box-shadow`.
+
+---
+
+## Remaining work
+
+**The other 7 frontends still have no design tokens.** This is now the largest
+outstanding item and the one the research flagged as highest-leverage:
+
+| App | SCSS files | Distinct font sizes | Tokens |
+|---|---|---|---|
+| xomify-frontend | 81 | **64** | none |
+| xomper-front-end | 73 | 36 | own file, different contents |
+| xomforms-frontend | 22 | 36 | none |
+| xomcloud-frontend | 20 | 26 | own file, different path |
+| xomtracks-frontend | 16 | 38 | none |
+| xomcron-frontend | 11 | 11 | none |
+| vest-site | 5 | 8 | none |
+
+xomify is worse than xomware-frontend ever was.
+
+### Token propagation (done 2026-08-05)
+
+Shared tokens extracted to `src/styles/_tokens.scss` and adopted by four repos:
+
+| App | Substitutions | Tie fixes | PR |
+|---|---|---|---|
+| xomcron-frontend | 95 | 2 | #1 merged |
+| xomtracks-frontend | 237 | 0 | #9 merged |
+| xomforms-frontend | 391 | 3 | #25 merged |
+| xomify-frontend | — (81 files, 64 sizes) | 23 | #333 merged |
+
+All four now enforce the scale with stylelint in PR-time CI.
+
+### BLOCKED — needs a decision, not a migration
+
+`xomcloud-frontend` and `xomper-front-end` already define variables that collide
+with the shared token names **at different values**. Importing the shared file
+would silently reassign them app-wide:
+
+- **xomcloud**: `radius-sm` 8->4px, `radius-md` 12->8px, `radius-lg` 16->12px,
+  `radius-pill` 25->100px — every rounded corner in the app changes
+- **xomper**: `text-xs` 0.75->0.8125rem, `text-lg` 1.125->1.25rem, `text-xl`
+  1.25->1.5rem, `text-2xl` 1.5->1.625rem, `text-4xl` 2.5->2.375rem — text
+  resizes app-wide
+
+Neither has a visual regression suite, so nothing would catch the damage. Both
+already have internally coherent scales; the only gain from unifying is
+cross-app consistency, and the cost is resizing a live app blind. **Owner's
+call.**
+
+`vest-site` is not a consumer — its `main` branch holds only a README.
+
+### The tie trap, totalled
+
+`0.04em` sits exactly between `$tracking-normal` and `$tracking-wide`. Automatic
+nearest-match rounds it to 0 and silently strips tracking from uppercase labels.
+It hit **31 components across four repos**. It is now documented in
+`_tokens.scss` itself so the next migration does not repeat it.
+
+### Corner radius
+
+(20-24px vs the reference's near-zero) is the one remaining identity decision,
+deliberately left for the owner.
+
+---
+
+## Original open items (kept for the record)
+
 ## Open items
 
 1. **Xom Forms vs XomFit green** — genuinely two green products. Accept, or

@@ -11,7 +11,9 @@
     "lint:css": "stylelint \"src/**/*.scss\"",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
-    "build:visual": "ng build --configuration visual --output-hashing=none"
+    "build:visual": "ng build --configuration visual --output-hashing=none",
+    "tokens:check": "node scripts/sync-tokens.mjs",
+    "tokens:sync": "node scripts/sync-tokens.mjs --write"
   },
   "private": true,
   "dependencies": {

@@ -1,6 +1,11 @@
 // ================================================
-// XOMWARE Design System v2.0 — Midnight Cyan Redesign
+// XOMWARE Design System — app palette + app-specific values
 // ================================================
+//
+// Structural tokens (type scale, tracking, weights, spacing, radius, motion,
+// breakpoints) live in _tokens.scss, which is shared across all Xomware
+// frontends. Everything below is specific to xomware.com.
+@import 'tokens';
 
 // ── Primary Colors ──────────────────────────────
 $brand-cyan: #00b4d8;
@@ -37,101 +42,24 @@ $cyan-accent: linear-gradient(90deg, $brand-cyan 0%, $brand-cyan-light 100%);
 $hero-gradient: radial-gradient(ellipse at 50% 0%, rgba(0, 180, 216, 0.15) 0%, transparent 60%);
 $hero-gradient-alt: radial-gradient(ellipse at 80% 20%, rgba(156, 10, 191, 0.08) 0%, transparent 50%);
 
-// ── Typography ───────────────────────────────────
+// ── Typography (app-specific font stacks) ────────
 $font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 $font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-$font-weight-regular: 400;
-$font-weight-medium: 500;
-$font-weight-semibold: 600;
-$font-weight-bold: 700;
-$font-weight-extrabold: 800;
 // NOTE: index.html loads Inter at wght@400;500;600;700;800.
 // There is no 900 — requesting it produces synthetic faux-bold.
-// Do not add $font-weight-black without adding 900 to the font request.
+// $font-weight-* live in _tokens.scss; do not add a 900 without also adding
+// 900 to the font request in index.html.
 
-// ── Type Scale ───────────────────────────────────
-// Fixed ramp. Before this existed, every size was hand-typed at the call
-// site, which is how the codebase reached ~30 distinct sizes mixing px
-// and rem (14px and 0.875rem were both in use for the same size).
-//
-// Declared in rem so browser font-size preferences are respected; px
-// equivalents at a 16px root are in the comments.
-//
-// RULE: no font-size outside this scale. Enforced by stylelint
-// (declaration-property-value-allowed-list in .stylelintrc.json).
-$text-3xs:  0.6875rem; // 11px — dense admin chrome ONLY, see note below
-$text-2xs:  0.75rem;   // 12px — smallest permitted on public surfaces
-$text-xs:   0.8125rem; // 13px
-$text-sm:   0.875rem;  // 14px
-$text-base: 1rem;      // 16px — body default
-$text-md:   1.125rem;  // 18px
-$text-lg:   1.25rem;   // 20px
-$text-xl:   1.5rem;    // 24px
-$text-2xl:  1.625rem;  // 26px
-$text-3xl:  2rem;      // 32px
-$text-4xl:  2.375rem;  // 38px
-$text-5xl:  3rem;      // 48px
-
-// $text-3xs (11px) is an escape hatch, not a design choice. The codebase
-// has 9px/10px/0.65rem text in the infra dashboard and status badges;
-// forcing those straight to 12px is a +33% jump that reflows those
-// layouts. 11px lets those surfaces migrate without a visual break.
-// Public surfaces (landing, apps, auth, privacy) must not use it.
-
-// ── Letter Spacing ───────────────────────────────
-// Was 12+ ad-hoc values including a stray 0.5px, which breaks at every
-// font size because it does not scale with type. These three cover every
-// real use; $tracking-wide is for uppercase labels and eyebrows, which
-// genuinely need the extra room.
-$tracking-tight:  -0.02em; // headings / large display type
-$tracking-normal: 0;
-$tracking-wide:   0.08em;  // uppercase labels, status pills, tags
-$tracking-wider:  0.15em;  // section eyebrows only — the smallest uppercase
-                           // type, which needs the extra room to stay legible.
-                           // Four values, down from 12+.
-
-// ── Spacing (8px base grid) ──────────────────────
-$spacing-xs: 4px;
-$spacing-sm: 8px;
-$spacing-md: 16px;
-$spacing-lg: 24px;
-$spacing-xl: 32px;
-$spacing-2xl: 48px;
-$spacing-3xl: 64px;
-$spacing-4xl: 96px;
-
-// ── Border Radius ────────────────────────────────
-$radius-sm: 4px;
-$radius-md: 8px;
-$radius-lg: 12px;
-$radius-xl: 20px;
-$radius-2xl: 24px;
-$radius-pill: 100px;
-
-// ── Shadows ──────────────────────────────────────
+// ── Shadows (app-specific) ───────────────────────
 $shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
 $shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
 $shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
-$shadow-glow-cyan: 0 0 40px rgba(0, 180, 216, 0.2);
-$shadow-glow-purple: 0 0 40px rgba(156, 10, 191, 0.15);
 
-// ── Glass Morphism ───────────────────────────────
+// ── Glass Morphism (app-specific) ────────────────
 $glass-bg: rgba(20, 20, 40, 0.6);
 $glass-border: rgba(255, 255, 255, 0.08);
 $glass-blur: blur(20px);
 $glass-border-hover: rgba(255, 255, 255, 0.15);
-
-// ── Transitions ──────────────────────────────────
-$transition-fast: 150ms ease;
-$transition-base: 300ms ease;
-$transition-slow: 500ms ease;
-$transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
-
-// ── Breakpoints ──────────────────────────────────
-$breakpoint-sm: 576px;
-$breakpoint-md: 768px;
-$breakpoint-lg: 992px;
-$breakpoint-xl: 1200px;
 
 // ── Glass Morphism Mixin ─────────────────────────
 @mixin glass-card($bg: $glass-bg, $border: $glass-border) {
