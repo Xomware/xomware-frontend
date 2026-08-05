@@ -27,26 +27,19 @@ const CONSUMERS = {
   'xomtracks-frontend': 'src/styles/_tokens.scss',
   'xomforms-frontend': 'src/styles/_tokens.scss',
   'xomcron-frontend': 'src/styles/_tokens.scss',
+  'xomper-front-end': 'src/styles/_tokens.scss',
+  'xomcloud-frontend': 'src/app/styles/_tokens.scss',
 };
 
-// NOT consumers, deliberately:
+// NOT a consumer:
 //
-// vest-site      — placeholder repo; `main` holds only a README, there is no
-//                  Angular app and no stylesheets to migrate.
+// vest-site — placeholder repo; `main` holds only a README, there is no
+//             Angular app and no stylesheets to migrate.
 //
-// xomcloud-frontend and xomper-front-end are BLOCKED, not skipped. Both already
-// define variables that collide with these token names at DIFFERENT values, so
-// importing this file would silently reassign them across the whole app:
-//
-//   xomcloud  radius-sm 8px->4px, radius-md 12px->8px, radius-lg 16px->12px,
-//             radius-pill 25px->100px  (every rounded corner in the app)
-//   xomper    text-xs 0.75->0.8125rem, text-lg 1.125->1.25rem,
-//             text-xl 1.25->1.5rem, text-2xl 1.5->1.625rem,
-//             text-4xl 2.5->2.375rem  (text resizes app-wide)
-//
-// Neither repo has a visual regression suite, so there is nothing to catch the
-// damage. These need a deliberate decision — adopt the shared values and accept
-// the resize, or keep their own scales — not a mechanical migration.
+// xomcloud-frontend and xomper-front-end were previously blocked: both defined
+// variables colliding with these token names at different values, and neither
+// had a visual regression suite to catch the resulting resize. Both now have
+// suites and have adopted the shared values, so they are ordinary consumers.
 
 const write = process.argv.includes('--write');
 const source = readFileSync(SOURCE, 'utf8');
