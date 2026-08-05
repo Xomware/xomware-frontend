@@ -12,9 +12,9 @@
 
 .section-eyebrow {
   display: inline-block;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   font-weight: $font-weight-bold;
-  letter-spacing: 0.15em;
+  letter-spacing: $tracking-wider;
   text-transform: uppercase;
   color: $brand-cyan;
   margin-bottom: $spacing-sm;
@@ -25,11 +25,11 @@
   font-weight: $font-weight-extrabold;
   color: $text-primary;
   margin-bottom: $spacing-sm;
-  letter-spacing: -0.01em;
+  letter-spacing: $tracking-tight;
 }
 
 .section-subtitle {
-  font-size: 1rem;
+  font-size: $text-base;
   color: $text-secondary;
 }
 
@@ -135,9 +135,9 @@
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  font-size: 0.65rem;
+  font-size: $text-2xs;
   font-weight: $font-weight-semibold;
-  letter-spacing: 0.04em;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   border-radius: $radius-pill;
   background: rgba(255, 255, 255, 0.06);
@@ -226,14 +226,14 @@
 }
 
 .card-name {
-  font-size: 1.1rem;
+  font-size: $text-md;
   font-weight: $font-weight-bold;
   margin-bottom: $spacing-xs;
   transition: color $transition-base;
 }
 
 .card-description {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: $text-secondary;
   line-height: 1.5;
   margin-bottom: $spacing-md;
@@ -248,11 +248,11 @@
 }
 
 .card-tag {
-  font-size: 0.7rem;
+  font-size: $text-2xs;
   font-weight: $font-weight-medium;
   color: $text-muted;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: $tracking-wide;
   padding: 3px $spacing-sm;
   background: rgba(255, 255, 255, 0.04);
   border-radius: $radius-sm;
@@ -269,10 +269,10 @@
 
 // ── Platform Section Headings ────────────────────
 .platform-heading {
-  font-size: 1rem;
+  font-size: $text-base;
   font-weight: $font-weight-semibold;
   color: $text-secondary;
-  letter-spacing: 0.06em;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   margin-bottom: $spacing-lg;
   display: flex;
@@ -291,9 +291,9 @@
   background: rgba($brand-cyan, 0.08);
   border: 1px solid rgba($brand-cyan, 0.2);
   border-radius: $radius-pill;
-  font-size: 0.65rem;
+  font-size: $text-2xs;
   font-weight: $font-weight-semibold;
-  letter-spacing: 0.1em;
+  letter-spacing: $tracking-wide;
   color: $brand-cyan;
   text-transform: uppercase;
   vertical-align: middle;
@@ -301,7 +301,7 @@
 
 // ── iOS Whitelist Note ────────────────────────────
 .ios-whitelist-note {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: $text-muted;
   margin-bottom: $spacing-xl;
   line-height: 1.5;

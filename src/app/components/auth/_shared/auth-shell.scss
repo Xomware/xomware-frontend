@@ -50,15 +50,15 @@
   }
 
   span {
-    font-size: 1.1rem;
+    font-size: $text-md;
     font-weight: $font-weight-bold;
-    letter-spacing: 0.08em;
+    letter-spacing: $tracking-wide;
     color: $text-primary;
   }
 }
 
 .auth-title {
-  font-size: 1.75rem;
+  font-size: $text-2xl;
   font-weight: $font-weight-bold;
   color: $text-primary;
   margin: 0 0 $spacing-xs;
@@ -66,7 +66,7 @@
 }
 
 .auth-subtitle {
-  font-size: 0.95rem;
+  font-size: $text-base;
   color: $text-secondary;
   margin: 0 0 $spacing-xl;
   text-align: center;
@@ -85,10 +85,10 @@
 }
 
 .auth-label {
-  font-size: 0.8rem;
+  font-size: $text-xs;
   font-weight: $font-weight-semibold;
   color: $text-secondary;
-  letter-spacing: 0.04em;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
 }
 
@@ -99,7 +99,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: $radius-md;
   color: $text-primary;
-  font-size: 1rem;
+  font-size: $text-base;
   font-family: $font-stack;
   outline: none;
   transition: border-color $transition-base, box-shadow $transition-base;
@@ -129,12 +129,12 @@
 }
 
 .auth-hint {
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   color: $text-muted;
 }
 
 .auth-error-field {
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: #ff7b7b;
 }
 
@@ -144,7 +144,7 @@
   border: 1px solid rgba(255, 82, 82, 0.3);
   border-radius: $radius-md;
   color: #ff8a8a;
-  font-size: 0.85rem;
+  font-size: $text-sm;
 }
 
 .auth-btn {
@@ -157,7 +157,7 @@
   border: none;
   border-radius: $radius-md;
   color: white;
-  font-size: 1rem;
+  font-size: $text-base;
   font-weight: $font-weight-semibold;
   font-family: $font-stack;
   cursor: pointer;
@@ -193,7 +193,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: $radius-md;
   color: $text-primary;
-  font-size: 0.95rem;
+  font-size: $text-base;
   font-weight: $font-weight-medium;
   font-family: $font-stack;
   cursor: pointer;
@@ -221,9 +221,9 @@
   gap: $spacing-md;
   margin: $spacing-md 0;
   color: $text-muted;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: $tracking-wide;
 
   &::before,
   &::after {
@@ -237,7 +237,7 @@
 .auth-footer {
   margin-top: $spacing-xl;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   color: $text-secondary;
 
   a {
@@ -263,7 +263,7 @@
   margin-top: $spacing-lg;
   text-align: center;
   color: $text-muted;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   text-decoration: none;
   width: 100%;
 

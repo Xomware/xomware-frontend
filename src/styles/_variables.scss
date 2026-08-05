@@ -85,7 +85,10 @@ $text-5xl:  3rem;      // 48px
 // genuinely need the extra room.
 $tracking-tight:  -0.02em; // headings / large display type
 $tracking-normal: 0;
-$tracking-wide:   0.08em;  // uppercase labels, eyebrows, status pills
+$tracking-wide:   0.08em;  // uppercase labels, status pills, tags
+$tracking-wider:  0.15em;  // section eyebrows only — the smallest uppercase
+                           // type, which needs the extra room to stay legible.
+                           // Four values, down from 12+.
 
 // ── Spacing (8px base grid) ──────────────────────
 $spacing-xs: 4px;

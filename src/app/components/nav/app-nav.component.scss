@@ -43,8 +43,8 @@
 
 .nav-wordmark {
   font-weight: $font-weight-bold;
-  font-size: 1rem;
-  letter-spacing: 0.12em;
+  font-size: $text-base;
+  letter-spacing: $tracking-wider;
   color: $text-primary;
 }
 
@@ -56,7 +56,7 @@
 
 .nav-link {
   color: $text-secondary;
-  font-size: 0.875rem;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   text-decoration: none;
   transition: color $transition-fast;
@@ -123,9 +123,9 @@
 }
 
 .report-menu-header {
-  font-size: 0.7rem;
+  font-size: $text-2xs;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: $tracking-wide;
   color: $text-secondary;
   padding: $spacing-sm $spacing-md $spacing-xs;
 }
@@ -153,12 +153,12 @@
 }
 
 .report-menu-label {
-  font-size: 0.875rem;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
 }
 
 .report-menu-repo {
-  font-size: 0.7rem;
+  font-size: $text-2xs;
   color: $text-secondary;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
@@ -222,7 +222,7 @@
   overflow: hidden;
   flex-shrink: 0;
   color: $text-primary;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   font-weight: $font-weight-bold;
 
   &.has-image {
@@ -242,7 +242,7 @@
 }
 
 .user-menu-handle {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   color: $text-primary;
   margin-right: 4px;
@@ -359,7 +359,7 @@
   align-items: center;
   gap: $spacing-sm;
   color: $text-secondary;
-  font-size: 1.1rem;
+  font-size: $text-md;
   font-weight: $font-weight-medium;
   text-decoration: none;
   padding: $spacing-md $spacing-sm;
@@ -396,16 +396,16 @@
   display: flex;
   align-items: center;
   gap: $spacing-sm;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: $tracking-wide;
   color: $text-secondary;
   padding: 0 $spacing-sm $spacing-xs;
 }
 
 .mobile-menu-sublink {
   color: $text-secondary;
-  font-size: 0.95rem;
+  font-size: $text-base;
   text-decoration: none;
   padding: $spacing-sm $spacing-lg;
   border-radius: $radius-sm;

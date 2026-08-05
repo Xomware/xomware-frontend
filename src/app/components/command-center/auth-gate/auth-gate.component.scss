@@ -31,14 +31,14 @@
 }
 
 .auth-title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: $text-xl;
+  font-weight: $font-weight-semibold;
   color: $text-primary;
   margin-bottom: $spacing-xs;
 }
 
 .auth-subtitle {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: $text-muted;
   margin-bottom: $spacing-xl;
 }
@@ -59,7 +59,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: $radius-md;
     color: $text-primary;
-    font-size: 1rem;
+    font-size: $text-base;
     font-family: $font-stack;
     outline: none;
     transition: border-color $transition-base;
@@ -77,7 +77,7 @@
 
 .auth-error {
   color: #ff5252;
-  font-size: 0.85rem;
+  font-size: $text-sm;
 }
 
 .auth-btn {
@@ -86,8 +86,8 @@
   border: none;
   border-radius: $radius-md;
   color: white;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: all $transition-base;
 
@@ -116,7 +116,7 @@
   display: inline-block;
   margin-top: $spacing-lg;
   color: $text-muted;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   text-decoration: none;
 
   &:hover {
