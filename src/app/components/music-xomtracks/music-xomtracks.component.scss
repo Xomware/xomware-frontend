@@ -26,14 +26,14 @@
 }
 
 .xomtracks-coming-soon-title {
-  font-size: 20px;
+  font-size: $text-lg;
   font-weight: $font-weight-semibold;
   color: $text-primary;
   margin: 0;
 }
 
 .xomtracks-coming-soon-body {
-  font-size: 14px;
+  font-size: $text-sm;
   color: $text-secondary;
   line-height: 1.6;
   margin: 0;
@@ -55,7 +55,10 @@
   gap: $spacing-xl;
 
   @media (max-width: $breakpoint-md) {
-    grid-template-columns: 1fr;
+    // minmax(0, 1fr), not 1fr: a grid item defaults to min-width:auto, which
+    // lets long track names push the row past the viewport instead of
+    // ellipsizing. This tab overflowed horizontally on mobile because of it.
+    grid-template-columns: minmax(0, 1fr);
     gap: $spacing-lg;
   }
 }
@@ -114,7 +117,7 @@
 
 .xomtracks-error-msg {
   color: $text-secondary;
-  font-size: 15px;
+  font-size: $text-sm;
   max-width: 360px;
   line-height: 1.5;
   margin: 0;
@@ -126,7 +129,7 @@
   border: none;
   border-radius: $radius-md;
   padding: $spacing-sm $spacing-xl;
-  font-size: 14px;
+  font-size: $text-sm;
   font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: background $transition-fast, transform $transition-fast;
@@ -149,7 +152,7 @@
 // ── Subtitle ──────────────────────────────────────────
 .xomtracks-subtitle {
   color: $text-secondary;
-  font-size: 14px;
+  font-size: $text-sm;
   line-height: 1.6;
   max-width: 720px;
   margin: 0 0 $spacing-lg;
@@ -164,7 +167,10 @@
   margin-bottom: $spacing-2xl;
 
   @media (max-width: $breakpoint-md) {
-    grid-template-columns: 1fr;
+    // minmax(0, 1fr), not 1fr: a grid item defaults to min-width:auto, which
+    // lets long track names push the row past the viewport instead of
+    // ellipsizing. This tab overflowed horizontally on mobile because of it.
+    grid-template-columns: minmax(0, 1fr);
     gap: $spacing-lg;
   }
 }
@@ -189,7 +195,7 @@
 }
 
 .xomtracks-section-title {
-  font-size: 18px;
+  font-size: $text-md;
   font-weight: $font-weight-bold;
   color: $text-primary;
   margin: 0;
@@ -202,7 +208,7 @@
   flex-shrink: 0;
   color: $text-muted;
   text-decoration: none;
-  font-size: 11px;
+  font-size: $text-2xs;
   font-weight: $font-weight-medium;
   transition: color $transition-fast;
 
@@ -226,7 +232,7 @@
 
 .xomtracks-section-empty {
   color: $text-muted;
-  font-size: 14px;
+  font-size: $text-sm;
   font-style: italic;
   margin: 0;
 }
@@ -275,7 +281,7 @@
 }
 
 .share-name {
-  font-size: 14px;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   color: $text-primary;
   white-space: nowrap;
@@ -301,7 +307,7 @@
 }
 
 .share-artist {
-  font-size: 12px;
+  font-size: $text-2xs;
   color: $text-secondary;
   white-space: nowrap;
   overflow: hidden;
@@ -309,7 +315,7 @@
 }
 
 .share-meta {
-  font-size: 11px;
+  font-size: $text-2xs;
   color: $text-muted;
   white-space: nowrap;
   overflow: hidden;
@@ -320,9 +326,9 @@
 // Platform badges — real product brand colors (not xomware design tokens).
 .share-platform-badge {
   flex-shrink: 0;
-  font-size: 9px;
+  font-size: $text-2xs;
   font-weight: $font-weight-bold;
-  letter-spacing: 0.04em;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   padding: 3px 7px;
   border-radius: $radius-sm;
@@ -359,7 +365,7 @@
   text-decoration: none;
   border-radius: $radius-pill;
   padding: $spacing-sm $spacing-xl;
-  font-size: 14px;
+  font-size: $text-sm;
   font-weight: $font-weight-semibold;
   transition: background $transition-fast, transform $transition-fast;
 

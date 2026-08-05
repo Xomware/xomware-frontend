@@ -53,9 +53,9 @@ $ticker-duration: 36s;
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  font-size: 10px;
+  font-size: $text-2xs;
   font-weight: $font-weight-semibold;
-  letter-spacing: 0.12em;
+  letter-spacing: $tracking-wider;
   text-transform: uppercase;
   color: $text-muted;
   // Breathing room at the very front
@@ -73,9 +73,9 @@ $ticker-duration: 36s;
 }
 
 .ticker-divider-label {
-  font-size: 10px;
+  font-size: $text-2xs;
   font-weight: $font-weight-bold;
-  letter-spacing: 0.14em;
+  letter-spacing: $tracking-wider;
   text-transform: uppercase;
   color: $brand-cyan;
   padding: 2px $spacing-sm;
@@ -157,7 +157,7 @@ $ticker-duration: 36s;
 }
 
 .ticker-item-label {
-  font-size: 13px;
+  font-size: $text-xs;
   font-weight: $font-weight-medium;
   color: $text-primary;
   white-space: nowrap;
@@ -167,7 +167,7 @@ $ticker-duration: 36s;
 }
 
 .ticker-item-sub {
-  font-size: 11px;
+  font-size: $text-2xs;
   color: $text-muted;
   white-space: nowrap;
   max-width: 140px;
@@ -177,7 +177,7 @@ $ticker-duration: 36s;
 
 // Inter-item dot separator
 .ticker-dot {
-  font-size: 12px;
+  font-size: $text-2xs;
   color: $text-muted;
   opacity: 0.35;
   margin-left: $spacing-xs;
@@ -242,9 +242,9 @@ $ticker-duration: 36s;
 }
 
 .ticker-badge-label {
-  font-size: 12px;
+  font-size: $text-2xs;
   font-weight: $font-weight-semibold;
-  letter-spacing: 0.02em;
+  letter-spacing: $tracking-normal;
   color: rgba($xomify-purple, 0.9);
   white-space: nowrap;
 }

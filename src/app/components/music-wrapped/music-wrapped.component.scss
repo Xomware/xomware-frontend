@@ -26,14 +26,14 @@
 }
 
 .wrapped-coming-soon-title {
-  font-size: 20px;
+  font-size: $text-lg;
   font-weight: $font-weight-semibold;
   color: $text-primary;
   margin: 0;
 }
 
 .wrapped-coming-soon-body {
-  font-size: 14px;
+  font-size: $text-sm;
   color: $text-secondary;
   line-height: 1.6;
   margin: 0;
@@ -113,7 +113,7 @@
 
 .wrapped-error-msg {
   color: $text-secondary;
-  font-size: 15px;
+  font-size: $text-sm;
   max-width: 360px;
   line-height: 1.5;
   margin: 0;
@@ -125,7 +125,7 @@
   border: none;
   border-radius: $radius-md;
   padding: $spacing-sm $spacing-xl;
-  font-size: 14px;
+  font-size: $text-sm;
   font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: background $transition-fast, transform $transition-fast;
@@ -148,7 +148,7 @@
 // ── Empty state ───────────────────────────────────────
 .wrapped-empty {
   color: $text-muted;
-  font-size: 14px;
+  font-size: $text-sm;
   font-style: italic;
   margin: $spacing-2xl 0;
   text-align: center;
@@ -163,11 +163,11 @@
 }
 
 .month-selector-label {
-  font-size: 13px;
+  font-size: $text-xs;
   font-weight: $font-weight-semibold;
   color: $text-secondary;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: $tracking-wide;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -185,7 +185,7 @@
   border: 1px solid $glass-border;
   border-radius: $radius-md;
   color: $text-primary;
-  font-size: 14px;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   font-family: $font-stack;
   padding: $spacing-sm $spacing-3xl $spacing-sm $spacing-md;
@@ -216,7 +216,7 @@
 
   @media (max-width: $breakpoint-sm) {
     min-width: 140px;
-    font-size: 13px;
+    font-size: $text-xs;
   }
 }
 
@@ -242,7 +242,7 @@
   background: #1db954;
   color: #fff;
   text-decoration: none;
-  font-size: 14px;
+  font-size: $text-sm;
   font-weight: $font-weight-semibold;
   padding: $spacing-sm $spacing-xl;
   border-radius: $radius-md;
@@ -305,7 +305,7 @@
 }
 
 .wrapped-section-title {
-  font-size: 20px;
+  font-size: $text-lg;
   font-weight: $font-weight-bold;
   color: $text-primary;
   margin: 0;
@@ -315,7 +315,7 @@
 
 .wrapped-section-empty {
   color: $text-muted;
-  font-size: 14px;
+  font-size: $text-sm;
   font-style: italic;
   margin: 0;
 }
@@ -338,7 +338,7 @@
 }
 
 .track-rank {
-  font-size: 13px;
+  font-size: $text-xs;
   font-weight: $font-weight-bold;
   color: $text-muted;
   width: 20px;
@@ -390,7 +390,7 @@
 }
 
 .track-name {
-  font-size: 15px;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   white-space: nowrap;
   overflow: hidden;
@@ -398,7 +398,7 @@
 }
 
 .track-artist {
-  font-size: 13px;
+  font-size: $text-xs;
   color: $text-secondary;
   white-space: nowrap;
   overflow: hidden;
@@ -431,7 +431,7 @@
 }
 
 .artist-rank {
-  font-size: 13px;
+  font-size: $text-xs;
   font-weight: $font-weight-bold;
   color: $text-muted;
   width: 20px;
@@ -475,7 +475,7 @@
 }
 
 .artist-name {
-  font-size: 15px;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   flex: 1;
   white-space: nowrap;
@@ -503,7 +503,7 @@
 }
 
 .genre-rank {
-  font-size: 13px;
+  font-size: $text-xs;
   font-weight: $font-weight-bold;
   color: $text-muted;
   width: 20px;
@@ -512,14 +512,14 @@
 }
 
 .genre-name {
-  font-size: 15px;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   color: $text-primary;
   flex: 1;
 }
 
 .genre-count {
-  font-size: 12px;
+  font-size: $text-2xs;
   font-weight: $font-weight-medium;
   color: $text-muted;
   min-width: 28px;
