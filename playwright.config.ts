@@ -45,6 +45,12 @@ export default defineConfig({
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
     trace: 'retain-on-failure',
+    // Set at the context level so it applies BEFORE the first navigation.
+    // Setting it inside the test (via page.emulateMedia) left a window where
+    // the music ticker's infinite marquee had already started, so it could be
+    // captured at slightly different offsets between runs — an intermittent
+    // one-test failure that was hard to pin down.
+    reducedMotion: 'reduce',
   },
 
   projects: [
@@ -62,15 +68,22 @@ export default defineConfig({
   ],
 
   webServer: {
-    // Serves whatever is in dist/. Build with `npm run build:visual` first —
-    // that config forces musicSurfaces to 'mock' so the music components render
-    // real content instead of an empty shell.
+    // Builds before serving, deliberately.
+    //
+    // dist/ is shared with `npm run build:prod`, so running a production build
+    // (e.g. before a commit) silently leaves the wrong bundle in place — one
+    // where musicSurfaces is 'live' and every music surface hangs on a stubbed
+    // API, stuck rendering skeletons. That presented as flaky screenshots and
+    // cost real time to track down. Building here makes the suite own its own
+    // input instead of trusting whatever was left in dist/.
     //
     // -s = SPA fallback, so deep routes like /apps resolve to index.html
     // instead of 404ing.
-    command: `npx serve -s dist/xomware -l ${PORT} --no-clipboard`,
+    command: `npm run build:visual && npx serve -s dist/xomware -l ${PORT} --no-clipboard`,
     url: `http://127.0.0.1:${PORT}`,
-    reuseExistingServer: !process.env.CI,
+    // Must not reuse: a server left over from a previous run is serving the
+    // previous build, which defeats the build step above.
+    reuseExistingServer: false,
     timeout: 60_000,
   },
 });
