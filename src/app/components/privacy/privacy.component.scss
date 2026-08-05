@@ -16,7 +16,7 @@
     display: inline-block;
     color: #00b4d8;
     text-decoration: none;
-    font-size: 14px;
+    font-size: $text-sm;
     margin-bottom: 24px;
     transition: color 150ms ease;
 
@@ -33,9 +33,9 @@
   }
 
   h1 {
-    font-size: 36px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    font-size: $text-4xl;
+    font-weight: $font-weight-extrabold;
+    letter-spacing: $tracking-tight;
     margin: 0 0 8px;
     background: linear-gradient(90deg, #00b4d8, #48cae4);
     background-clip: text;
@@ -45,22 +45,25 @@
 
   .updated {
     color: #71717a;
-    font-size: 14px;
+    font-size: $text-sm;
     margin: 0;
   }
 
   .body {
     h2 {
-      font-size: 20px;
-      font-weight: 700;
+      font-size: $text-lg;
+      font-weight: $font-weight-bold;
       margin: 32px 0 12px;
       color: #fafafa;
     }
 
+    // Body copy of the policy. 15px sat exactly between $text-sm (14) and
+    // $text-base (16); rounded up, because shrinking the body text of a long
+    // legal document is the wrong direction for readability.
     p,
     ul {
       color: #d4d4d8;
-      font-size: 15px;
+      font-size: $text-base;
       margin: 0 0 12px;
     }
 
@@ -77,7 +80,7 @@
       border: 1px solid #27272a;
       border-radius: 4px;
       padding: 1px 6px;
-      font-size: 13px;
+      font-size: $text-xs;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       color: #00b4d8;
     }
