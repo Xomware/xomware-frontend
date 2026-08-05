@@ -53,6 +53,10 @@ export default defineConfig({
   ],
 
   webServer: {
+    // Serves whatever is in dist/. Build with `npm run build:visual` first —
+    // that config forces musicSurfaces to 'mock' so the music components render
+    // real content instead of an empty shell.
+    //
     // -s = SPA fallback, so deep routes like /apps resolve to index.html
     // instead of 404ing.
     command: `npx serve -s dist/xomware -l ${PORT} --no-clipboard`,
