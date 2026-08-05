@@ -24,10 +24,19 @@ export default defineConfig({
 
   expect: {
     toHaveScreenshot: {
-      // Anti-aliasing differs slightly between machines and Chromium builds.
-      // Small enough to still catch a font-size change; large enough not to
-      // fail on subpixel noise.
-      maxDiffPixelRatio: 0.01,
+      // ABSOLUTE pixel count, not a ratio.
+      //
+      // maxDiffPixelRatio: 0.01 was here originally and it was far too coarse:
+      // 1% of a tall full-page screenshot is ~25,000 pixels, so a heading
+      // losing its gradient, or a card glow being removed, passed silently.
+      // The suite caught reflow (which shifts everything) but was blind to
+      // local colour changes — exactly the kind of edit visual polish is made of.
+      //
+      // Two consecutive runs on the same machine produce byte-identical
+      // renders, so the real noise floor is 0. 150 leaves room for
+      // anti-aliasing drift across Chromium updates without hiding a change
+      // to a single heading or badge.
+      maxDiffPixels: 150,
       animations: 'disabled',
       caret: 'hide',
     },

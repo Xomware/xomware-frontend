@@ -81,3 +81,45 @@ for (const route of ROUTES) {
     });
   });
 }
+
+/**
+ * Hover state of an app card.
+ *
+ * The resting screenshots above cover none of this: every per-app colour cue —
+ * the glow, the logo drop-shadow, the accent-coloured title and arrow — fires
+ * only on :hover. Card hover is the primary interaction on the site and was
+ * completely unverified, which is how a change to the hover treatment could
+ * ship without a single screenshot moving.
+ *
+ * Desktop only: the hover block is gated behind `@media (hover: hover)`, so on
+ * a touch viewport there is deliberately nothing to capture.
+ */
+test('app card hover state', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'hover is pointer-only by design');
+
+  await stubBackend(page);
+  await page.goto('/apps', { waitUntil: 'domcontentloaded' });
+  await settle(page);
+
+  const card = page.locator('.app-card').first();
+  await card.hover();
+  // Let the glow/transform transitions finish ($transition-slow is 500ms).
+  await page.waitForTimeout(700);
+
+  // Capture a padded region around the card, NOT the element itself.
+  // An element screenshot clips to the border box, and box-shadow renders
+  // outside it — so `expect(card).toHaveScreenshot()` silently excludes the
+  // entire glow this test exists to watch.
+  const box = await card.boundingBox();
+  if (!box) throw new Error('app card has no bounding box');
+  const PAD = 60;
+
+  await expect(page).toHaveScreenshot('app-card-hover.png', {
+    clip: {
+      x: Math.max(0, box.x - PAD),
+      y: Math.max(0, box.y - PAD),
+      width: box.width + PAD * 2,
+      height: box.height + PAD * 2,
+    },
+  });
+});

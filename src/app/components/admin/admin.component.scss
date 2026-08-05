@@ -34,7 +34,6 @@
 .admin-logo img {
   width: 32px;
   height: 32px;
-  filter: drop-shadow(0 0 8px $brand-cyan-glow);
 }
 
 .admin-title {
@@ -238,7 +237,7 @@
   font-weight: $font-weight-semibold;
 
   &:hover:not(:disabled) {
-    box-shadow: $shadow-glow-cyan;
+    box-shadow: $shadow-md;
   }
 }
 
