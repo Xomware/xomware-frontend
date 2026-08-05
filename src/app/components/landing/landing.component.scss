@@ -49,9 +49,12 @@
 }
 
 .anon-gate-wordmark {
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
+  font-size: $text-lg;
+  // Was 900. index.html loads Inter at wght@400..800, so 900 had no real
+  // face behind it and the browser synthesized faux-bold - which is why this
+  // wordmark rendered slightly smeared next to the rest of the type.
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $tracking-tight;
   color: $brand-cyan;
 }
 
@@ -75,9 +78,9 @@
   align-items: center;
   justify-content: center;
   padding: 10px 22px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
+  border-radius: $radius-md;
+  font-weight: $font-weight-semibold;
+  font-size: $text-sm;
   text-decoration: none;
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #d4d4d8;

@@ -37,12 +37,14 @@ export class InfraDashboardComponent implements OnInit {
     xomfit: '#ff4d6d',
   };
 
-  readonly appIcons: Record<string, string> = {
-    xomware: '🏠',
-    xomify: '🎵',
-    xomcloud: '☁️',
-    xomper: '🏈',
-    xomfit: '💪',
+  // Monograms, not emoji — emoji are not used in product UI. These also render
+  // consistently across platforms, which the emoji did not.
+  readonly appMonograms: Record<string, string> = {
+    xomware: 'XW',
+    xomify: 'XY',
+    xomcloud: 'XC',
+    xomper: 'XP',
+    xomfit: 'XF',
   };
 
   constructor(private infra: InfraService) {}
@@ -95,7 +97,9 @@ export class InfraDashboardComponent implements OnInit {
   }
 
   getIcon(name: string): string {
-    return this.appIcons[name] || '📦';
+    // Fall back to the first two letters rather than a generic placeholder, so
+    // an unmapped workspace is still distinguishable at a glance.
+    return this.appMonograms[name] ?? name.slice(0, 2).toUpperCase();
   }
 
   formatBytes(bytes: number): string {

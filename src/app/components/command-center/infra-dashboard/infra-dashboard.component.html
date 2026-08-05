@@ -2,7 +2,7 @@
   <!-- OVERVIEW VIEW -->
   <div *ngIf="view === 'overview'" class="overview">
     <div class="section-header">
-      <h2>🏗️ Infrastructure</h2>
+      <h2>Infrastructure</h2>
       <button class="refresh-btn" (click)="loadWorkspaces()" [disabled]="loading">
         ↻ Refresh
       </button>
@@ -10,7 +10,7 @@
     <p class="section-subtitle">Terraform workspaces across Xomware apps</p>
 
     <div *ngIf="error" class="error-banner">
-      <span>⚠️ {{ error }}</span>
+      <span>{{ error }}</span>
       <button class="retry-btn" (click)="loadWorkspaces()">Retry</button>
     </div>
 
@@ -63,7 +63,7 @@
     </div>
 
     <div *ngIf="detailError" class="error-banner">
-      <span>⚠️ {{ detailError }}</span>
+      <span>{{ detailError }}</span>
     </div>
 
     <div *ngIf="detailLoading" class="loading-state">Loading state…</div>

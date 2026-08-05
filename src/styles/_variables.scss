@@ -45,6 +45,47 @@ $font-weight-medium: 500;
 $font-weight-semibold: 600;
 $font-weight-bold: 700;
 $font-weight-extrabold: 800;
+// NOTE: index.html loads Inter at wght@400;500;600;700;800.
+// There is no 900 — requesting it produces synthetic faux-bold.
+// Do not add $font-weight-black without adding 900 to the font request.
+
+// ── Type Scale ───────────────────────────────────
+// Fixed ramp. Before this existed, every size was hand-typed at the call
+// site, which is how the codebase reached ~30 distinct sizes mixing px
+// and rem (14px and 0.875rem were both in use for the same size).
+//
+// Declared in rem so browser font-size preferences are respected; px
+// equivalents at a 16px root are in the comments.
+//
+// RULE: no font-size outside this scale. Enforced by stylelint
+// (declaration-property-value-allowed-list in .stylelintrc.json).
+$text-3xs:  0.6875rem; // 11px — dense admin chrome ONLY, see note below
+$text-2xs:  0.75rem;   // 12px — smallest permitted on public surfaces
+$text-xs:   0.8125rem; // 13px
+$text-sm:   0.875rem;  // 14px
+$text-base: 1rem;      // 16px — body default
+$text-md:   1.125rem;  // 18px
+$text-lg:   1.25rem;   // 20px
+$text-xl:   1.5rem;    // 24px
+$text-2xl:  1.625rem;  // 26px
+$text-3xl:  2rem;      // 32px
+$text-4xl:  2.375rem;  // 38px
+$text-5xl:  3rem;      // 48px
+
+// $text-3xs (11px) is an escape hatch, not a design choice. The codebase
+// has 9px/10px/0.65rem text in the infra dashboard and status badges;
+// forcing those straight to 12px is a +33% jump that reflows those
+// layouts. 11px lets those surfaces migrate without a visual break.
+// Public surfaces (landing, apps, auth, privacy) must not use it.
+
+// ── Letter Spacing ───────────────────────────────
+// Was 12+ ad-hoc values including a stray 0.5px, which breaks at every
+// font size because it does not scale with type. These three cover every
+// real use; $tracking-wide is for uppercase labels and eyebrows, which
+// genuinely need the extra room.
+$tracking-tight:  -0.02em; // headings / large display type
+$tracking-normal: 0;
+$tracking-wide:   0.08em;  // uppercase labels, eyebrows, status pills
 
 // ── Spacing (8px base grid) ──────────────────────
 $spacing-xs: 4px;
