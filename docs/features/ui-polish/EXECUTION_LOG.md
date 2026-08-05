@@ -168,8 +168,49 @@ outstanding item and the one the research flagged as highest-leverage:
 
 xomify is worse than xomware-frontend ever was.
 
-**Corner radius** (20-24px vs the reference's near-zero) is the one remaining
-identity decision, deliberately left for the owner.
+### Token propagation (done 2026-08-05)
+
+Shared tokens extracted to `src/styles/_tokens.scss` and adopted by four repos:
+
+| App | Substitutions | Tie fixes | PR |
+|---|---|---|---|
+| xomcron-frontend | 95 | 2 | #1 merged |
+| xomtracks-frontend | 237 | 0 | #9 merged |
+| xomforms-frontend | 391 | 3 | #25 merged |
+| xomify-frontend | — (81 files, 64 sizes) | 23 | #333 merged |
+
+All four now enforce the scale with stylelint in PR-time CI.
+
+### BLOCKED — needs a decision, not a migration
+
+`xomcloud-frontend` and `xomper-front-end` already define variables that collide
+with the shared token names **at different values**. Importing the shared file
+would silently reassign them app-wide:
+
+- **xomcloud**: `radius-sm` 8->4px, `radius-md` 12->8px, `radius-lg` 16->12px,
+  `radius-pill` 25->100px — every rounded corner in the app changes
+- **xomper**: `text-xs` 0.75->0.8125rem, `text-lg` 1.125->1.25rem, `text-xl`
+  1.25->1.5rem, `text-2xl` 1.5->1.625rem, `text-4xl` 2.5->2.375rem — text
+  resizes app-wide
+
+Neither has a visual regression suite, so nothing would catch the damage. Both
+already have internally coherent scales; the only gain from unifying is
+cross-app consistency, and the cost is resizing a live app blind. **Owner's
+call.**
+
+`vest-site` is not a consumer — its `main` branch holds only a README.
+
+### The tie trap, totalled
+
+`0.04em` sits exactly between `$tracking-normal` and `$tracking-wide`. Automatic
+nearest-match rounds it to 0 and silently strips tracking from uppercase labels.
+It hit **31 components across four repos**. It is now documented in
+`_tokens.scss` itself so the next migration does not repeat it.
+
+### Corner radius
+
+(20-24px vs the reference's near-zero) is the one remaining identity decision,
+deliberately left for the owner.
 
 ---
 
