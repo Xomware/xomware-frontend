@@ -66,10 +66,7 @@
   letter-spacing: $tracking-tight;
   line-height: 1.1;
   margin: 0 0 $spacing-md;
-  background: linear-gradient(135deg, $text-primary 0%, $brand-cyan-light 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: $text-primary;
 }
 
 .music-hero-subtitle {
