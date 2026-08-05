@@ -46,9 +46,9 @@
   display: flex;
   align-items: center;
   gap: $spacing-sm;
-  font-size: 13px;
+  font-size: $text-xs;
   font-weight: $font-weight-medium;
-  letter-spacing: 0.08em;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   color: $brand-cyan;
   margin-bottom: $spacing-md;
@@ -63,7 +63,7 @@
 .music-hero-title {
   font-size: clamp(36px, 6vw, 56px);
   font-weight: $font-weight-extrabold;
-  letter-spacing: -0.03em;
+  letter-spacing: $tracking-tight;
   line-height: 1.1;
   margin: 0 0 $spacing-md;
   background: linear-gradient(135deg, $text-primary 0%, $brand-cyan-light 100%);
@@ -73,7 +73,7 @@
 }
 
 .music-hero-subtitle {
-  font-size: 16px;
+  font-size: $text-base;
   color: $text-secondary;
   margin: 0;
 }
@@ -123,7 +123,7 @@
   border: none;
   border-bottom: 2px solid transparent;
   padding: $spacing-md $spacing-md;
-  font-size: 14px;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   font-family: $font-stack;
   color: $text-secondary;
@@ -160,7 +160,7 @@
   }
 
   @media (max-width: $breakpoint-sm) {
-    font-size: 13px;
+    font-size: $text-xs;
     padding: $spacing-md $spacing-sm;
     gap: $spacing-xs;
 
@@ -215,7 +215,7 @@
 
 
 .music-meta-updated {
-  font-size: 12px;
+  font-size: $text-2xs;
   color: $text-muted;
 }
 
@@ -243,13 +243,13 @@
   border: none;
   border-radius: $radius-pill;
   padding: 5px $spacing-md;
-  font-size: 12px;
+  font-size: $text-2xs;
   font-weight: $font-weight-semibold;
   font-family: $font-stack;
   color: $text-secondary;
   cursor: pointer;
   white-space: nowrap;
-  letter-spacing: 0.01em;
+  letter-spacing: $tracking-normal;
   transition:
     color $transition-fast,
     background $transition-fast,
@@ -381,7 +381,7 @@
 
 .music-error-msg {
   color: $text-secondary;
-  font-size: 15px;
+  font-size: $text-sm;
   max-width: 360px;
   line-height: 1.5;
   margin: 0;
@@ -393,7 +393,7 @@
   border: none;
   border-radius: $radius-md;
   padding: $spacing-sm $spacing-xl;
-  font-size: 14px;
+  font-size: $text-sm;
   font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: background $transition-fast, transform $transition-fast;
@@ -459,7 +459,7 @@
 }
 
 .music-section-title {
-  font-size: 22px;
+  font-size: $text-lg;
   font-weight: $font-weight-bold;
   color: $text-primary;
   margin: 0;
@@ -469,7 +469,7 @@
 
 .music-section-empty {
   color: $text-muted;
-  font-size: 14px;
+  font-size: $text-sm;
   font-style: italic;
   margin: 0;
 }
@@ -498,7 +498,7 @@
   background: $bg-card;
   border: 1px solid $glass-border;
   border-radius: $radius-pill;
-  font-size: 12px;
+  font-size: $text-2xs;
   font-weight: $font-weight-semibold;
   font-family: $font-stack;
   color: $text-secondary;
@@ -536,7 +536,7 @@
 }
 
 .track-rank {
-  font-size: 13px;
+  font-size: $text-xs;
   font-weight: $font-weight-bold;
   color: $text-muted;
   width: 20px;
@@ -588,7 +588,7 @@
 }
 
 .track-name {
-  font-size: 15px;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   white-space: nowrap;
   overflow: hidden;
@@ -596,7 +596,7 @@
 }
 
 .track-artist {
-  font-size: 13px;
+  font-size: $text-xs;
   color: $text-secondary;
   white-space: nowrap;
   overflow: hidden;
@@ -629,7 +629,7 @@
 }
 
 .artist-rank {
-  font-size: 13px;
+  font-size: $text-xs;
   font-weight: $font-weight-bold;
   color: $text-muted;
   width: 20px;
@@ -673,7 +673,7 @@
 }
 
 .artist-name {
-  font-size: 15px;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   flex: 1;
   white-space: nowrap;
@@ -701,7 +701,7 @@
 }
 
 .genre-rank {
-  font-size: 13px;
+  font-size: $text-xs;
   font-weight: $font-weight-bold;
   color: $text-muted;
   width: 20px;
@@ -710,7 +710,7 @@
 }
 
 .genre-name {
-  font-size: 15px;
+  font-size: $text-sm;
   font-weight: $font-weight-medium;
   color: $text-primary;
   flex: 1 1 auto;
@@ -718,7 +718,7 @@
 }
 
 .genre-count {
-  font-size: 12px;
+  font-size: $text-2xs;
   font-weight: $font-weight-medium;
   color: $text-muted;
   flex-shrink: 0;
@@ -763,12 +763,12 @@
 }
 
 .music-footer-copy {
-  font-size: 13px;
+  font-size: $text-xs;
   color: $text-muted;
 }
 
 .music-footer-link {
-  font-size: 13px;
+  font-size: $text-xs;
   color: $text-secondary;
   text-decoration: none;
   transition: color $transition-fast;

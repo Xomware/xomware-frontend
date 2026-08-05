@@ -26,14 +26,14 @@
 }
 
 .radar-coming-soon-title {
-  font-size: 20px;
+  font-size: $text-lg;
   font-weight: $font-weight-semibold;
   color: $text-primary;
   margin: 0;
 }
 
 .radar-coming-soon-body {
-  font-size: 14px;
+  font-size: $text-sm;
   color: $text-secondary;
   line-height: 1.6;
   margin: 0;
@@ -90,7 +90,7 @@
 
 .radar-error-msg {
   color: $text-secondary;
-  font-size: 15px;
+  font-size: $text-sm;
   max-width: 360px;
   line-height: 1.5;
   margin: 0;
@@ -102,7 +102,7 @@
   border: none;
   border-radius: $radius-md;
   padding: $spacing-sm $spacing-xl;
-  font-size: 14px;
+  font-size: $text-sm;
   font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: background $transition-fast, transform $transition-fast;
@@ -132,10 +132,10 @@
 }
 
 .radar-meta-window {
-  font-size: 12px;
+  font-size: $text-2xs;
   font-weight: $font-weight-medium;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: $tracking-wide;
   color: $brand-cyan;
   background: $brand-cyan-subtle;
   border: 1px solid rgba(0, 180, 216, 0.2);
@@ -144,14 +144,14 @@
 }
 
 .radar-meta-count {
-  font-size: 12px;
+  font-size: $text-2xs;
   color: $text-muted;
 }
 
 // ── Empty state ───────────────────────────────────────
 .radar-empty {
   color: $text-muted;
-  font-size: 14px;
+  font-size: $text-sm;
   font-style: italic;
   margin: $spacing-2xl 0;
   text-align: center;
@@ -223,9 +223,9 @@
   position: absolute;
   bottom: -4px;
   right: -4px;
-  font-size: 9px;
+  font-size: $text-2xs;
   font-weight: $font-weight-bold;
-  letter-spacing: 0.05em;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   padding: 2px 5px;
   border-radius: $radius-sm;
@@ -256,7 +256,7 @@
 }
 
 .radar-card-name {
-  font-size: 14px;
+  font-size: $text-sm;
   font-weight: $font-weight-semibold;
   white-space: nowrap;
   overflow: hidden;
@@ -265,7 +265,7 @@
 }
 
 .radar-card-artist {
-  font-size: 12px;
+  font-size: $text-2xs;
   color: $text-secondary;
   white-space: nowrap;
   overflow: hidden;
@@ -273,7 +273,7 @@
 }
 
 .radar-card-date {
-  font-size: 11px;
+  font-size: $text-2xs;
   color: $text-muted;
   margin-top: $spacing-xs;
 }

@@ -15,7 +15,15 @@ import { test, expect, type Page } from '@playwright/test';
 const ROUTES = [
   { path: '/', name: 'landing-anon-gate' },
   { path: '/apps', name: 'apps' },
+  // Requires the `visual` build config, which forces musicSurfaces to 'mock'.
+  // Against a normal build these render an empty shell and cover nothing.
   { path: '/music', name: 'music' },
+  { path: '/music?tab=radar', name: 'music-release-radar' },
+  { path: '/music?tab=wrapped', name: 'music-wrapped' },
+  // Tab names must match VALID_TABS in music.component.ts exactly — an unknown
+  // value silently falls back to 'now', which would duplicate the screenshot
+  // above and look like coverage without being any.
+  { path: '/music?tab=xomtracks', name: 'music-xomtracks' },
   { path: '/privacy', name: 'privacy' },
   { path: '/auth/sign-in', name: 'auth-sign-in' },
   { path: '/auth/sign-up', name: 'auth-sign-up' },
