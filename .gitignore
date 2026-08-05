@@ -50,3 +50,9 @@ src/environments/environment.local.ts
 # Personal Claude overrides (not shared)
 CLAUDE.local.md
 .claude/settings.local.json
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
