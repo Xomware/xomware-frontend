@@ -142,7 +142,14 @@ $breakpoint-xl: 1200px;
   border-radius: $radius-xl;
 }
 
+// Hover treatment for glass cards.
+//
+// Was `box-shadow: $shadow-glow-cyan` — a 40px cyan halo. Coloured glow is the
+// most common "amateur dark UI" tell; polished dark interfaces signal hover
+// with elevation and a brighter hairline instead, which is what this does now.
+// The card still lifts (translateY at the call site) and the border brightens,
+// so the affordance is unchanged.
 @mixin glass-card-hover {
   border-color: $glass-border-hover;
-  box-shadow: $shadow-glow-cyan;
+  box-shadow: $shadow-lg;
 }

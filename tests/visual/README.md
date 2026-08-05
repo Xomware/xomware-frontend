@@ -46,8 +46,20 @@ The net was checked both directions before being committed:
 - **Reduced motion is forced and the timeline is settled.** Playwright's
   `animations: 'disabled'` only freezes CSS animations; GSAP and ScrollTrigger
   drive entrance animation from JS and would otherwise be captured mid-fade.
-- `maxDiffPixelRatio: 0.01` absorbs anti-aliasing noise while still failing on a
-  real size change.
+- `maxDiffPixels: 150` — an **absolute** count, not a ratio.
+
+  This started as `maxDiffPixelRatio: 0.01` and that was far too coarse: 1% of a
+  tall full-page screenshot is ~25,000 pixels, so removing a card glow or
+  dropping a heading's gradient passed silently. The suite caught reflow (which
+  shifts everything and blows past any threshold) but was blind to local colour
+  changes — exactly what visual polish consists of.
+
+  Two consecutive runs on the same machine produce byte-identical renders, so
+  the real noise floor is 0. 150 leaves room for anti-aliasing drift across
+  Chromium versions without hiding a change to one heading or badge.
+
+  **If a change looks invisible to this suite, check the pixel count before
+  believing it.** A few thousand changed pixels is a real, visible edit.
 
 ## Two real limitations
 

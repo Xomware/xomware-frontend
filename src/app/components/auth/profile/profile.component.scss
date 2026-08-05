@@ -25,7 +25,7 @@
   justify-content: center;
   overflow: hidden;
   border: 2px solid $glass-border;
-  box-shadow: $shadow-glow-cyan;
+  box-shadow: $shadow-md;
   margin-bottom: $spacing-md;
 
   img {
@@ -169,7 +169,7 @@
   background: $card-gradient;
   border: 1px solid $glass-border;
   border-radius: $radius-xl;
-  box-shadow: $shadow-lg, $shadow-glow-cyan;
+  box-shadow: $shadow-lg;
 }
 
 .edit-modal-header {

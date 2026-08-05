@@ -31,7 +31,10 @@
   padding: $spacing-2xl;
   background: rgba(24, 24, 27, 0.7);
   border: 1px solid rgba(0, 180, 216, 0.2);
-  border-radius: 16px;
+  // 16px was off the radius scale (4/8/12/20/24/100) — the exact bypass that
+  // proved a token file without enforcement is worthless. $radius-lg is the
+  // tighter neighbour, which also reads closer to the flatter look we're after.
+  border-radius: $radius-lg;
   text-align: center;
   backdrop-filter: blur(12px);
 }

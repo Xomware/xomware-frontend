@@ -32,7 +32,7 @@
   background: $card-gradient;
   border: 1px solid $glass-border;
   border-radius: $radius-xl;
-  box-shadow: $shadow-lg, $shadow-glow-cyan;
+  box-shadow: $shadow-lg;
   animation: authFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -46,7 +46,6 @@
   img {
     width: 40px;
     height: 40px;
-    filter: drop-shadow(0 0 12px $brand-cyan-glow);
   }
 
   span {
