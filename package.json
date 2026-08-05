@@ -8,9 +8,7 @@
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint:css": "node scripts/stylelint-ratchet.mjs",
-    "lint:css:baseline": "node scripts/stylelint-ratchet.mjs --update",
-    "lint:css:raw": "stylelint \"src/**/*.scss\"",
+    "lint:css": "stylelint \"src/**/*.scss\"",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
     "build:visual": "ng build --configuration visual --output-hashing=none"
