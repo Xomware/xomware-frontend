@@ -51,6 +51,43 @@
     </div>
 
     <!-- iOS Apps -->
+    <h2 class="platform-heading">Pools &amp; Events</h2>
+    <p class="platform-note">
+      Annual pools that run for a season and reset. Not products &mdash; events.
+    </p>
+    <div class="cards-container">
+      <ng-container *ngFor="let app of poolApps; let i = index">
+        <a class="app-card glass-card"
+           [style.--app-color]="app.color"
+           [style.--app-rgb]="app.colorRgb"
+           [href]="app.url"
+           target="_blank"
+           rel="noopener"
+        >
+          <div class="card-glow" aria-hidden="true"></div>
+          <span class="card-status" [class.live]="app.status === 'live'" [class.coming-soon]="app.status === 'coming-soon'">
+            <span class="status-dot"></span>
+            {{ app.status === 'live' ? 'Live' : 'Coming Soon' }}
+          </span>
+          <div class="card-logo" [class.card-logo--banner]="app.logoStyle === 'banner'">
+            <img [src]="app.logo" [alt]="app.name + ' logo'" loading="lazy" />
+          </div>
+          <div class="card-content">
+            <h3 class="card-name">{{ app.name }}</h3>
+            <p class="card-description">{{ app.description }}</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-tag">{{ app.tag }}</span>
+            <svg class="card-arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+            </svg>
+          </div>
+        </a>
+      </ng-container>
+    </div>
+
+    <!-- iOS Apps -->
+
     <h2 class="platform-heading platform-heading--ios">iOS Apps <span class="platform-badge">TestFlight</span></h2>
     <p class="ios-whitelist-note">
       TestFlight builds &mdash; email

@@ -61,6 +61,21 @@ async function stubBackend(page: Page): Promise<void> {
  * `animations: 'disabled'` (which only freezes CSS animations) is not enough.
  * Forcing reduced-motion plus settling the timeline avoids mid-fade captures.
  */
+/**
+ * Freeze the clock.
+ *
+ * The xomtracks feed renders relative timestamps ("12 days ago") computed from
+ * Date.now() against fixed mock timestamps. That makes the baseline expire
+ * every midnight — it drifted by one day mid-session and presented as a real
+ * CSS diff. A fixed time makes the screenshots reproducible on any date.
+ *
+ * setFixedTime only pins Date/now; it does not fake timers, so GSAP's
+ * requestAnimationFrame loop is untouched.
+ */
+async function freezeClock(page: Page): Promise<void> {
+  await page.clock.setFixedTime(new Date('2026-06-15T12:00:00Z'));
+}
+
 async function settle(page: Page): Promise<void> {
   // reducedMotion is set at context level in playwright.config.ts.
   await page.waitForLoadState('networkidle');
@@ -103,6 +118,7 @@ async function settle(page: Page): Promise<void> {
 
 for (const route of ROUTES) {
   test(`${route.name} renders consistently`, async ({ page }) => {
+    await freezeClock(page);
     await stubBackend(page);
     await page.goto(route.path, { waitUntil: 'domcontentloaded' });
     await settle(page);
@@ -128,6 +144,7 @@ for (const route of ROUTES) {
 test('app card hover state', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'hover is pointer-only by design');
 
+  await freezeClock(page);
   await stubBackend(page);
   await page.goto('/apps', { waitUntil: 'domcontentloaded' });
   await settle(page);

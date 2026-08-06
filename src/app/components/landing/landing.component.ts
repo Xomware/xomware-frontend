@@ -79,6 +79,11 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
     return this.apps.filter(a => a.platform === 'web');
   }
 
+  /** Annual/seasonal event pools — grouped apart from ongoing products. */
+  get poolApps(): AppCard[] {
+    return this.apps.filter((a) => a.platform === 'pool');
+  }
+
   get iosApps(): AppCard[] {
     return this.apps.filter(a => a.platform === 'ios');
   }
