@@ -42,9 +42,24 @@
   z-index: 1;
 }
 
+// Short note under a platform heading (e.g. what "Pools & Events" means).
+.platform-note {
+  font-size: $text-sm;
+  color: $text-secondary;
+  margin: 0 0 $spacing-lg;
+  max-width: 60ch;
+}
+
 .cards-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  // Was repeat(3, 1fr) — a hard three-up that cramped cards between the
+  // breakpoints. auto-fit lets the grid choose its own column count, and
+  // minmax(0, 1fr) (not 1fr) stops long words pushing a column past its track.
+  // auto-FILL, not auto-fit: auto-fit collapses unused tracks, so a two-card
+  // group (Pools & Events) stretched to full width while the three-card groups
+  // stayed narrower. auto-fill keeps the empty track, so every card in every
+  // group is the same width.
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: $spacing-lg;
 }
 
@@ -274,7 +289,15 @@
   color: $text-secondary;
   letter-spacing: $tracking-wide;
   text-transform: uppercase;
+  // Separates this group from the cards above it. Without it the heading sits
+  // hard against the previous row and the three groups read as one list.
+  // :first-of-type keeps the first heading tight to the section header.
+  margin-top: $spacing-3xl;
   margin-bottom: $spacing-lg;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
   display: flex;
   align-items: center;
   gap: $spacing-sm;

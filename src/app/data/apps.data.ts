@@ -7,7 +7,14 @@ export interface AppCard {
   logo: string;
   tag: string;
   status: 'live' | 'coming-soon';
-  platform: 'web' | 'ios';
+  /**
+   * 'pool' is for annual/seasonal event pools (Sun God Derby, Reese's Playoff
+   * Challenge) rather than ongoing products. They are built differently — a
+   * derby-style Next.js app rather than the Angular three-repo product
+   * template — and they read wrong sitting next to Xomify in a "Web Apps"
+   * list, so they get their own group.
+   */
+  platform: 'web' | 'ios' | 'pool';
   /**
    * Set to 'banner' when `logo` is a wide wordmark/banner asset (roughly
    * 3:2) rather than a square icon. Cards render a taller, wider logo
@@ -69,9 +76,21 @@ export const APPS: AppCard[] = [
     colorRgb: '200, 16, 46',
     url: 'https://derby.xomware.com',
     logo: 'assets/img/sun-god-derby-banner.png',
-    tag: 'Web App',
+    tag: 'Annual Pool',
     status: 'live',
-    platform: 'web',
+    platform: 'pool',
+  },
+  {
+    name: "Reese's Playoff Challenge",
+    description:
+      'NFL playoff pool. Draft one player per playoff team and ride them through January.',
+    color: '#8B4513',
+    colorRgb: '139, 69, 19',
+    url: 'https://playoffs.xomware.com',
+    logo: 'assets/img/xomware-icon-transparent-background.png',
+    tag: 'Annual Pool',
+    status: 'coming-soon',
+    platform: 'pool',
   },
   {
     name: 'Xom Appétit',
