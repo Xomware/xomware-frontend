@@ -552,6 +552,12 @@
     right: 0;
     // Below the discs, which sit on the vertical centre line.
     top: 64%;
+    // Hidden until the flight starts. setActive() fills this in on the very
+    // first scroll frame — progress 0 resolves to the first planet — so
+    // without this the first app's name and description sat at the bottom of
+    // the screen through the intro and the brief and all the way down.
+    // The timeline fades it in at BRIEF_END and out again at the end.
+    opacity: 0;
     display: flex;
     flex-direction: column;
     align-items: center;

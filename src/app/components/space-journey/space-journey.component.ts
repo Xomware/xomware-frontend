@@ -273,6 +273,19 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
         },
         BRIEF_END,
       )
+      // The mobile readout belongs to the flight only — see the note on
+      // .journey__focus for why it must not be visible before then.
+      .fromTo(
+        this.focus.nativeElement,
+        { opacity: 0 },
+        { opacity: 1, ease: 'none', duration: 0.03 },
+        BRIEF_END,
+      )
+      .to(
+        this.focus.nativeElement,
+        { opacity: 0, ease: 'none', duration: 1 - TRAVEL_END },
+        TRAVEL_END,
+      )
       // A short drift past the last planet, then the pin releases straight
       // into the page. There used to be an arrival panel here with a "continue
       // to full site" button, but it only appeared at the very end of the pin —
