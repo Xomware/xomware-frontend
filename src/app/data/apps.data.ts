@@ -116,7 +116,7 @@ export const APPS: AppCard[] = [
     logoStyle: 'banner',
     logoPulse: true,
     tag: 'Annual Pool',
-    status: 'coming-soon',
+    status: 'live',
     platform: 'pool',
   },
   {
