@@ -37,8 +37,6 @@ const TRAVEL_END = 0.94;
 const VH_PER_PLANET = 0.85;
 const EXTRA_BEATS = 3;
 
-const SKIP_KEY = 'xomware:journey-skipped';
-
 /**
  * How assembled the X constellation is at a given scroll progress, 0..1.
  *
@@ -67,25 +65,22 @@ export function constellationStrength(progress: number): number {
 /**
  * Whether the cinematic intro should mount at all.
  *
- * Three ways out, because a landing page has to stay usable:
- *  - `prefers-reduced-motion` — a pinned, scrubbed flight is exactly the
- *    kind of motion that setting exists to refuse.
- *  - an earlier skip this session — nobody wants the intro twice.
- *  - no `matchMedia` (SSR/prerender) — render the plain page.
+ * Only `prefers-reduced-motion` turns it off — a pinned, scrubbed flight is
+ * exactly the kind of motion that setting exists to refuse. (And no
+ * `matchMedia` at all means SSR/prerender, so render the plain page.)
  *
- * Nothing is lost when it returns false: every app on the rail is also in
+ * This used to also remember a skip in sessionStorage, on the theory that
+ * nobody wants the intro twice. In practice one tap of "Skip intro" made the
+ * whole flight vanish for the rest of the browser session with no way back —
+ * the page just started at the profile, and it read as the feature being
+ * broken. Skipping now only skips the once.
+ *
+ * Nothing is lost when this returns false: every app on the rail is also in
  * the directory grid further down the page.
  */
 export function shouldPlayJourney(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-
-  try {
-    return sessionStorage.getItem(SKIP_KEY) !== '1';
-  } catch {
-    // Private browsing or blocked storage — play it rather than fail closed.
-    return true;
-  }
+  return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 @Component({
@@ -176,13 +171,8 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  /** Same exit, but don't make them sit through it again this session. */
+  /** Jump past the flight to the page below. Not remembered — see above. */
   skip(): void {
-    try {
-      sessionStorage.setItem(SKIP_KEY, '1');
-    } catch {
-      // Storage blocked — skipping still works, it just won't be remembered.
-    }
     this.scrollPastPin('smooth');
   }
 
