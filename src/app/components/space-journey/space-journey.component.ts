@@ -35,7 +35,8 @@ const TRAVEL_END = 0.94;
  * the flight itself.
  */
 const VH_PER_PLANET = 0.85;
-const EXTRA_BEATS = 3;
+// Intro, brief, and the long empty run out to the outro.
+const EXTRA_BEATS = 4;
 
 /**
  * How assembled the X constellation is at a given scroll progress, 0..1.
