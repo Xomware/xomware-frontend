@@ -74,6 +74,7 @@
         <span class="planet__disc">
           <img
             class="planet__mark"
+            [class.is-pulsing]="p.logoPulse"
             [src]="p.logo"
             [alt]="p.name + ' logo'"
             loading="lazy"
@@ -114,21 +115,6 @@
   <div class="journey__focus" #focus aria-hidden="true">
     <span class="focus__name"></span>
     <span class="focus__description"></span>
-  </div>
-
-  <!-- Act III — arrival -->
-  <div class="journey__arrival" #arrival>
-    <p class="arrival__eyebrow">// Arrival</p>
-    <h2 class="arrival__title">That's the suite.</h2>
-    <p class="arrival__copy">
-      Everything above, plus who builds it and what's playing right now.
-    </p>
-    <button type="button" class="arrival__cta" (click)="continueToSite()">
-      Continue to full site
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="currentColor" />
-      </svg>
-    </button>
   </div>
 
   <!-- Always reachable: the journey must never be the only way down. -->

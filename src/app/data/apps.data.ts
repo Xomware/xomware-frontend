@@ -34,6 +34,11 @@ export interface AppCard {
    */
   logoStyle?: 'banner';
   /**
+   * Gently pulse the logo's colour. Reserved for the one app that earns the
+   * extra attention — a pulsing grid would just be noise.
+   */
+  logoPulse?: boolean;
+  /**
    * Internal tool — surfaced only inside the admin portal, never on the public
    * /apps grid or the landing page. The app's own API is the real gate; this
    * flag just keeps a private tool off a public directory.
@@ -109,6 +114,7 @@ export const APPS: AppCard[] = [
     logo: 'assets/img/banners/reeses.webp',
     icon: 'assets/img/apps/reeses.webp',
     logoStyle: 'banner',
+    logoPulse: true,
     tag: 'Annual Pool',
     status: 'coming-soon',
     platform: 'pool',
