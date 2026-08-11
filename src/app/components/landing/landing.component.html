@@ -131,7 +131,12 @@
             {{ app.status === 'live' ? 'Live' : 'Coming Soon' }}
           </span>
           <div class="card-logo" [class.card-logo--banner]="app.logoStyle === 'banner'">
-            <img [src]="app.logo" [alt]="app.name + ' logo'" loading="lazy" />
+            <img
+              [src]="app.logo"
+              [alt]="app.name + ' logo'"
+              [class.is-pulsing]="app.logoPulse"
+              loading="lazy"
+            />
           </div>
           <div class="card-content">
             <h3 class="card-name">{{ app.name }}</h3>
@@ -168,7 +173,12 @@
             {{ app.status === 'live' ? 'Live' : 'Coming Soon' }}
           </span>
           <div class="card-logo" [class.card-logo--banner]="app.logoStyle === 'banner'">
-            <img [src]="app.logo" [alt]="app.name + ' logo'" loading="lazy" />
+            <img
+              [src]="app.logo"
+              [alt]="app.name + ' logo'"
+              [class.is-pulsing]="app.logoPulse"
+              loading="lazy"
+            />
           </div>
           <div class="card-content">
             <h3 class="card-name">{{ app.name }}</h3>
@@ -207,7 +217,12 @@
             {{ app.status === 'live' ? 'Live' : 'Coming Soon' }}
           </span>
           <div class="card-logo" [class.card-logo--banner]="app.logoStyle === 'banner'">
-            <img [src]="app.logo" [alt]="app.name + ' logo'" loading="lazy" />
+            <img
+              [src]="app.logo"
+              [alt]="app.name + ' logo'"
+              [class.is-pulsing]="app.logoPulse"
+              loading="lazy"
+            />
           </div>
           <div class="card-content">
             <h3 class="card-name">{{ app.name }}</h3>

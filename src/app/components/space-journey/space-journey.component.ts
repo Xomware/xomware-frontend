@@ -12,29 +12,30 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PLANETS, Planet } from '../../data/planets';
 import { Starfield } from './starfield';
+import { environment } from '../../../environments/environment';
 
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Normalised timeline positions. The pinned scroll is split into three acts:
- * the intro clears, the camera travels past the planets, then the arrival
- * panel resolves.
+ * Normalised timeline positions. The pinned scroll runs three beats: the intro
+ * clears, the brief holds while the mark assembles behind it, then the camera
+ * travels past the planets and releases into the page.
  */
 const INTRO_END = 0.08;
 /** The brief rises while the mark is still assembling behind it. */
 const BRIEF_START = 0.12;
 /** The brief holds here, then clears — travel starts at BRIEF_END. */
 const BRIEF_END = 0.44;
-const TRAVEL_END = 0.88;
+const TRAVEL_END = 0.94;
 
 /**
  * Scroll distance of the pin, in viewport heights per planet.
  *
- * The `+ 4` buys room for the three non-planet beats (intro, brief, arrival)
- * so adding them doesn't compress the flight itself.
+ * The extra beats buy room for the intro and the brief so they don't compress
+ * the flight itself.
  */
 const VH_PER_PLANET = 0.85;
-const EXTRA_BEATS = 4;
+const EXTRA_BEATS = 3;
 
 const SKIP_KEY = 'xomware:journey-skipped';
 
@@ -101,7 +102,6 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
   @ViewChild('rail', { static: true }) rail!: ElementRef<HTMLElement>;
   @ViewChild('intro', { static: true }) intro!: ElementRef<HTMLElement>;
   @ViewChild('brief', { static: true }) brief!: ElementRef<HTMLElement>;
-  @ViewChild('arrival', { static: true }) arrival!: ElementRef<HTMLElement>;
   @ViewChild('focus', { static: true }) focus!: ElementRef<HTMLElement>;
   @ViewChildren('planetEl') planetEls!: QueryList<ElementRef<HTMLElement>>;
 
@@ -176,11 +176,6 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  /** Ride past the pin to the grounded site below. */
-  continueToSite(): void {
-    this.scrollPastPin('smooth');
-  }
-
   /** Same exit, but don't make them sit through it again this session. */
   skip(): void {
     try {
@@ -200,7 +195,10 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
   }
 
   private init(): void {
-    const field = new Starfield(this.canvasRef.nativeElement);
+    // staticScene freezes the shooting stars and asteroid tumble. Only the
+    // visual-regression build sets it: a meteor that may or may not be in
+    // flight when the screenshot lands would break the suite every other run.
+    const field = new Starfield(this.canvasRef.nativeElement, !environment.staticScene);
     this.starfield = field;
     field.resize();
 
@@ -283,25 +281,18 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
         },
         BRIEF_END,
       )
-      // Keep flying once the last planet has been and gone, carrying the rail
-      // a full viewport further so the planets exit stage left instead of
-      // sitting behind the arrival copy. Fading alone wasn't enough: the last
-      // planet occupies the exact centre the arrival text needs, so mid-fade
-      // the CTA still landed on top of its label.
+      // A short drift past the last planet, then the pin releases straight
+      // into the page. There used to be an arrival panel here with a "continue
+      // to full site" button, but it only appeared at the very end of the pin —
+      // which is the scroll position it wanted to send you to, so the button
+      // could never do anything.
       .to(
         rail,
         {
-          x: () => -(this.railTravel(els) + window.innerWidth),
-          opacity: 0,
+          x: () => -(this.railTravel(els) + window.innerWidth * 0.4),
           ease: 'power1.in',
           duration: 1 - TRAVEL_END,
         },
-        TRAVEL_END,
-      )
-      .fromTo(
-        this.arrival.nativeElement,
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, ease: 'power2.out', duration: 1 - TRAVEL_END },
         TRAVEL_END,
       );
 
@@ -343,7 +334,7 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
    *
    * Snapping asked for these before the first refresh, got an empty list, and
    * so could only ever snap to 0 or 1 — which flung the journey to the intro
-   * or the arrival instead of to a planet.
+   * or the end of the flight instead of to a planet.
    */
   private ensureFractions(): number[] {
     if (!this.fractions.length && this.els.length) {

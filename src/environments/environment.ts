@@ -15,6 +15,13 @@ export const environment = {
   // Explicit override for GET /shares/recent — see xomtracks-showcase.service.ts
   // for why this is passed instead of relying on the backend's default scoping.
   xomtracksOwnerId: 'dominickj.giordano@gmail.com',
+  /**
+   * Freeze the non-deterministic parts of the landing starfield (shooting
+   * stars, asteroid tumble). Only the visual-regression build turns this on:
+   * a meteor that may or may not be mid-flight when the screenshot is taken
+   * would blow past the suite's 150-pixel diff tolerance every other run.
+   */
+  staticScene: false,
   musicSurfaces: {
     now: 'live',
     radar: 'live',

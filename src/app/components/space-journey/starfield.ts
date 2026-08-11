@@ -34,6 +34,29 @@ interface Star {
   ty: number | null;
 }
 
+/** A shooting star: a short-lived streak with a fading tail. */
+interface Meteor {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  length: number;
+  life: number;
+  maxLife: number;
+}
+
+/** A tumbling rock. Drawn as an irregular polygon so no two look alike. */
+interface Asteroid {
+  x: number;
+  y: number;
+  radius: number;
+  /** Per-vertex radius multipliers — the silhouette. */
+  shape: number[];
+  spin: number;
+  angle: number;
+  layer: number;
+}
+
 /** Parallax rate per layer. Nearer layers travel faster. */
 const LAYER_SPEED = [0.25, 0.55, 1];
 const LAYER_SHARE = [0.46, 0.33, 0.21];
@@ -54,6 +77,11 @@ const STAR_COLOURS = [
   '255, 226, 190',
 ];
 const COLOUR_WEIGHTS = [0.42, 0.24, 0.16, 0.12, 0.06];
+
+const ASTEROID_COUNT = 7;
+/** Seconds between shooting stars, before jitter. */
+const METEOR_INTERVAL = 2.4;
+const MAX_METEORS = 3;
 
 /** Half-extent of the assembled mark, as a fraction of the smaller viewport side. */
 const X_SPAN = 0.42;
@@ -83,8 +111,9 @@ export class Starfield {
   private stars: Star[] = [];
   /** Only the stars that belong to the mark, cached to avoid re-filtering. */
   private xStars: Star[] = [];
-  /** Pre-rendered halo, so bright stars cost one drawImage instead of a gradient. */
-  private glow: HTMLCanvasElement | null = null;
+  /** One pre-rendered sprite per star colour, plus a spiked variant. */
+  private starSprites: HTMLCanvasElement[] = [];
+  private spikeSprites: HTMLCanvasElement[] = [];
   private frame = 0;
   private running = false;
   private width = 0;
@@ -92,15 +121,28 @@ export class Starfield {
   private dpr = 1;
   private time = 0;
 
+  private asteroids: Asteroid[] = [];
+  private meteors: Meteor[] = [];
+  private nextMeteorAt = METEOR_INTERVAL;
+  private rand: () => number = mulberry32(1);
+
   private progress = 0;
   private renderedProgress = 0;
   private formation = 0;
   private renderedFormation = 0;
 
-  constructor(private canvas: HTMLCanvasElement, starCount = BASE_STAR_COUNT) {
+  /**
+   * @param animateScene false freezes shooting stars and asteroid tumble, so
+   *   the scene is reproducible for the visual-regression suite.
+   */
+  constructor(
+    private canvas: HTMLCanvasElement,
+    private animateScene = true,
+    starCount = BASE_STAR_COUNT,
+  ) {
     this.ctx = canvas.getContext('2d');
     this.seed(starCount);
-    this.buildGlow();
+    this.buildSprites();
   }
 
   private seed(count: number): void {
@@ -128,6 +170,31 @@ export class Starfield {
     });
 
     this.assignMark(rand);
+    this.seedAsteroids(rand);
+    // Kept for meteor spawning, which needs randomness past construction.
+    this.rand = rand;
+  }
+
+  private seedAsteroids(rand: () => number): void {
+    this.asteroids = [];
+    for (let i = 0; i < ASTEROID_COUNT; i++) {
+      const vertices = 8 + Math.floor(rand() * 4);
+      const shape: number[] = [];
+      for (let v = 0; v < vertices; v++) {
+        // Never below 0.62, or the polygon folds in on itself and reads as a
+        // star rather than a rock.
+        shape.push(0.62 + rand() * 0.55);
+      }
+      this.asteroids.push({
+        x: rand(),
+        y: 0.08 + rand() * 0.84,
+        radius: 4 + rand() * 11,
+        shape,
+        spin: (rand() - 0.5) * 0.4,
+        angle: rand() * Math.PI * 2,
+        layer: rand() > 0.5 ? 1 : 2,
+      });
+    }
   }
 
   /**
@@ -150,22 +217,73 @@ export class Starfield {
     }
   }
 
-  /** Soft radial halo used for the brightest stars. */
-  private buildGlow(): void {
-    const size = 24;
-    const c = document.createElement('canvas');
-    c.width = size;
-    c.height = size;
-    const g = c.getContext('2d');
-    if (!g) return;
+  /**
+   * Pre-render one soft sprite per star colour, plus a spiked version.
+   *
+   * Stars used to be drawn with fillRect, which is exactly a square dot — at
+   * these sizes that reads as confetti, not sky. A soft radial falloff gives
+   * every star a core and a halo, and the four-point diffraction spikes on the
+   * bright ones are the detail the eye actually reads as "star".
+   *
+   * Pre-rendering per colour means drawing is a drawImage rather than building
+   * a gradient 640 times a frame.
+   */
+  private buildSprites(): void {
+    this.starSprites = STAR_COLOURS.map((rgb) => {
+      const size = 32;
+      const c = document.createElement('canvas');
+      c.width = size;
+      c.height = size;
+      const g = c.getContext('2d');
+      if (!g) return c;
 
-    const grad = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-    grad.addColorStop(0, 'rgba(255, 255, 255, 0.55)');
-    grad.addColorStop(0.35, 'rgba(255, 255, 255, 0.14)');
-    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    g.fillStyle = grad;
-    g.fillRect(0, 0, size, size);
-    this.glow = c;
+      const r = size / 2;
+      const grad = g.createRadialGradient(r, r, 0, r, r, r);
+      grad.addColorStop(0, `rgba(${rgb}, 1)`);
+      grad.addColorStop(0.16, `rgba(${rgb}, 0.85)`);
+      grad.addColorStop(0.42, `rgba(${rgb}, 0.22)`);
+      grad.addColorStop(1, `rgba(${rgb}, 0)`);
+      g.fillStyle = grad;
+      g.fillRect(0, 0, size, size);
+      return c;
+    });
+
+    this.spikeSprites = STAR_COLOURS.map((rgb) => {
+      const size = 96;
+      const c = document.createElement('canvas');
+      c.width = size;
+      c.height = size;
+      const g = c.getContext('2d');
+      if (!g) return c;
+
+      const r = size / 2;
+      // Core bloom.
+      const core = g.createRadialGradient(r, r, 0, r, r, r * 0.34);
+      core.addColorStop(0, `rgba(${rgb}, 0.95)`);
+      core.addColorStop(0.5, `rgba(${rgb}, 0.28)`);
+      core.addColorStop(1, `rgba(${rgb}, 0)`);
+      g.fillStyle = core;
+      g.fillRect(0, 0, size, size);
+
+      // Four spikes, drawn as tapered gradients out from the centre.
+      const spike = (w: number, h: number) => {
+        const grad = g.createLinearGradient(r - w / 2, r, r + w / 2, r);
+        grad.addColorStop(0, `rgba(${rgb}, 0)`);
+        grad.addColorStop(0.5, `rgba(${rgb}, 0.5)`);
+        grad.addColorStop(1, `rgba(${rgb}, 0)`);
+        g.fillStyle = grad;
+        g.fillRect(r - w / 2, r - h / 2, w, h);
+      };
+      spike(size * 0.94, 1.1);
+      g.save();
+      g.translate(r, r);
+      g.rotate(Math.PI / 2);
+      g.translate(-r, -r);
+      spike(size * 0.72, 1.1);
+      g.restore();
+
+      return c;
+    });
   }
 
   resize(): void {
@@ -213,7 +331,10 @@ export class Starfield {
     this.stop();
     this.stars = [];
     this.xStars = [];
-    this.glow = null;
+    this.asteroids = [];
+    this.meteors = [];
+    this.starSprites = [];
+    this.spikeSprites = [];
     this.ctx = null;
   }
 
@@ -222,9 +343,51 @@ export class Starfield {
     this.renderedProgress += (this.progress - this.renderedProgress) * 0.08;
     this.renderedFormation += (this.formation - this.renderedFormation) * 0.055;
     this.time += 0.016;
+    this.update();
     this.draw();
     this.frame = requestAnimationFrame(this.tick);
   };
+
+  /** Advance everything that has its own motion, independent of scroll. */
+  private update(): void {
+    if (!this.animateScene) return;
+
+    for (const rock of this.asteroids) {
+      rock.angle += rock.spin * 0.01;
+    }
+
+    if (this.time >= this.nextMeteorAt && this.meteors.length < MAX_METEORS) {
+      this.spawnMeteor();
+      // Jittered so they never fall into a visible rhythm.
+      this.nextMeteorAt = this.time + METEOR_INTERVAL + this.rand() * 3.4;
+    }
+
+    for (let i = this.meteors.length - 1; i >= 0; i--) {
+      const m = this.meteors[i];
+      m.x += m.vx;
+      m.y += m.vy;
+      m.life += 1;
+      if (m.life > m.maxLife) this.meteors.splice(i, 1);
+    }
+  }
+
+  private spawnMeteor(): void {
+    const rand = this.rand;
+    // Shallow diagonal, entering from either side of the top half.
+    const leftToRight = rand() > 0.45;
+    const angle = (18 + rand() * 22) * (Math.PI / 180);
+    const speed = 9 + rand() * 7;
+
+    this.meteors.push({
+      x: leftToRight ? -80 : this.width + 80,
+      y: this.height * (0.02 + rand() * 0.45),
+      vx: (leftToRight ? 1 : -1) * Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      length: 90 + rand() * 150,
+      life: 0,
+      maxLife: 55 + rand() * 45,
+    });
+  }
 
   private draw(): void {
     const ctx = this.ctx;
@@ -237,6 +400,8 @@ export class Starfield {
     const cx = this.width / 2;
     const cy = this.height / 2;
     const scale = Math.min(this.width, this.height) * X_SPAN;
+
+    this.drawAsteroids(ctx, travel, form);
 
     for (const star of this.stars) {
       let x = (star.x * this.width - travel * LAYER_SPEED[star.layer]) % this.width;
@@ -265,21 +430,105 @@ export class Starfield {
       // silhouette (62% of its points sit on the stroke boundary), not from
       // being bright — blown out it looked like a graphic pasted on the sky.
       const alpha = Math.min(0.92, star.alpha * twinkle * recede + assembled * 0.4);
-      const size = star.size + assembled * 0.75;
+      const sprite = this.starSprites[star.tint];
+      if (!sprite) continue;
 
-      if (star.luminous && this.glow) {
-        const halo = (star.size + 1.5 + assembled * 2) * 7;
-        ctx.globalAlpha = alpha * 0.75;
-        ctx.drawImage(this.glow, x - halo / 2, y - halo / 2, halo, halo);
-      }
-
+      // The sprite's visible core is a fraction of its box, so it is drawn
+      // several times the nominal star size.
+      const box = (star.size + assembled * 0.9) * 6.5;
       ctx.globalAlpha = alpha;
-      ctx.fillStyle = `rgb(${STAR_COLOURS[star.tint]})`;
-      // fillRect beats arc()+fill by a wide margin at this count, and at these
-      // sizes the difference is not visible.
-      ctx.fillRect(x, y, size, size);
+      ctx.drawImage(sprite, x - box / 2, y - box / 2, box, box);
+
+      if (star.luminous) {
+        const spikes = this.spikeSprites[star.tint];
+        if (spikes) {
+          const sb = box * 3.4;
+          ctx.globalAlpha = alpha * 0.8;
+          ctx.drawImage(spikes, x - sb / 2, y - sb / 2, sb, sb);
+        }
+      }
     }
 
+    this.drawMeteors(ctx);
     ctx.globalAlpha = 1;
+  }
+
+  /** Tumbling rocks drifting through the field. */
+  private drawAsteroids(ctx: CanvasRenderingContext2D, travel: number, form: number): void {
+    // They are not part of the mark, so they fade back with the rest of the
+    // sky while it assembles.
+    const dim = 1 - form * 0.55;
+
+    for (const rock of this.asteroids) {
+      let x = (rock.x * this.width - travel * LAYER_SPEED[rock.layer] * 0.85) % this.width;
+      if (x < 0) x += this.width;
+      const y = rock.y * this.height;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rock.angle);
+
+      ctx.beginPath();
+      for (let i = 0; i < rock.shape.length; i++) {
+        const a = (i / rock.shape.length) * Math.PI * 2;
+        const r = rock.radius * rock.shape[i];
+        const px = Math.cos(a) * r;
+        const py = Math.sin(a) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+
+      // Lit from the upper left, like the planets, so the scene agrees with
+      // itself about where the light is.
+      const shade = ctx.createLinearGradient(-rock.radius, -rock.radius, rock.radius, rock.radius);
+      // Kept dark. Brighter than this and they stop reading as distant rock
+      // and start competing with the stars for attention.
+      shade.addColorStop(0, `rgba(96, 100, 122, ${0.6 * dim})`);
+      shade.addColorStop(0.55, `rgba(44, 46, 62, ${0.62 * dim})`);
+      shade.addColorStop(1, `rgba(18, 19, 30, ${0.7 * dim})`);
+      ctx.fillStyle = shade;
+      ctx.fill();
+
+      ctx.strokeStyle = `rgba(150, 158, 186, ${0.18 * dim})`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  /** Shooting stars: a bright head trailing a fading streak. */
+  private drawMeteors(ctx: CanvasRenderingContext2D): void {
+    for (const m of this.meteors) {
+      // Ease in and out so they never pop into or out of existence.
+      const t = m.life / m.maxLife;
+      const fade = Math.sin(Math.min(Math.max(t, 0), 1) * Math.PI);
+      if (fade <= 0.01) continue;
+
+      const speed = Math.hypot(m.vx, m.vy) || 1;
+      const tailX = m.x - (m.vx / speed) * m.length;
+      const tailY = m.y - (m.vy / speed) * m.length;
+
+      const grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+      grad.addColorStop(0, `rgba(255, 255, 255, ${0.9 * fade})`);
+      grad.addColorStop(0.25, `rgba(214, 236, 255, ${0.4 * fade})`);
+      grad.addColorStop(1, 'rgba(214, 236, 255, 0)');
+
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.8;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(tailX, tailY);
+      ctx.stroke();
+
+      const head = this.starSprites[0];
+      if (head) {
+        const b = 14;
+        ctx.globalAlpha = fade;
+        ctx.drawImage(head, m.x - b / 2, m.y - b / 2, b, b);
+      }
+    }
   }
 }

@@ -17,6 +17,8 @@ export interface Planet {
   logo: string;
   /** Square mark, for surfaces that must be circular (the /apps orbit). */
   icon: string;
+  /** See AppCard.logoPulse. */
+  logoPulse: boolean;
   status: 'live' | 'coming-soon';
   /** Human labels for every platform the product ships on, e.g. ['Web', 'iOS']. */
   platforms: string[];
@@ -104,6 +106,7 @@ function buildPlanets(): Planet[] {
       url: primary.url,
       logo: primary.logo,
       icon: primary.icon,
+      logoPulse: !!primary.logoPulse,
       // Live on any platform means the product is live and reachable.
       status: rows.some((r) => r.status === 'live') ? 'live' : 'coming-soon',
       platforms: [...new Set(rows.map((r) => PLATFORM_LABEL[r.platform]))],
