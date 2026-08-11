@@ -341,8 +341,11 @@
 }
 
 .planet__mark {
-  width: 52%;
-  height: 52%;
+  // A wide box, not a square: these are banner lockups, so constraining them
+  // to a square slot would shrink them to a sliver to fit the height.
+  // object-fit keeps the aspect ratio inside it.
+  width: 76%;
+  height: 48%;
   object-fit: contain;
   // Settled rule: product logos stay full colour at rest. Only the
   // surrounding body reacts to the active state.

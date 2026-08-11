@@ -132,8 +132,8 @@ export class AppOrbitComponent implements AfterViewInit, OnDestroy {
     const rect = this.stage.nativeElement.getBoundingClientRect();
     // A wide, shallow ellipse reads as a ring seen at an angle rather than a
     // flat circle of icons.
-    this.radiusX = rect.width * 0.36;
-    this.radiusY = Math.min(rect.height * 0.34, 148);
+    this.radiusX = rect.width * 0.38;
+    this.radiusY = Math.min(rect.height * 0.36, 186);
   }
 
   /**

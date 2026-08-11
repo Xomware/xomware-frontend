@@ -1,13 +1,19 @@
+import { X_POINTS } from './x-points';
+
 /**
- * Parallax starfield with living constellations, rendered to a 2D canvas.
+ * Parallax starfield, rendered to a 2D canvas.
  *
  * Deliberately hand-written rather than pulled from a particle library: the
  * app ships every route in the initial bundle (no lazy loading), so a WebGL
- * or particle dependency would eat the whole remaining budget. This is a few
- * hundred rectangles and a handful of lines per frame, and costs nothing.
+ * or particle dependency would eat the whole remaining budget.
  *
- * Angular-free on purpose — it owns a canvas and a rAF loop, nothing else,
- * so it stays testable and can't leak change detection.
+ * There are no drawn lines anywhere in here. An earlier version connected
+ * neighbouring stars and traced the mark with two strokes, which read as a
+ * diagram rather than a sky. The constellation is made of stars alone — 460 of
+ * them, sampled from the real logo artwork (see x-points.ts), so the brush
+ * texture of the painted X is what actually forms.
+ *
+ * Angular-free on purpose — it owns a canvas and a rAF loop, nothing else.
  */
 
 interface Star {
@@ -19,41 +25,39 @@ interface Star {
   layer: number;
   /** Phase offset so twinkling isn't synchronised across the field. */
   phase: number;
-}
-
-/** A star that also belongs to the Xomware X, with a target to fly to. */
-interface Node {
-  star: Star;
-  /** Target offset from centre, in units of the formation scale. */
-  tx: number;
-  ty: number;
-  stroke: 0 | 1;
+  /** Index into STAR_COLOURS. */
+  tint: number;
+  /** Bright enough to get a drawn halo. */
+  luminous: boolean;
+  /** Target in the mark, -1..1 about centre. Null for stars not in the X. */
+  tx: number | null;
+  ty: number | null;
 }
 
 /** Parallax rate per layer. Nearer layers travel faster. */
 const LAYER_SPEED = [0.25, 0.55, 1];
-/** Share of the total star count in each layer — most stars sit far away. */
-const LAYER_SHARE = [0.5, 0.32, 0.18];
+const LAYER_SHARE = [0.46, 0.33, 0.21];
 
-const BASE_STAR_COUNT = 260;
+const BASE_STAR_COUNT = 640;
 /** Retina is worth it; beyond 2x is invisible and costs 4x the fill rate. */
 const MAX_DPR = 2;
 
-/** Nodes per stroke of the X. Two strokes, so double this in total. */
-const NODES_PER_STROKE = 13;
-/** Half-extent of the X, as a fraction of the smaller viewport dimension. */
-const X_SPAN = 0.34;
-/** Stars closer than this (px) get an ambient link drawn between them. */
-const LINK_DISTANCE = 96;
-
-const CYAN = '0, 180, 216';
-
 /**
- * Deterministic PRNG (mulberry32).
- *
- * A fixed seed means the same sky every load, so a visual-regression run or
- * a bug report describes a reproducible scene rather than a new random one.
+ * Real starlight isn't white. Skewed towards blue-white and white, with a few
+ * warmer ones — roughly what the eye picks out on a clear night.
  */
+const STAR_COLOURS = [
+  '255, 255, 255',
+  '226, 238, 255',
+  '198, 220, 255',
+  '255, 244, 224',
+  '255, 226, 190',
+];
+const COLOUR_WEIGHTS = [0.42, 0.24, 0.16, 0.12, 0.06];
+
+/** Half-extent of the assembled mark, as a fraction of the smaller viewport side. */
+const X_SPAN = 0.42;
+
 function mulberry32(seed: number): () => number {
   let a = seed;
   return () => {
@@ -65,12 +69,22 @@ function mulberry32(seed: number): () => number {
   };
 }
 
+function pickColour(r: number): number {
+  let acc = 0;
+  for (let i = 0; i < COLOUR_WEIGHTS.length; i++) {
+    acc += COLOUR_WEIGHTS[i];
+    if (r <= acc) return i;
+  }
+  return 0;
+}
+
 export class Starfield {
   private ctx: CanvasRenderingContext2D | null;
   private stars: Star[] = [];
-  private nodes: Node[] = [];
-  /** Front-layer stars only — the ones eligible for ambient links. */
-  private linkable: Star[] = [];
+  /** Only the stars that belong to the mark, cached to avoid re-filtering. */
+  private xStars: Star[] = [];
+  /** Pre-rendered halo, so bright stars cost one drawImage instead of a gradient. */
+  private glow: HTMLCanvasElement | null = null;
   private frame = 0;
   private running = false;
   private width = 0;
@@ -78,18 +92,15 @@ export class Starfield {
   private dpr = 1;
   private time = 0;
 
-  /** Journey scroll progress, 0..1, driven by ScrollTrigger. */
   private progress = 0;
-  /** Eased follower of `progress` so the field glides instead of snapping. */
   private renderedProgress = 0;
-
-  /** 0 = free drift, 1 = fully assembled into the X. */
   private formation = 0;
   private renderedFormation = 0;
 
   constructor(private canvas: HTMLCanvasElement, starCount = BASE_STAR_COUNT) {
     this.ctx = canvas.getContext('2d');
     this.seed(starCount);
+    this.buildGlow();
   }
 
   private seed(count: number): void {
@@ -102,50 +113,59 @@ export class Starfield {
         this.stars.push({
           x: rand(),
           y: rand(),
-          // Far stars are sub-pixel points; near ones read as small discs.
-          size: 0.4 + layer * 0.5 + rand() * 0.7,
-          alpha: 0.25 + rand() * 0.6,
+          // Mostly sub-pixel dust with a handful of larger stars — an evenly
+          // sized field is the thing that reads as "generated".
+          size: 0.5 + layer * 0.35 + Math.pow(rand(), 2.2) * 1.5,
+          alpha: 0.2 + Math.pow(rand(), 1.6) * 0.75,
           layer,
           phase: rand() * Math.PI * 2,
+          tint: pickColour(rand()),
+          luminous: rand() > 0.975,
+          tx: null,
+          ty: null,
         });
       }
     });
 
-    this.linkable = this.stars.filter((s) => s.layer === 2);
-    this.seedConstellation(rand);
+    this.assignMark(rand);
   }
 
   /**
-   * Pick the stars that form the X and give each a target.
+   * Hand out the mark's sampled points to a random spread of stars.
    *
-   * Targets carry a small perpendicular jitter rather than sitting on a clean
-   * diagonal: the Xomware mark is a painted brush X with uneven strokes, and a
-   * geometrically perfect X reads as a close-button, not as the logo.
+   * Drawn from the whole field rather than one layer, so the X assembles from
+   * every depth at once instead of a single plane sliding into place.
    */
-  private seedConstellation(rand: () => number): void {
-    this.nodes = [];
-    const pool = [...this.linkable];
+  private assignMark(rand: () => number): void {
+    const pool = [...this.stars];
+    this.xStars = [];
 
-    for (const stroke of [0, 1] as const) {
-      for (let i = 0; i < NODES_PER_STROKE; i++) {
-        if (!pool.length) break;
-        const star = pool.splice(Math.floor(rand() * pool.length), 1)[0];
-
-        // t runs -1..1 along the stroke.
-        const t = (i / (NODES_PER_STROKE - 1)) * 2 - 1;
-        // Stroke 0 runs top-left→bottom-right, stroke 1 the other way.
-        const dir = stroke === 0 ? 1 : -1;
-        const jitter = (rand() - 0.5) * 0.1;
-
-        this.nodes.push({
-          star,
-          tx: t * 0.78 * dir + jitter,
-          // Slightly taller than wide, matching the mark's proportions.
-          ty: t + jitter * 0.6,
-          stroke,
-        });
-      }
+    const count = Math.min(X_POINTS.length, pool.length);
+    for (let i = 0; i < count; i++) {
+      const star = pool.splice(Math.floor(rand() * pool.length), 1)[0];
+      const [tx, ty] = X_POINTS[i];
+      star.tx = tx;
+      star.ty = ty;
+      this.xStars.push(star);
     }
+  }
+
+  /** Soft radial halo used for the brightest stars. */
+  private buildGlow(): void {
+    const size = 24;
+    const c = document.createElement('canvas');
+    c.width = size;
+    c.height = size;
+    const g = c.getContext('2d');
+    if (!g) return;
+
+    const grad = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.55)');
+    grad.addColorStop(0.35, 'rgba(255, 255, 255, 0.14)');
+    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, size, size);
+    this.glow = c;
   }
 
   resize(): void {
@@ -165,7 +185,7 @@ export class Starfield {
     this.progress = p;
   }
 
-  /** 0 = scattered, 1 = assembled into the X. Driven by the timeline. */
+  /** 0 = scattered, 1 = assembled into the mark. Driven by the timeline. */
   setFormation(v: number): void {
     this.formation = Math.min(Math.max(v, 0), 1);
   }
@@ -192,28 +212,19 @@ export class Starfield {
   destroy(): void {
     this.stop();
     this.stars = [];
-    this.nodes = [];
-    this.linkable = [];
+    this.xStars = [];
+    this.glow = null;
     this.ctx = null;
   }
 
   private tick = (): void => {
     if (!this.running) return;
-    // Chase the targets. Scroll updates arrive in jumps; this turns them into
-    // continuous motion so the field never visibly steps.
     this.renderedProgress += (this.progress - this.renderedProgress) * 0.08;
-    this.renderedFormation += (this.formation - this.renderedFormation) * 0.06;
+    this.renderedFormation += (this.formation - this.renderedFormation) * 0.055;
     this.time += 0.016;
     this.draw();
     this.frame = requestAnimationFrame(this.tick);
   };
-
-  /** Screen position of a star, including parallax wrap. */
-  private starX(star: Star, travel: number): number {
-    let x = (star.x * this.width - travel * LAYER_SPEED[star.layer]) % this.width;
-    if (x < 0) x += this.width;
-    return x;
-  }
 
   private draw(): void {
     const ctx = this.ctx;
@@ -221,131 +232,49 @@ export class Starfield {
 
     ctx.clearRect(0, 0, this.width, this.height);
 
-    // Travel distance in screen widths across the whole journey. Higher than
-    // the rail's own travel so the sky reads as much deeper than the planets.
     const travel = this.renderedProgress * this.width * 6;
     const form = this.renderedFormation;
-
-    // Where each node currently is, so links and dots agree.
     const cx = this.width / 2;
     const cy = this.height / 2;
     const scale = Math.min(this.width, this.height) * X_SPAN;
-    const placed = new Map<Star, { x: number; y: number }>();
 
-    for (const node of this.nodes) {
-      const freeX = this.starX(node.star, travel);
-      const freeY = node.star.y * this.height;
-      const targetX = cx + node.tx * scale;
-      const targetY = cy + node.ty * scale;
-      placed.set(node.star, {
-        x: freeX + (targetX - freeX) * form,
-        y: freeY + (targetY - freeY) * form,
-      });
-    }
-
-    this.drawAmbientLinks(ctx, travel, placed);
-    this.drawConstellation(ctx, form, placed);
-
-    // Stars last so they sit on top of their own links.
     for (const star of this.stars) {
-      const at = placed.get(star);
-      const x = at ? at.x : this.starX(star, travel);
-      const y = at ? at.y : star.y * this.height;
+      let x = (star.x * this.width - travel * LAYER_SPEED[star.layer]) % this.width;
+      if (x < 0) x += this.width;
+      let y = star.y * this.height;
 
-      // Slow twinkle. Amplitude is small — this should register as the sky
-      // being alive, not as blinking.
-      const twinkle = 0.82 + Math.sin(this.time * 1.4 + star.phase) * 0.18;
-
-      ctx.globalAlpha = star.alpha * twinkle;
-      ctx.fillStyle = '#ffffff';
-      // fillRect beats arc()+fill by a wide margin at this count, and at
-      // these sizes the difference is not visible.
-      ctx.fillRect(x, y, star.size, star.size);
-    }
-
-    ctx.globalAlpha = 1;
-  }
-
-  /**
-   * Faint links between near neighbours in the front layer.
-   *
-   * Only the front layer participates (~47 stars), which keeps this at a few
-   * hundred distance checks per frame instead of tens of thousands.
-   */
-  private drawAmbientLinks(
-    ctx: CanvasRenderingContext2D,
-    travel: number,
-    placed: Map<Star, { x: number; y: number }>,
-  ): void {
-    ctx.lineWidth = 1;
-
-    for (let i = 0; i < this.linkable.length; i++) {
-      const a = this.linkable[i];
-      const pa = placed.get(a);
-      const ax = pa ? pa.x : this.starX(a, travel);
-      const ay = pa ? pa.y : a.y * this.height;
-
-      for (let j = i + 1; j < this.linkable.length; j++) {
-        const b = this.linkable[j];
-        const pb = placed.get(b);
-        const bx = pb ? pb.x : this.starX(b, travel);
-        const by = pb ? pb.y : b.y * this.height;
-
-        const dx = ax - bx;
-        const dy = ay - by;
-        const distance = Math.hypot(dx, dy);
-        if (distance > LINK_DISTANCE) continue;
-
-        // Fade with distance so links dissolve rather than pop.
-        ctx.globalAlpha = (1 - distance / LINK_DISTANCE) * 0.16;
-        ctx.strokeStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.moveTo(ax, ay);
-        ctx.lineTo(bx, by);
-        ctx.stroke();
+      // Stars belonging to the mark ease toward their sampled point.
+      let assembled = 0;
+      if (form > 0.001 && star.tx !== null && star.ty !== null) {
+        assembled = form;
+        x += (cx + star.tx * scale - x) * form;
+        y += (cy + star.ty * scale - y) * form;
       }
-    }
-  }
 
-  /** The X itself: two strokes drawn through their own nodes. */
-  private drawConstellation(
-    ctx: CanvasRenderingContext2D,
-    form: number,
-    placed: Map<Star, { x: number; y: number }>,
-  ): void {
-    if (form < 0.02) return;
+      // Slow twinkle. Small amplitude — the sky should read as alive, not
+      // as blinking.
+      const twinkle = 0.78 + Math.sin(this.time * 1.3 + star.phase) * 0.22;
 
-    ctx.lineWidth = 1.5;
-    ctx.lineCap = 'round';
+      // Contrast is what makes the mark readable without drawing a single
+      // line: its stars brighten and swell while the rest of the sky falls
+      // back. Brightening the mark alone wasn't enough — against a full field
+      // the shape stayed lost in the noise.
+      const isMark = star.tx !== null;
+      const recede = isMark ? 1 : 1 - form * 0.72;
+      const alpha = Math.min(1, star.alpha * twinkle * recede + assembled * 0.85);
+      const size = star.size + assembled * 1.5;
 
-    for (const stroke of [0, 1] as const) {
-      const points = this.nodes
-        .filter((n) => n.stroke === stroke)
-        .map((n) => placed.get(n.star))
-        .filter((p): p is { x: number; y: number } => !!p);
-
-      if (points.length < 2) continue;
-
-      // Squared so the line only really arrives once the stars are nearly
-      // home — otherwise the X is legible long before it has formed.
-      ctx.globalAlpha = form * form * 0.55;
-      ctx.strokeStyle = `rgba(${CYAN}, 1)`;
-      ctx.beginPath();
-      ctx.moveTo(points[0].x, points[0].y);
-      for (let i = 1; i < points.length; i++) {
-        ctx.lineTo(points[i].x, points[i].y);
+      if (star.luminous && this.glow) {
+        const halo = (star.size + 1.5 + assembled * 2) * 7;
+        ctx.globalAlpha = alpha * 0.75;
+        ctx.drawImage(this.glow, x - halo / 2, y - halo / 2, halo, halo);
       }
-      ctx.stroke();
-    }
 
-    // Brighten the node stars themselves as they lock into place.
-    ctx.globalAlpha = form * 0.9;
-    ctx.fillStyle = `rgba(${CYAN}, 1)`;
-    for (const node of this.nodes) {
-      const at = placed.get(node.star);
-      if (!at) continue;
-      const r = 1 + form * 1.6;
-      ctx.fillRect(at.x - r / 2, at.y - r / 2, r, r);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = `rgb(${STAR_COLOURS[star.tint]})`;
+      // fillRect beats arc()+fill by a wide margin at this count, and at these
+      // sizes the difference is not visible.
+      ctx.fillRect(x, y, size, size);
     }
 
     ctx.globalAlpha = 1;

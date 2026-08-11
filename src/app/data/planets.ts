@@ -13,7 +13,9 @@ export interface Planet {
   color: string;
   colorRgb: string;
   url: string;
-  /** Square mark — a planet is a circle, so the banner lockup can't be used. */
+  /** Wide banner lockup — what the planets show on the landing flight. */
+  logo: string;
+  /** Square mark, for surfaces that must be circular (the /apps orbit). */
   icon: string;
   status: 'live' | 'coming-soon';
   /** Human labels for every platform the product ships on, e.g. ['Web', 'iOS']. */
@@ -100,6 +102,7 @@ function buildPlanets(): Planet[] {
       color: primary.color,
       colorRgb: primary.colorRgb,
       url: primary.url,
+      logo: primary.logo,
       icon: primary.icon,
       // Live on any platform means the product is live and reachable.
       status: rows.some((r) => r.status === 'live') ? 'live' : 'coming-soon',

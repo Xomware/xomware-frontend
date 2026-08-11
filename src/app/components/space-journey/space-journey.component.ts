@@ -20,9 +20,11 @@ gsap.registerPlugin(ScrollTrigger);
  * the intro clears, the camera travels past the planets, then the arrival
  * panel resolves.
  */
-const INTRO_END = 0.1;
+const INTRO_END = 0.08;
+/** The mark owns the screen alone between the intro and the brief. */
+const BRIEF_START = 0.26;
 /** The brief holds here, then clears — travel starts at BRIEF_END. */
-const BRIEF_END = 0.3;
+const BRIEF_END = 0.44;
 const TRAVEL_END = 0.88;
 
 /**
@@ -47,9 +49,9 @@ const SKIP_KEY = 'xomware:journey-skipped';
  */
 export function constellationStrength(progress: number): number {
   const GATHER_FROM = 0.04;
-  const HOLD_FROM = 0.13;
-  const HOLD_UNTIL = 0.26;
-  const SCATTER_BY = 0.36;
+  const HOLD_FROM = 0.11;
+  const HOLD_UNTIL = 0.19;
+  const SCATTER_BY = 0.25;
 
   if (progress <= GATHER_FROM || progress >= SCATTER_BY) return 0;
   if (progress >= HOLD_FROM && progress <= HOLD_UNTIL) return 1;
@@ -259,8 +261,8 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
       .fromTo(
         this.brief.nativeElement,
         { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, ease: 'power2.out', duration: 0.06 },
-        INTRO_END,
+        { opacity: 1, y: 0, ease: 'power2.out', duration: 0.05 },
+        BRIEF_START,
       )
       .to(
         this.brief.nativeElement,
