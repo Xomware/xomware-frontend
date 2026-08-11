@@ -13,126 +13,6 @@
   // Orbs are handled by .bg-orbs overflow:hidden instead
 }
 
-// Anonymous gate — full-viewport centered card. Replaces the entire
-// landing for signed-out visitors. Brand mark + sign-in CTA only.
-.anon-gate {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: $spacing-xl;
-}
-
-.anon-gate-card {
-  width: 100%;
-  max-width: 420px;
-  padding: $spacing-2xl;
-  background: rgba(24, 24, 27, 0.7);
-  border: 1px solid rgba(0, 180, 216, 0.2);
-  // 16px was off the radius scale (4/8/12/20/24/100) — the exact bypass that
-  // proved a token file without enforcement is worthless. $radius-lg is the
-  // tighter neighbour, which also reads closer to the flatter look we're after.
-  border-radius: $radius-lg;
-  text-align: center;
-  backdrop-filter: blur(12px);
-}
-
-.anon-gate-mark {
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-sm;
-  margin-bottom: $spacing-md;
-
-  img {
-    width: 32px;
-    height: 32px;
-  }
-}
-
-.anon-gate-wordmark {
-  font-size: $text-lg;
-  // Was 900. index.html loads Inter at wght@400..800, so 900 had no real
-  // face behind it and the browser synthesized faux-bold - which is why this
-  // wordmark rendered slightly smeared next to the rest of the type.
-  font-weight: $font-weight-extrabold;
-  letter-spacing: $tracking-tight;
-  color: $brand-cyan;
-}
-
-.anon-gate-tagline {
-  color: #a1a1aa;
-  font-size: $text-sm;
-  line-height: 1.5;
-  margin: 0 0 $spacing-lg;
-}
-
-.anon-gate-actions {
-  display: flex;
-  gap: $spacing-md;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: $spacing-lg;
-}
-
-.anon-gate-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 22px;
-  border-radius: $radius-md;
-  font-weight: $font-weight-semibold;
-  font-size: $text-sm;
-  text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #d4d4d8;
-  background: transparent;
-  transition: all 150ms ease;
-
-  &:hover,
-  &:focus-visible {
-    border-color: $brand-cyan;
-    color: #fafafa;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 2px;
-  }
-
-  &.primary {
-    background: linear-gradient(90deg, $brand-cyan, #48cae4);
-    border-color: transparent;
-    color: #0a0a0b;
-
-    &:hover,
-    &:focus-visible {
-      filter: brightness(1.05);
-      color: #0a0a0b;
-    }
-  }
-}
-
-.anon-gate-link {
-  display: inline-block;
-  font-size: $text-2xs;
-  color: #71717a;
-  text-decoration: none;
-  transition: color 150ms ease;
-
-  &:hover,
-  &:focus-visible {
-    color: $brand-cyan;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
-}
-
 // ── Profile / Hero Section ───────────────────────
 .hero {
   width: 100%;
@@ -408,29 +288,9 @@
   }
 }
 
-// ── Landing: sticky ticker (top, under fixed nav) ────
-// Fixed nav is z:1000. Ticker sticks directly under it.
-.landing-ticker-top {
-  position: sticky;
-  top: var(--nav-h);
-  z-index: 90;
-  // Push in-flow content below the nav so the ticker is the first thing
-  // seen after the nav; the margin-top accounts for the fixed nav offset.
-  margin-top: var(--nav-h);
-  overflow: visible; // allow ticker's full-bleed breakout
-}
-
-// Spacer so the hero starts below both the fixed nav AND sticky ticker.
-// Height = ticker height (defined in --ticker-h). Only rendered when the
-// ticker has data (same *ngIf as .landing-ticker-top).
-.landing-ticker-spacer {
-  height: var(--ticker-h);
-  flex-shrink: 0;
-}
-
-// ── Music snapshot section (between hero and apps) ────
-// Moved outside .hero-content so the hero ScrollTrigger fade does not
-// affect this element. Sits as its own in-flow block after the hero.
+// ── Music section (between the app directory and the footer) ────
+// Its own in-flow block, outside .hero-content, so the hero ScrollTrigger
+// fade does not affect it.
 .music-snapshot-section {
   width: 100%;
   max-width: 1100px;

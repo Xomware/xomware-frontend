@@ -1,15 +1,15 @@
-import { Component, OnDestroy, AfterViewInit, OnInit } from '@angular/core';
-import { Subscription, interval, of } from 'rxjs';
-import { switchMap, startWith, catchError } from 'rxjs/operators';
+import { Component, ElementRef, OnDestroy, AfterViewInit, OnInit, ViewChild } from '@angular/core';
+import { BehaviorSubject, EMPTY, Subscription, interval, of } from 'rxjs';
+import { switchMap, startWith, catchError, distinctUntilChanged } from 'rxjs/operators';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { CognitoService, XomUser } from '../../services/cognito.service';
 import { MusicService } from '../../services/music.service';
 import { NowPlayingService } from '../../services/now-playing.service';
 import { MusicProfile } from '../../models/music.model';
 import { NowPlayingState } from '../../models/now-playing.model';
 import { environment } from '../../../environments/environment';
 import { AppCard, APPS } from '../../data/apps.data';
+import { shouldPlayJourney } from '../space-journey/space-journey.component';
 
 const IDLE_STATE: NowPlayingState = {
   isPlaying: false,
@@ -28,7 +28,12 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
-  user: XomUser | null = null;
+  /**
+   * Whether to mount the cinematic intro. Read once, before the first render,
+   * so the page never mounts the journey and then yanks it away.
+   */
+  readonly showJourney = shouldPlayJourney();
+
   landingTickerProfile: MusicProfile | null = null;
   nowPlayingState: NowPlayingState | null = null;
 
@@ -38,19 +43,48 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
    */
   apps: AppCard[] = APPS.filter((a) => !a.adminOnly);
 
-  private userSub?: Subscription;
   private tickerSub?: Subscription;
   private nowPlayingSub?: Subscription;
 
+  /**
+   * Gates the now-playing poll. This page is public and the poll runs every
+   * 25s forever, so left ungated a single forgotten background tab would keep
+   * hitting the API indefinitely. Polling only runs while the music section is
+   * actually on screen and the tab is visible.
+   */
+  private readonly pollActive$ = new BehaviorSubject<boolean>(false);
+  private musicInView = false;
+  private musicObserver?: IntersectionObserver;
+
+  /**
+   * The music section sits behind an *ngIf on the profile fetch, so it does
+   * not exist at ngAfterViewInit. A setter picks it up whenever it appears.
+   */
+  @ViewChild('musicSection') set musicSection(ref: ElementRef<HTMLElement> | undefined) {
+    this.musicObserver?.disconnect();
+    if (!ref) {
+      this.musicInView = false;
+      this.syncPolling();
+      return;
+    }
+
+    this.musicObserver = new IntersectionObserver(
+      ([entry]) => {
+        this.musicInView = entry.isIntersecting;
+        this.syncPolling();
+      },
+      // Start a little before it scrolls in, so data is warm on arrival.
+      { rootMargin: '400px' },
+    );
+    this.musicObserver.observe(ref.nativeElement);
+  }
+
   constructor(
-    private cognito: CognitoService,
     private musicService: MusicService,
     private nowPlayingService: NowPlayingService,
   ) {}
 
   ngOnInit(): void {
-    this.userSub = this.cognito.user$.subscribe((u) => (this.user = u));
-
     // Fetch top-items once for the ticker and snapshot module (short_term default).
     this.tickerSub = this.musicService
       .getPublicTopItems(environment.musicProfileUserId)
@@ -62,10 +96,12 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
         },
       });
 
-    // Poll now-playing for the snapshot module (25s interval, same as /music).
-    this.nowPlayingSub = interval(25_000)
+    // Poll now-playing for the snapshot module (25s interval, same as /music),
+    // but only while pollActive$ says it is worth doing.
+    this.nowPlayingSub = this.pollActive$
       .pipe(
-        startWith(0),
+        distinctUntilChanged(),
+        switchMap((active) => (active ? interval(25_000).pipe(startWith(0)) : EMPTY)),
         switchMap(() =>
           this.nowPlayingService
             .getNowPlaying(environment.musicProfileUserId)
@@ -73,6 +109,27 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
         ),
       )
       .subscribe((s) => (this.nowPlayingState = s));
+
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
+  }
+
+  private readonly onVisibilityChange = (): void => this.syncPolling();
+
+  private syncPolling(): void {
+    this.pollActive$.next(this.musicInView && document.visibilityState === 'visible');
+  }
+
+  /**
+   * Mirrors MusicSnapshotComponent's own `hasData` guard.
+   *
+   * Gating the section on `landingTickerProfile` alone isn't enough: a
+   * response that parses but carries no items is still truthy, which would
+   * render a "What's playing" heading above an empty box.
+   */
+  get hasMusicData(): boolean {
+    const p = this.landingTickerProfile;
+    if (!p) return false;
+    return !!(p.topTracks?.length || p.topArtists?.length || p.topGenres?.length);
   }
 
   get webApps(): AppCard[] {
@@ -96,7 +153,8 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
 
   ngOnDestroy(): void {
     ScrollTrigger.getAll().forEach(t => t.kill());
-    this.userSub?.unsubscribe();
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
+    this.musicObserver?.disconnect();
     this.tickerSub?.unsubscribe();
     this.nowPlayingSub?.unsubscribe();
   }

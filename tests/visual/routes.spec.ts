@@ -13,7 +13,11 @@ import { test, expect, type Page } from '@playwright/test';
  * tests. Migrating those surfaces still needs manual review.
  */
 const ROUTES = [
-  { path: '/', name: 'landing-anon-gate' },
+  // The landing page is public — there is no longer a signed-out gate to
+  // capture. Note this run happens under reducedMotion: 'reduce', so what is
+  // baselined is the grounded page; the space journey does not mount and is
+  // therefore NOT covered by these tests.
+  { path: '/', name: 'landing' },
   { path: '/apps', name: 'apps' },
   // Requires the `visual` build config, which forces musicSurfaces to 'mock'.
   // Against a normal build these render an empty shell and cover nothing.
