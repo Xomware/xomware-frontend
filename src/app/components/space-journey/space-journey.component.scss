@@ -322,6 +322,10 @@
 
 .planet__disc {
   position: relative;
+  // Above the ring, so the ring only shows where it extends past the body —
+  // which is what makes it read as a ring seen near edge-on rather than a
+  // halo drawn around the outside.
+  z-index: 1;
   display: grid;
   place-items: center;
   width: calc(clamp(8rem, 22vw, 15rem) * var(--planet-size));
@@ -344,6 +348,10 @@
 }
 
 .planet__mark {
+  // Lifted above .planet__surface: that is absolutely positioned, so without
+  // a stacking order of its own it would paint straight over the logo.
+  position: relative;
+  z-index: 1;
   // A wide box, not a square: these are banner lockups, so constraining them
   // to a square slot would shrink them to a sliver to fit the height.
   // object-fit keeps the aspect ratio inside it.
@@ -447,6 +455,161 @@
   }
 }
 
+// ── Surface character ────────────────────────────
+// Each body wears one of four treatments plus an optional ring, assigned by
+// position in planets.ts rather than at random so the composition is the same
+// every run. All of it is drawn under .planet__mark, which stays untouched —
+// the product logos are the one thing here that must not be stylised.
+.planet__surface {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  opacity: 0.85;
+  // Lit from the upper left, same as the disc beneath and the asteroids in
+  // the field, so the whole scene agrees about where the light is.
+  mask-image: radial-gradient(circle at 34% 28%, #000 0%, #000 62%, transparent 88%);
+}
+
+.planet__disc.is-cratered .planet__surface {
+  background:
+    radial-gradient(circle at 30% 62%, rgba(0, 0, 0, 0.42) 0 8%, transparent 9%),
+    radial-gradient(circle at 62% 34%, rgba(0, 0, 0, 0.34) 0 5.5%, transparent 6.5%),
+    radial-gradient(circle at 72% 68%, rgba(0, 0, 0, 0.38) 0 6.5%, transparent 7.5%),
+    radial-gradient(circle at 44% 22%, rgba(0, 0, 0, 0.28) 0 3.5%, transparent 4.5%),
+    radial-gradient(circle at 24% 40%, rgba(255, 255, 255, 0.05) 0 4%, transparent 5%);
+}
+
+.planet__disc.is-banded .planet__surface {
+  background: repeating-linear-gradient(
+    172deg,
+    rgba(var(--app-rgb), 0.16) 0 6%,
+    transparent 6% 12%,
+    rgba(0, 0, 0, 0.2) 12% 17%,
+    transparent 17% 24%
+  );
+}
+
+.planet__disc.is-swirled .planet__surface {
+  background:
+    radial-gradient(ellipse 60% 26% at 38% 40%, rgba(var(--app-rgb), 0.26) 0%, transparent 70%),
+    radial-gradient(ellipse 44% 18% at 66% 62%, rgba(255, 255, 255, 0.07) 0%, transparent 72%),
+    radial-gradient(ellipse 30% 14% at 30% 72%, rgba(0, 0, 0, 0.3) 0%, transparent 70%);
+}
+
+.planet__disc.is-icy .planet__surface {
+  background:
+    linear-gradient(168deg, rgba(214, 240, 255, 0.16) 0%, transparent 34%),
+    linear-gradient(348deg, rgba(214, 240, 255, 0.13) 0%, transparent 30%),
+    radial-gradient(ellipse 50% 22% at 56% 48%, rgba(0, 0, 0, 0.22) 0%, transparent 70%);
+}
+
+// ── Rings ────────────────────────────────────────
+.planet__ring {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: calc(clamp(8rem, 22vw, 15rem) * var(--planet-size) * 1.72);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  // Flattened into an ellipse and tilted, which is what sells it as a ring
+  // seen edge-on rather than a halo drawn around the body.
+  transform: translate(-50%, -50%) rotate(var(--ring-tilt)) scaleY(0.24);
+  border: 3px solid rgba(var(--app-rgb), 0.42);
+  box-shadow:
+    0 0 0 5px rgba(var(--app-rgb), 0.1),
+    inset 0 0 0 4px rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+// ── The locals ───────────────────────────────────
+.planet__alien {
+  position: absolute;
+  z-index: 2;
+  // Standing on the upper-right shoulder of the body.
+  top: 4%;
+  left: 74%;
+  width: calc(clamp(8rem, 22vw, 15rem) * var(--planet-size) * 0.19);
+  color: rgba(var(--app-rgb), 0.9);
+  pointer-events: none;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+  }
+}
+
+// Waves from the elbow rather than the shoulder, so the arm swings instead of
+// the whole body rocking.
+.planet__alien-arm {
+  transform-origin: 28.5px 30px;
+  animation: alien-wave 1.6s ease-in-out infinite;
+}
+
+@keyframes alien-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(-26deg);
+  }
+}
+
+// ── Outro ────────────────────────────────────────
+.outro {
+  position: relative;
+  flex: 0 0 auto;
+  width: 62vw;
+  max-width: 30rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+  text-align: center;
+}
+
+.outro__eyebrow {
+  margin: 0;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wider;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  color: $brand-cyan;
+}
+
+.outro__title {
+  margin: 0;
+  font-family: $font-display;
+  font-size: clamp(1.7rem, 4.5vw, 2.6rem);
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-tight;
+  color: $text-primary;
+}
+
+.outro__copy {
+  margin: 0;
+  font-size: $text-sm;
+  line-height: 1.6;
+  color: $text-secondary;
+}
+
+.outro__cue {
+  margin-top: $spacing-sm;
+  color: $text-muted;
+
+  svg {
+    width: 22px;
+    height: 22px;
+    animation: cue-bob 1.8s ease-in-out infinite;
+  }
+}
+
 // ── Mobile focus readout ─────────────────────────
 // Hidden by default; on narrow viewports it replaces the per-planet labels.
 .journey__focus {
@@ -474,6 +637,69 @@
 @media (prefers-reduced-motion: reduce) {
   .is-pulsing {
     animation: none;
+  }
+}
+
+// ── Step controls ────────────────────────────────
+// Bottom-left, opposite the skip button so the two never collide.
+.journey__steps {
+  position: absolute;
+  z-index: 5;
+  left: $spacing-xl;
+  bottom: $spacing-xl;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  // The timeline fades this in when the flight starts.
+  opacity: 0;
+}
+
+.journey__step {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid $glass-border;
+  background: rgba(10, 10, 20, 0.6);
+  backdrop-filter: blur(8px);
+  color: $text-secondary;
+  cursor: pointer;
+  transition:
+    color $transition-fast,
+    border-color $transition-fast;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      color: $text-primary;
+      border-color: $glass-border-hover;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+  }
+}
+
+.journey__step-count {
+  min-width: 3.2rem;
+  text-align: center;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wide;
+  color: $text-muted;
+}
+
+@media (max-width: $breakpoint-md) {
+  .journey__steps {
+    left: $spacing-md;
+    bottom: $spacing-md;
   }
 }
 
@@ -595,7 +821,9 @@
 // (see shouldPlayJourney), but if it ever renders, nothing should move.
 @media (prefers-reduced-motion: reduce) {
   .intro__char,
-  .intro__cue-icon {
+  .intro__cue-icon,
+  .planet__alien-arm,
+  .outro__cue svg {
     animation: none;
   }
 
