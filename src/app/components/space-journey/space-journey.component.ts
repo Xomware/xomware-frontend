@@ -98,6 +98,9 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
   @ViewChild('intro', { static: true }) intro!: ElementRef<HTMLElement>;
   @ViewChild('brief', { static: true }) brief!: ElementRef<HTMLElement>;
   @ViewChild('focus', { static: true }) focus!: ElementRef<HTMLElement>;
+  @ViewChild('outro', { static: true }) outro!: ElementRef<HTMLElement>;
+  @ViewChild('steps', { static: true }) steps!: ElementRef<HTMLElement>;
+  @ViewChild('stepCount', { static: true }) stepCount!: ElementRef<HTMLElement>;
   @ViewChildren('planetEl') planetEls!: QueryList<ElementRef<HTMLElement>>;
 
   private starfield?: Starfield;
@@ -143,8 +146,8 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
     if (!trigger) return;
 
     const span = trigger.end - trigger.start;
-    // Same measured fractions the highlight uses, so focus lands the planet
-    // in the centre of the screen rather than merely somewhere nearby.
+    // Same measured fractions the highlight and the step controls use, so
+    // focus lands the planet in the centre rather than merely somewhere near.
     const share = this.ensureFractions()[index] ?? 0;
     const target = trigger.start + span * (BRIEF_END + (TRAVEL_END - BRIEF_END) * share);
 
@@ -169,6 +172,35 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
 
       window.scrollTo({ top: target, behavior: 'instant' as ScrollBehavior });
     });
+  }
+
+  /**
+   * Step to the previous/next planet.
+   *
+   * Reuses the same measured fractions as the highlight and keyboard focus, so
+   * "next" always lands the following planet dead centre rather than nudging
+   * the scroll by a guessed amount.
+   */
+  jump(direction: 1 | -1): void {
+    const count = this.planets.length;
+    if (!count) return;
+
+    // activeIndex is -1 until the first scroll frame; treat that as "before
+    // the first planet" so a forward press from the intro goes to planet one.
+    const from = this.activeIndex < 0 ? (direction > 0 ? -1 : 0) : this.activeIndex;
+    const next = Math.min(Math.max(from + direction, 0), count - 1);
+    this.scrollToPlanet(next);
+  }
+
+  /** Scroll so a given planet sits in the centre of the screen. */
+  private scrollToPlanet(index: number): void {
+    const trigger = this.trigger;
+    if (!trigger) return;
+
+    const span = trigger.end - trigger.start;
+    const share = this.ensureFractions()[index] ?? 0;
+    const target = trigger.start + span * (BRIEF_END + (TRAVEL_END - BRIEF_END) * share);
+    window.scrollTo({ top: target, behavior: 'smooth' });
   }
 
   /** Jump past the flight to the page below. Not remembered — see above. */
@@ -273,8 +305,20 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
         },
         BRIEF_END,
       )
-      // The mobile readout belongs to the flight only — see the note on
-      // .journey__focus for why it must not be visible before then.
+      // The step controls and the mobile readout both belong to the flight
+      // only: there is nothing to step through, and nothing centred to report,
+      // until the planets start moving.
+      .fromTo(
+        this.steps.nativeElement,
+        { opacity: 0 },
+        { opacity: 1, ease: 'none', duration: 0.03 },
+        BRIEF_END,
+      )
+      .to(
+        this.steps.nativeElement,
+        { opacity: 0, ease: 'none', duration: 1 - TRAVEL_END },
+        TRAVEL_END,
+      )
       .fromTo(
         this.focus.nativeElement,
         { opacity: 0 },
@@ -286,30 +330,23 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
         { opacity: 0, ease: 'none', duration: 1 - TRAVEL_END },
         TRAVEL_END,
       )
-      // A short drift past the last planet, then the pin releases straight
-      // into the page. There used to be an arrival panel here with a "continue
-      // to full site" button, but it only appeared at the very end of the pin —
-      // which is the scroll position it wanted to send you to, so the button
-      // could never do anything.
-      .to(
-        rail,
-        {
-          x: () => -(this.railTravel(els) + window.innerWidth * 0.4),
-          ease: 'power1.in',
-          duration: 1 - TRAVEL_END,
-        },
-        TRAVEL_END,
-      );
+      ;
+    // Travel ends on the outro at TRAVEL_END and simply holds there for the
+    // last stretch of the pin, so the closing card gets a beat to be read
+    // before the page takes over. Nothing animates in that window on purpose.
 
     this.timeline = timeline;
     this.trigger = timeline.scrollTrigger;
   }
 
   /**
-   * Distance the rail must travel for the final planet to land dead centre.
+   * Distance the rail must travel for its last item to land dead centre.
+   *
+   * That item is the outro, not the last planet — the flight should come to
+   * rest on the closing card rather than sailing past it.
    */
   private railTravel(els: HTMLElement[]): number {
-    const last = els[els.length - 1];
+    const last = this.outro?.nativeElement ?? els[els.length - 1];
     if (!last) return 0;
     const centre = last.offsetLeft + last.offsetWidth / 2;
     return Math.max(0, centre - window.innerWidth / 2);
@@ -387,5 +424,7 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
     const description = focus.querySelector('.focus__description');
     if (name) name.textContent = planet.name;
     if (description) description.textContent = planet.description;
+
+    this.stepCount.nativeElement.textContent = `${index + 1} / ${this.planets.length}`;
   }
 }

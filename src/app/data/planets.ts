@@ -22,10 +22,18 @@ export interface Planet {
   status: 'live' | 'coming-soon';
   /** Human labels for every platform the product ships on, e.g. ['Web', 'iOS']. */
   platforms: string[];
-  /** Layout only — see LAYOUT below. */
+  /** Layout and surface treatment only — see LAYOUT below. */
   size: number;
   offsetY: number;
   depth: number;
+  /** Surface treatment. Purely cosmetic; see LAYOUT. */
+  surface: 'cratered' | 'banded' | 'swirled' | 'icy';
+  /** Whether the body carries a ring. */
+  ring: boolean;
+  /** Degrees of tilt on that ring, so no two sit at the same angle. */
+  ringTilt: number;
+  /** A small inhabitant waving from the rim. Two of them, so it stays a find. */
+  alien: boolean;
 }
 
 /**
@@ -35,20 +43,28 @@ export interface Planet {
  * journey untestable; a fixed table gives the same varied-but-deliberate
  * arrangement every time. Cycled with `%` so adding a 9th app still works.
  *
- * size    — multiplier on the base planet diameter
- * offsetY — vertical drift from the travel line, in vh
- * depth   — parallax rate; >1 passes nearer the camera than the star layers
+ * size     — multiplier on the base planet diameter
+ * offsetY  — vertical drift from the travel line, in vh
+ * depth    — parallax rate; >1 passes nearer the camera than the star layers
+ * surface  — which surface treatment the body wears
+ * ring     — whether it carries a ring
+ * ringTilt — that ring's tilt in degrees
+ * alien    — a small waving inhabitant on the rim
+ *
+ * Rings are spread out rather than given to neighbours, so two ringed bodies
+ * are never on screen together — one at a time reads as a feature, a row of
+ * them reads as a texture.
  */
 const LAYOUT = [
-  { size: 1.0, offsetY: -7, depth: 0.9 },
-  { size: 0.84, offsetY: 11, depth: 0.7 },
-  { size: 1.12, offsetY: -13, depth: 1.05 },
-  { size: 0.92, offsetY: 5, depth: 0.8 },
-  { size: 1.04, offsetY: -4, depth: 0.95 },
-  { size: 0.88, offsetY: 13, depth: 0.72 },
-  { size: 1.16, offsetY: -10, depth: 1.1 },
-  { size: 0.96, offsetY: 6, depth: 0.85 },
-];
+  { size: 1.0, offsetY: -7, depth: 0.9, surface: 'swirled', ring: false, ringTilt: 0, alien: false },
+  { size: 0.84, offsetY: 11, depth: 0.7, surface: 'cratered', ring: false, ringTilt: 0, alien: true },
+  { size: 1.12, offsetY: -13, depth: 1.05, surface: 'banded', ring: true, ringTilt: -16, alien: false },
+  { size: 0.92, offsetY: 5, depth: 0.8, surface: 'icy', ring: false, ringTilt: 0, alien: false },
+  { size: 1.04, offsetY: -4, depth: 0.95, surface: 'cratered', ring: false, ringTilt: 0, alien: false },
+  { size: 0.88, offsetY: 13, depth: 0.72, surface: 'swirled', ring: true, ringTilt: 12, alien: false },
+  { size: 1.16, offsetY: -10, depth: 1.1, surface: 'banded', ring: false, ringTilt: 0, alien: true },
+  { size: 0.96, offsetY: 6, depth: 0.85, surface: 'icy', ring: true, ringTilt: -24, alien: false },
+] as const;
 
 const PLATFORM_LABEL: Record<AppCard['platform'], string> = {
   web: 'Web',
