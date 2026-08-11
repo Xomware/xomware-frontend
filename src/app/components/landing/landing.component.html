@@ -2,31 +2,19 @@
   <!-- Ambient GSAP blobs (fixed background layer) -->
   <app-monster></app-monster>
 
-  <!-- Signed-out gate. Anonymous visitors see only this — minimal brand
-       mark + sign-in CTA. Keeps the home page renderable for Google's
-       OAuth verifier without exposing any of Dom's content. -->
-  <main class="anon-gate" *ngIf="!user">
-    <div class="anon-gate-card">
-      <div class="anon-gate-mark">
-        <img src="assets/img/xomware-icon-transparent-background.png" alt="Xomware" />
-        <span class="anon-gate-wordmark">XOMWARE</span>
-      </div>
-      <p class="anon-gate-tagline">Sign in to continue.</p>
-      <div class="anon-gate-actions">
-        <a routerLink="/auth/sign-in" class="anon-gate-btn primary">Sign in</a>
-        <a routerLink="/auth/sign-up" class="anon-gate-btn">Create account</a>
-      </div>
-      <a routerLink="/privacy" class="anon-gate-link">Privacy policy</a>
-    </div>
-  </main>
-
-<ng-container *ngIf="user">
-  <!-- Shared site navbar -->
+  <!-- Shared site navbar. Renders sign-in or the user menu on its own, so the
+       landing page below is public to everyone — this is the marketing
+       surface, not a gated dashboard. -->
   <app-nav></app-nav>
 
+  <!-- Act I-III: the cinematic flight past every app. Skipped entirely under
+       prefers-reduced-motion or after a skip this session — every app on the
+       rail is also in the directory below, so nothing is lost when it's off. -->
+  <app-space-journey *ngIf="showJourney"></app-space-journey>
 
+  <!-- Act IV: the grounded site. -->
   <!-- Hero / Profile Section -->
-  <header class="hero" id="hero">
+  <header class="hero" id="site">
     <div class="hero-content">
       <div class="profile-headshot">
         <img
@@ -236,11 +224,25 @@
     </div>
   </section>
 
+  <!-- Music — the landing already fetches this profile and polls now-playing;
+       before this it was fetched and never rendered. -->
+  <section class="music-snapshot-section" id="music" #musicSection *ngIf="hasMusicData">
+    <div class="section-header">
+      <span class="section-eyebrow">// On Repeat</span>
+      <h2 class="section-title">What's playing</h2>
+      <p class="section-subtitle">Recent listening, straight out of Xomify.</p>
+    </div>
+    <app-music-snapshot
+      [profile]="landingTickerProfile"
+      [nowPlayingState]="nowPlayingState"
+    ></app-music-snapshot>
+  </section>
+
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <img src="assets/img/xomware-icon-transparent-background.png" alt="Xomware" class="footer-logo" />
+        <img src="assets/img/xomware-icon.webp" alt="Xomware" class="footer-logo" />
         <div class="footer-brand-text">
           <span class="footer-name">XOMWARE</span>
           <span class="footer-tagline">Apps built by &#64;domgiordano</span>
@@ -265,5 +267,4 @@
       </div>
     </div>
   </footer>
-</ng-container>
 </div>

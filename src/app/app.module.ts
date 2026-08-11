@@ -8,6 +8,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { jwtInterceptor } from './interceptors/jwt.interceptor';
 import { AppComponent } from './app.component';
 import { LandingComponent } from './components/landing/landing.component';
+import { SpaceJourneyComponent } from './components/space-journey/space-journey.component';
 import { MonsterComponent } from './components/monster/monster.component';
 import { CommandCenterComponent } from './components/command-center/command-center.component';
 import { AuthGateComponent } from './components/command-center/auth-gate/auth-gate.component';
@@ -36,6 +37,7 @@ import { MusicSnapshotComponent } from './components/music-snapshot/music-snapsh
   declarations: [
     AppComponent,
     LandingComponent,
+    SpaceJourneyComponent,
     MonsterComponent,
     CommandCenterComponent,
     AuthGateComponent,

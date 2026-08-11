@@ -1,0 +1,554 @@
+@import 'styles/variables';
+
+// ─────────────────────────────────────────────────────────────
+// Space journey — the pinned, horizontally-scrubbed landing intro.
+//
+// House rule is "no coloured glows", because a coloured halo on a card or a
+// button is the classic amateur dark-UI tell. That rule is about UI chrome.
+// Inside this section the light is diegetic: a planet is a lit body in a
+// void, so its rim light and bloom are motivated rather than decorative.
+// Chrome in here (skip button, CTA, badges) stays flat like everywhere else.
+// ─────────────────────────────────────────────────────────────
+
+// The landing page is a centred flex column; without this the host collapses
+// and ScrollTrigger pins a zero-width element.
+:host {
+  display: block;
+  width: 100%;
+}
+
+.journey {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  // Own stacking context so the fixed ambient blob layer on the landing page
+  // can't punch through the void.
+  isolation: isolate;
+  // Fallback until the first active planet sets it.
+  --active-rgb: 0, 180, 216;
+}
+
+.journey__void {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0, 180, 216, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 100%, rgba(156, 10, 191, 0.08) 0%, transparent 55%),
+    #05050c;
+}
+
+.journey__field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+// Ambient tint from whichever planet is currently centred. Sits above the
+// stars, below the content.
+.journey__bloom {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 55% 45% at 50% 50%,
+    rgba(var(--active-rgb), 0.16) 0%,
+    transparent 70%
+  );
+  transition: background $transition-slow;
+}
+
+// Darkens the edges so type stays legible over a busy starfield.
+.journey__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 5, 12, 0.75) 0%,
+    rgba(5, 5, 12, 0) 28%,
+    rgba(5, 5, 12, 0) 68%,
+    rgba(5, 5, 12, 0.85) 100%
+  );
+}
+
+// ── Act I — intro ────────────────────────────────
+.journey__intro {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: $spacing-xl;
+  pointer-events: none;
+}
+
+.intro__eyebrow {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wider;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  color: $brand-cyan;
+  margin: 0 0 $spacing-lg;
+}
+
+.intro__wordmark {
+  display: flex;
+  gap: 0.06em;
+  margin: 0;
+  // Big display type without leaving the scale: clamp() is the one escape
+  // hatch stylelint allows for font-size.
+  font-size: clamp(2.75rem, 12vw, 8rem);
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $tracking-tight;
+  line-height: 1;
+  color: $text-primary;
+}
+
+.intro__char {
+  display: inline-block;
+  // Staggered rise, driven by CSS so the intro paints correctly even before
+  // GSAP has taken over the timeline.
+  animation: char-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+
+  @for $i from 1 through 7 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 60}ms;
+    }
+  }
+}
+
+@keyframes char-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.intro__tagline {
+  max-width: 34rem;
+  margin: $spacing-lg 0 0;
+  font-size: $text-md;
+  line-height: 1.6;
+  color: $text-secondary;
+}
+
+.intro__cue {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin: $spacing-3xl 0 0;
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wide;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+.intro__cue-icon {
+  width: 16px;
+  height: 16px;
+  animation: cue-bob 1.8s ease-in-out infinite;
+}
+
+@keyframes cue-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+// ── Act II — the rail ────────────────────────────
+.journey__rail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  // A full viewport of lead-in holds the first planet completely off-screen
+  // while the intro is still on top of it; without this it sits centred
+  // behind the wordmark at scroll 0. The run-out just stops the last planet
+  // being clipped — where travel actually ends is computed in the component.
+  padding: 0 50vw 0 100vw;
+  will-change: transform;
+}
+
+.planet {
+  position: relative;
+  flex: 0 0 auto;
+  width: 62vw;
+  max-width: 30rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-lg;
+  text-decoration: none;
+  text-align: center;
+  // Parallax: nearer planets ride further off the travel line.
+  transform: translateY(calc(var(--planet-offset) * var(--planet-depth)));
+
+  &:focus-visible {
+    outline: none;
+
+    .planet__disc {
+      outline: 2px solid $brand-cyan;
+      outline-offset: 6px;
+    }
+  }
+}
+
+.planet__body {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.planet__disc {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(clamp(8rem, 22vw, 15rem) * var(--planet-size));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  // The body itself: a lit sphere, brighter toward the top-left light source.
+  background:
+    radial-gradient(circle at 32% 26%, rgba(var(--app-rgb), 0.32) 0%, transparent 58%),
+    radial-gradient(circle at 68% 78%, rgba(0, 0, 0, 0.55) 0%, transparent 60%),
+    linear-gradient(145deg, rgba(26, 26, 46, 0.95), rgba(8, 8, 18, 0.98));
+  border: 1px solid rgba(var(--app-rgb), 0.25);
+  // Rim light + a faint atmosphere. Diegetic, not chrome — see the note up top.
+  box-shadow:
+    inset 0 0 40px rgba(var(--app-rgb), 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
+  transition:
+    box-shadow $transition-slow,
+    border-color $transition-slow,
+    transform $transition-base;
+}
+
+.planet__mark {
+  width: 52%;
+  height: 52%;
+  object-fit: contain;
+  // Settled rule: product logos stay full colour at rest. Only the
+  // surrounding body reacts to the active state.
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+}
+
+.planet__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+  max-width: 26rem;
+  opacity: 0.45;
+  transform: translateY(6px);
+  transition:
+    opacity $transition-base,
+    transform $transition-base;
+}
+
+.planet__meta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.planet__status,
+.planet__platform {
+  font-size: $text-3xs;
+  letter-spacing: $tracking-wide;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: $radius-pill;
+  border: 1px solid $glass-border;
+  color: $text-secondary;
+}
+
+.planet__status {
+  &.is-live {
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.35);
+  }
+
+  &.is-soon {
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.35);
+  }
+}
+
+.planet__name {
+  font-size: $text-2xl;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-tight;
+  color: $text-primary;
+}
+
+.planet__description {
+  font-size: $text-sm;
+  line-height: 1.6;
+  color: $text-secondary;
+}
+
+.planet__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: $spacing-xs;
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wide;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  color: var(--app-color);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// Active state — set from the scrub handler, not a binding.
+.planet.is-active {
+  .planet__disc {
+    border-color: rgba(var(--app-rgb), 0.55);
+    box-shadow:
+      inset 0 0 60px rgba(var(--app-rgb), 0.22),
+      0 0 80px rgba(var(--app-rgb), 0.18);
+    transform: scale(1.04);
+  }
+
+  .planet__label {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ── Mobile focus readout ─────────────────────────
+// Hidden by default; on narrow viewports it replaces the per-planet labels.
+.journey__focus {
+  display: none;
+}
+
+// ── Act III — arrival ────────────────────────────
+.journey__arrival {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: $spacing-xl;
+  // GSAP fades this in; until then it must not swallow clicks on the rail.
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(5, 5, 12, 0.92) 0%, transparent 75%);
+}
+
+.arrival__eyebrow {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wider;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  color: $brand-cyan;
+  margin: 0 0 $spacing-md;
+}
+
+.arrival__title {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $tracking-tight;
+  color: $text-primary;
+}
+
+.arrival__copy {
+  max-width: 30rem;
+  margin: $spacing-md 0 $spacing-2xl;
+  font-size: $text-md;
+  line-height: 1.6;
+  color: $text-secondary;
+}
+
+.arrival__cta {
+  // The panel above is click-through so it never blocks the rail, but a
+  // child can opt back in — so the button stays clickable regardless.
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: 14px 28px;
+  border-radius: $radius-md;
+  border: 1px solid rgba(0, 180, 216, 0.4);
+  background: rgba(0, 180, 216, 0.08);
+  color: $text-primary;
+  font-family: inherit;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color $transition-fast,
+    background $transition-fast;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  // Gated so a tap on touch doesn't leave a stuck hover state — the same
+  // reason the app cards gate theirs.
+  @media (hover: hover) {
+    &:hover {
+      border-color: $brand-cyan;
+      background: rgba(0, 180, 216, 0.16);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 3px;
+  }
+}
+
+// ── Skip ─────────────────────────────────────────
+.journey__skip {
+  position: absolute;
+  z-index: 5;
+  right: $spacing-xl;
+  bottom: $spacing-xl;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: $radius-pill;
+  border: 1px solid $glass-border;
+  background: rgba(10, 10, 20, 0.6);
+  backdrop-filter: blur(8px);
+  color: $text-secondary;
+  font-family: inherit;
+  font-size: $text-2xs;
+  font-weight: $font-weight-medium;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color $transition-fast,
+    border-color $transition-fast;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      color: $text-primary;
+      border-color: $glass-border-hover;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+  }
+}
+
+// ── Responsive ───────────────────────────────────
+@media (max-width: $breakpoint-md) {
+  .planet {
+    width: 84vw;
+    gap: $spacing-md;
+  }
+
+  .planet__description {
+    font-size: $text-xs;
+  }
+
+  // In-rail labels are dropped entirely here — even the active planet's label
+  // is off-centre for most of the travel, because keeping one fully on screen
+  // would need it narrower than (viewport - planet spacing), which is about
+  // 60px on a phone. The fixed readout below reports the centred planet
+  // instead. The labels stay in the DOM for the links and for screen readers.
+  .planet__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .journey__focus {
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    // Below the discs, which sit on the vertical centre line.
+    top: 64%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: 0 $spacing-lg;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .focus__name {
+    font-size: $text-xl;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-tight;
+    color: $text-primary;
+  }
+
+  .focus__description {
+    font-size: $text-xs;
+    line-height: 1.55;
+    color: $text-secondary;
+  }
+
+  .journey__skip {
+    right: $spacing-md;
+    bottom: $spacing-md;
+  }
+
+  .intro__tagline {
+    font-size: $text-sm;
+  }
+}
+
+// Belt and braces: the component is not mounted at all under reduced motion
+// (see shouldPlayJourney), but if it ever renders, nothing should move.
+@media (prefers-reduced-motion: reduce) {
+  .intro__char,
+  .intro__cue-icon {
+    animation: none;
+  }
+
+  .planet__label {
+    opacity: 1;
+    transform: none;
+  }
+}

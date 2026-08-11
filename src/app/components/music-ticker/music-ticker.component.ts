@@ -31,7 +31,7 @@ interface TickerBadgeItem {
 export type TickerSegment = TickerTrackItem | TickerDividerItem | TickerTimeframeItem | TickerBadgeItem;
 
 const XOMIFY_URL = 'https://xomify.xomware.com';
-const XOMIFY_LOGO = 'assets/img/xomify-logo.png';
+const XOMIFY_LOGO = 'assets/img/apps/xomify.webp';
 
 /**
  * Pure-CSS marquee that scrolls top tracks, artists, and genres as labeled
