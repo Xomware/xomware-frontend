@@ -13,7 +13,9 @@
 // ── Hero ─────────────────────────────────────────────
 .apps-hero {
   background: $hero-gradient;
-  padding: calc(#{$spacing-4xl} + var(--nav-h)) $spacing-xl $spacing-2xl;
+  // Trimmed so the orbit — the point of this page — sits high enough to be
+  // seen without scrolling rather than being pushed under a tall title block.
+  padding: calc(#{$spacing-xl} + var(--nav-h)) $spacing-xl $spacing-sm;
   text-align: center;
 
   @media (max-width: $breakpoint-md) {
