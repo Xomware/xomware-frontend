@@ -566,6 +566,11 @@
   flex: 0 0 auto;
   width: 62vw;
   max-width: 30rem;
+  // A long empty stretch after the last app, so the flight clears the suite
+  // before the closing card arrives instead of the two running together.
+  // Travel is measured to this element, so the extra distance is picked up
+  // automatically — EXTRA_BEATS covers the added scroll.
+  margin-left: 45vw;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -700,6 +705,10 @@
   .journey__steps {
     left: $spacing-md;
     bottom: $spacing-md;
+  }
+
+  .outro {
+    margin-left: 55vw;
   }
 }
 
