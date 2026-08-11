@@ -25,7 +25,7 @@ const INTRO_END = 0.08;
 /** The brief rises while the mark is still assembling behind it. */
 const BRIEF_START = 0.12;
 /** The brief holds here, then clears — travel starts at BRIEF_END. */
-const BRIEF_END = 0.44;
+const BRIEF_END = 0.3;
 const TRAVEL_END = 0.94;
 
 /**
@@ -35,6 +35,14 @@ const TRAVEL_END = 0.94;
  * the flight itself.
  */
 const VH_PER_PLANET = 0.85;
+/**
+ * Phones get a shorter flight.
+ *
+ * The pin is measured in viewport heights, and a phone viewport is a much
+ * smaller bite of scroll than a desktop one — the same multiplier meant far
+ * more thumb travel for the same journey.
+ */
+const VH_PER_PLANET_NARROW = 0.6;
 // Intro, brief, and the long empty run out to the outro.
 const EXTRA_BEATS = 4;
 
@@ -48,10 +56,10 @@ const EXTRA_BEATS = 4;
  * of its outline rather than on brightness.
  */
 export function constellationStrength(progress: number): number {
-  const GATHER_FROM = 0.05;
-  const HOLD_FROM = 0.17;
-  const HOLD_UNTIL = 0.34;
-  const SCATTER_BY = 0.42;
+  const GATHER_FROM = 0.04;
+  const HOLD_FROM = 0.13;
+  const HOLD_UNTIL = 0.23;
+  const SCATTER_BY = 0.29;
 
   if (progress <= GATHER_FROM || progress >= SCATTER_BY) return 0;
   if (progress >= HOLD_FROM && progress <= HOLD_UNTIL) return 1;
@@ -249,8 +257,11 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
       scrollTrigger: {
         trigger: this.root.nativeElement,
         start: 'top top',
-        end: () =>
-          `+=${window.innerHeight * VH_PER_PLANET * (this.planets.length + EXTRA_BEATS)}`,
+        end: () => {
+          const perPlanet =
+            window.innerWidth <= 768 ? VH_PER_PLANET_NARROW : VH_PER_PLANET;
+          return `+=${window.innerHeight * perPlanet * (this.planets.length + EXTRA_BEATS)}`;
+        },
         pin: true,
         // Anticipates the pin on fast scrolls; without it the section can
         // visibly jump at high scroll velocity.

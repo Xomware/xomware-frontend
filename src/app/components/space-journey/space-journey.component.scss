@@ -189,6 +189,16 @@
   padding: $spacing-xl;
   opacity: 0;
   pointer-events: none;
+  // The mark assembles directly behind this copy, and 620 stars behind text is
+  // a legibility problem however dim they are. This pools darkness where the
+  // words sit and falls away well before the edges, so the X's arms still read
+  // around it rather than the whole thing being flattened by a flat overlay.
+  background: radial-gradient(
+    ellipse 62% 48% at 50% 50%,
+    rgba(10, 10, 20, 0.88) 0%,
+    rgba(10, 10, 20, 0.72) 40%,
+    rgba(10, 10, 20, 0) 76%
+  );
 }
 
 .brief__eyebrow {
@@ -203,6 +213,7 @@
 
 .brief__title {
   margin: 0;
+  text-shadow: 0 2px 18px rgba(5, 5, 12, 0.9);
   font-family: $font-display;
   font-size: clamp(1.9rem, 5.5vw, 3.5rem);
   font-weight: $font-weight-bold;
@@ -212,6 +223,7 @@
 }
 
 .brief__copy {
+  text-shadow: 0 1px 12px rgba(5, 5, 12, 0.9);
   max-width: 36rem;
   margin: $spacing-lg 0 0;
   font-size: $text-md;
