@@ -100,10 +100,12 @@
   display: flex;
   gap: 0.06em;
   margin: 0;
+  font-family: $font-display;
   // Big display type without leaving the scale: clamp() is the one escape
   // hatch stylelint allows for font-size.
   font-size: clamp(2.75rem, 12vw, 8rem);
-  font-weight: $font-weight-extrabold;
+  // Space Grotesk tops out at 700 — 800 would be synthesised.
+  font-weight: $font-weight-bold;
   letter-spacing: $tracking-tight;
   line-height: 1;
   color: $text-primary;
@@ -168,6 +170,103 @@
 
   50% {
     transform: translateY(4px);
+  }
+}
+
+// ── Act I½ — the brief ───────────────────────────
+.journey__brief {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: $spacing-xl;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.brief__eyebrow {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wider;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  color: $brand-cyan;
+  margin: 0 0 $spacing-lg;
+}
+
+.brief__title {
+  margin: 0;
+  font-family: $font-display;
+  font-size: clamp(1.9rem, 5.5vw, 3.5rem);
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-tight;
+  line-height: 1.1;
+  color: $text-primary;
+}
+
+.brief__copy {
+  max-width: 36rem;
+  margin: $spacing-lg 0 0;
+  font-size: $text-md;
+  line-height: 1.65;
+  color: $text-secondary;
+}
+
+.brief__disciplines {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $spacing-md;
+  margin: $spacing-2xl 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brief__discipline {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 8.5rem;
+  padding: $spacing-md $spacing-lg;
+  border: 1px solid $glass-border;
+  border-radius: $radius-lg;
+  background: rgba(10, 10, 20, 0.45);
+  backdrop-filter: blur(8px);
+}
+
+.brief__discipline-label {
+  font-family: $font-display;
+  font-size: $text-base;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-tight;
+  color: $text-primary;
+}
+
+.brief__discipline-detail {
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+@media (max-width: $breakpoint-md) {
+  .brief__copy {
+    font-size: $text-sm;
+  }
+
+  .brief__disciplines {
+    gap: $spacing-sm;
+    margin-top: $spacing-xl;
+  }
+
+  .brief__discipline {
+    min-width: 0;
+    flex: 1 1 8rem;
+    padding: $spacing-sm $spacing-md;
   }
 }
 
@@ -296,6 +395,7 @@
 }
 
 .planet__name {
+  font-family: $font-display;
   font-size: $text-2xl;
   font-weight: $font-weight-bold;
   letter-spacing: $tracking-tight;
@@ -376,8 +476,9 @@
 
 .arrival__title {
   margin: 0;
+  font-family: $font-display;
   font-size: clamp(2rem, 6vw, 3.5rem);
-  font-weight: $font-weight-extrabold;
+  font-weight: $font-weight-bold;
   letter-spacing: $tracking-tight;
   color: $text-primary;
 }
@@ -517,6 +618,7 @@
   }
 
   .focus__name {
+    font-family: $font-display;
     font-size: $text-xl;
     font-weight: $font-weight-bold;
     letter-spacing: $tracking-tight;

@@ -45,6 +45,14 @@ $hero-gradient-alt: radial-gradient(ellipse at 80% 20%, rgba(156, 10, 191, 0.08)
 // ── Typography (app-specific font stacks) ────────
 $font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 $font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+// Display face — wordmark, section titles, app names. Body copy stays on Inter;
+// Space Grotesk has real character in its letterforms, which reads well large
+// and gets noisy at paragraph sizes.
+//
+// NOTE: index.html loads Space Grotesk at wght@500;600;700. There is no 800 in
+// the family — requesting $font-weight-extrabold with this stack produces
+// synthetic faux-bold, the same way Inter did at 900.
+$font-display: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 // NOTE: index.html loads Inter at wght@400;500;600;700;800.
 // There is no 900 — requesting it produces synthetic faux-bold.
 // $font-weight-* live in _tokens.scss; do not add a 900 without also adding

@@ -1,0 +1,73 @@
+<section
+  class="orbit"
+  aria-label="The Xomware suite"
+  (mouseenter)="hold()"
+  (mouseleave)="release()"
+>
+  <div class="orbit__stage" #stage>
+    <!-- Ring the bodies travel along. Decorative — the ellipse is implied by
+         the motion, this just makes it legible when everything is still. -->
+    <div class="orbit__ring" aria-hidden="true"></div>
+
+    <!-- The centre of the system. -->
+    <div class="orbit__core" aria-hidden="true">
+      <img src="assets/img/xomware-icon.webp" alt="" class="orbit__core-mark" />
+    </div>
+
+    <a
+      class="orbit__body"
+      *ngFor="let app of apps; let i = index"
+      #body
+      [href]="app.url"
+      target="_blank"
+      rel="noopener"
+      [style.--app-color]="app.color"
+      [style.--app-rgb]="app.colorRgb"
+      [attr.aria-label]="app.name + ' — ' + app.description"
+      (focus)="select(i)"
+      (mouseenter)="select(i)"
+    >
+      <img class="orbit__icon" [src]="app.icon" [alt]="app.name + ' logo'" loading="lazy" />
+      <span class="orbit__body-name">{{ app.name }}</span>
+    </a>
+  </div>
+
+  <!-- Details for whichever product is at the front. -->
+  <div class="orbit__panel" [style.--app-color]="focused.color" [style.--app-rgb]="focused.colorRgb">
+    <div class="orbit__meta">
+      <span
+        class="orbit__status"
+        [class.is-live]="focused.status === 'live'"
+        [class.is-soon]="focused.status === 'coming-soon'"
+        >{{ focused.status === 'live' ? 'Live' : 'Coming Soon' }}</span
+      >
+      <span class="orbit__platform" *ngFor="let p of focused.platforms">{{ p }}</span>
+    </div>
+
+    <!-- aria-live so the panel swapping under an auto-advancing orbit is
+         announced rather than silently changing. -->
+    <h2 class="orbit__name" aria-live="polite">{{ focused.name }}</h2>
+    <p class="orbit__description">{{ focused.description }}</p>
+
+    <a class="orbit__cta" [href]="focused.url" target="_blank" rel="noopener">
+      Open {{ focused.name }}
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor" />
+      </svg>
+    </a>
+
+    <div class="orbit__controls">
+      <button type="button" class="orbit__step" (click)="step_(-1)" aria-label="Previous app">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M14 6l1.41 1.41L10.83 12l4.58 4.59L14 18l-6-6z" fill="currentColor" />
+        </svg>
+      </button>
+      <span class="orbit__count">{{ focusedIndex + 1 }} / {{ apps.length }}</span>
+      <button type="button" class="orbit__step" (click)="step_(1)" aria-label="Next app">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</section>

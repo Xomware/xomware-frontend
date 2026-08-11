@@ -24,6 +24,36 @@
     </p>
   </div>
 
+  <!-- Act I½ — the brief. Without this the flight showed a wordmark and then
+       jumped straight to logos, so a visitor never learned what any of it is. -->
+  <div class="journey__brief" #brief>
+    <p class="brief__eyebrow">// What this is</p>
+    <h2 class="brief__title">Built end to end,<br />by one engineer.</h2>
+    <p class="brief__copy">
+      I'm Dominick — a senior software engineer. Xomware is where I design,
+      build and ship my own products: {{ planets.length }} of them so far,
+      across web and iOS, running on infrastructure I manage myself.
+    </p>
+    <ul class="brief__disciplines">
+      <li class="brief__discipline">
+        <span class="brief__discipline-label">Web</span>
+        <span class="brief__discipline-detail">Angular · TypeScript</span>
+      </li>
+      <li class="brief__discipline">
+        <span class="brief__discipline-label">iOS</span>
+        <span class="brief__discipline-detail">Swift · SwiftUI</span>
+      </li>
+      <li class="brief__discipline">
+        <span class="brief__discipline-label">Backend</span>
+        <span class="brief__discipline-detail">Python · Node</span>
+      </li>
+      <li class="brief__discipline">
+        <span class="brief__discipline-label">Infra</span>
+        <span class="brief__discipline-detail">AWS · Terraform</span>
+      </li>
+    </ul>
+  </div>
+
   <!-- Act II — the travel rail -->
   <div class="journey__rail" #rail>
     <a
@@ -44,7 +74,7 @@
         <span class="planet__disc">
           <img
             class="planet__mark"
-            [src]="p.logo"
+            [src]="p.icon"
             [alt]="p.name + ' logo'"
             loading="lazy"
             decoding="async"
