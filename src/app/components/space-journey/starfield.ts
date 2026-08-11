@@ -83,6 +83,21 @@ const ASTEROID_COUNT = 7;
 const METEOR_INTERVAL = 2.4;
 const MAX_METEORS = 3;
 
+/** How the field is configured for a given surface. */
+export interface StarfieldOptions {
+  /** false freezes meteors and asteroid tumble, for reproducible screenshots. */
+  animateScene?: boolean;
+  starCount?: number;
+  /** Shooting stars. */
+  meteors?: boolean;
+  /** Tumbling rocks. */
+  asteroids?: boolean;
+  /** Whether stars are reserved to assemble the Xomware mark. */
+  mark?: boolean;
+  /** Self-propelled drift per frame, for surfaces not driven by scroll. */
+  drift?: number;
+}
+
 /** Half-extent of the assembled mark, as a fraction of the smaller viewport side. */
 const X_SPAN = 0.42;
 
@@ -131,18 +146,25 @@ export class Starfield {
   private formation = 0;
   private renderedFormation = 0;
 
-  /**
-   * @param animateScene false freezes shooting stars and asteroid tumble, so
-   *   the scene is reproducible for the visual-regression suite.
-   */
-  constructor(
-    private canvas: HTMLCanvasElement,
-    private animateScene = true,
-    starCount = BASE_STAR_COUNT,
-  ) {
+  private readonly opts: Required<StarfieldOptions>;
+
+  constructor(private canvas: HTMLCanvasElement, options: StarfieldOptions = {}) {
+    this.opts = {
+      animateScene: true,
+      starCount: BASE_STAR_COUNT,
+      meteors: true,
+      asteroids: true,
+      mark: true,
+      drift: 0,
+      ...options,
+    };
     this.ctx = canvas.getContext('2d');
-    this.seed(starCount);
+    this.seed(this.opts.starCount);
     this.buildSprites();
+  }
+
+  private get animateScene(): boolean {
+    return this.opts.animateScene;
   }
 
   private seed(count: number): void {
@@ -169,8 +191,8 @@ export class Starfield {
       }
     });
 
-    this.assignMark(rand);
-    this.seedAsteroids(rand);
+    if (this.opts.mark) this.assignMark(rand);
+    if (this.opts.asteroids) this.seedAsteroids(rand);
     // Kept for meteor spawning, which needs randomness past construction.
     this.rand = rand;
   }
@@ -340,6 +362,8 @@ export class Starfield {
 
   private tick = (): void => {
     if (!this.running) return;
+    // A backdrop has no scroll driving it, so it advances itself.
+    if (this.opts.drift) this.progress += this.opts.drift;
     this.renderedProgress += (this.progress - this.renderedProgress) * 0.08;
     this.renderedFormation += (this.formation - this.renderedFormation) * 0.055;
     this.time += 0.016;
@@ -356,7 +380,7 @@ export class Starfield {
       rock.angle += rock.spin * 0.01;
     }
 
-    if (this.time >= this.nextMeteorAt && this.meteors.length < MAX_METEORS) {
+    if (this.opts.meteors && this.time >= this.nextMeteorAt && this.meteors.length < MAX_METEORS) {
       this.spawnMeteor();
       // Jittered so they never fall into a visible rhythm.
       this.nextMeteorAt = this.time + METEOR_INTERVAL + this.rand() * 3.4;

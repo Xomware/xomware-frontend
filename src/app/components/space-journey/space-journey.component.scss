@@ -35,7 +35,10 @@
   background:
     radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0, 180, 216, 0.1) 0%, transparent 60%),
     radial-gradient(ellipse 60% 50% at 85% 100%, rgba(156, 10, 191, 0.08) 0%, transparent 55%),
-    #05050c;
+    // Matches the page background exactly. At #05050c the flight ended on a
+    // visible tonal step against the rest of the page, which reads as a seam
+    // now that the sky continues underneath it.
+    $bg-dark;
 }
 
 .journey__field {
@@ -65,10 +68,10 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(5, 5, 12, 0.75) 0%,
-    rgba(5, 5, 12, 0) 28%,
-    rgba(5, 5, 12, 0) 68%,
-    rgba(5, 5, 12, 0.85) 100%
+    rgba(10, 10, 20, 0.75) 0%,
+    rgba(10, 10, 20, 0) 28%,
+    rgba(10, 10, 20, 0) 68%,
+    rgba(10, 10, 20, 0.85) 100%
   );
 }
 

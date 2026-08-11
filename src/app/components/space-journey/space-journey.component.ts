@@ -188,7 +188,9 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
     // staticScene freezes the shooting stars and asteroid tumble. Only the
     // visual-regression build sets it: a meteor that may or may not be in
     // flight when the screenshot lands would break the suite every other run.
-    const field = new Starfield(this.canvasRef.nativeElement, !environment.staticScene);
+    const field = new Starfield(this.canvasRef.nativeElement, {
+      animateScene: !environment.staticScene,
+    });
     this.starfield = field;
     field.resize();
 
