@@ -17,7 +17,15 @@ const OUT = 'src/app/components/space-journey/x-points.ts';
 /** Sampling grid. Higher = finer detail in the stroke edges. */
 const GRID = 132;
 /** How many stars end up in the mark. */
-const TARGET_POINTS = 460;
+const TARGET_POINTS = 620;
+/**
+ * Share of points placed on the stroke edges rather than the interior.
+ *
+ * An evenly-filled cloud reads as a smudge at low brightness. Concentrating
+ * points on the boundary gives the silhouette a crisp edge, so the mark stays
+ * unmistakably the X even when the stars are dim.
+ */
+const EDGE_SHARE = 0.62;
 /** Alpha above which a pixel counts as part of the mark. */
 const ALPHA_CUTOFF = 130;
 
@@ -34,33 +42,52 @@ function mulberry32(seed) {
 }
 
 // `txt:` gives one line per pixel; the alpha channel becomes grey levels.
-const raw = execFileSync(
-  'magick',
-  [SOURCE, '-alpha', 'extract', '-resize', `${GRID}x${GRID}!`, '-depth', '8', 'txt:-'],
-  { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
-);
-
-const filled = [];
-for (const line of raw.split('\n')) {
-  // e.g. "12,34: (255,255,255)  #FFFFFF  gray(255)"
-  const m = /^(\d+),(\d+):\s*\((\d+)/.exec(line);
-  if (!m) continue;
-  const value = Number(m[3]);
-  if (value < ALPHA_CUTOFF) continue;
-  filled.push([Number(m[1]), Number(m[2])]);
+function sample(args) {
+  const raw = execFileSync('magick', args, {
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  const out = [];
+  for (const line of raw.split('\n')) {
+    // e.g. "12,34: (255,255,255)  #FFFFFF  gray(255)"
+    const m = /^(\d+),(\d+):\s*\((\d+)/.exec(line);
+    if (!m) continue;
+    if (Number(m[3]) < ALPHA_CUTOFF) continue;
+    out.push([Number(m[1]), Number(m[2])]);
+  }
+  return out;
 }
 
+const base = [SOURCE, '-alpha', 'extract', '-resize', `${GRID}x${GRID}!`, '-threshold', '50%'];
+const filled = sample([...base, '-depth', '8', 'txt:-']);
+// EdgeOut leaves just the boundary band of the strokes.
+const edges = sample([...base, '-morphology', 'EdgeOut', 'Octagon:1', '-depth', '8', 'txt:-']);
+
 if (!filled.length) throw new Error('No opaque pixels found — check SOURCE/ALPHA_CUTOFF');
+if (!edges.length) throw new Error('No edge pixels found — check the morphology step');
+
+const edgeKeys = new Set(edges.map(([x, y]) => `${x},${y}`));
+const interior = filled.filter(([x, y]) => !edgeKeys.has(`${x},${y}`));
 
 // Even sampling across the whole mark, rather than the first N in raster
 // order, so both strokes are covered evenly.
 const rand = mulberry32(0x584f4d58);
-const picked = [];
-const pool = [...filled];
-const count = Math.min(TARGET_POINTS, pool.length);
-for (let i = 0; i < count; i++) {
-  picked.push(pool.splice(Math.floor(rand() * pool.length), 1)[0]);
+
+function take(source, n) {
+  const pool = [...source];
+  const out = [];
+  const count = Math.min(n, pool.length);
+  for (let i = 0; i < count; i++) {
+    out.push(pool.splice(Math.floor(rand() * pool.length), 1)[0]);
+  }
+  return out;
 }
+
+const edgeCount = Math.round(TARGET_POINTS * EDGE_SHARE);
+const picked = [
+  ...take(edges, edgeCount),
+  ...take(interior, TARGET_POINTS - edgeCount),
+];
 
 // Normalise to -1..1 about the mark's own centre, so the constellation is
 // centred on the artwork rather than on the (padded) canvas.
@@ -91,7 +118,8 @@ writeFileSync(
  *   node scripts/generate-x-points.mjs
  *
  * Coordinates are -1..1 about the centre of the artwork, y pointing down.
- * ${points.length} points sampled from ${filled.length} opaque pixels on a ${GRID}x${GRID} grid.
+ * ${points.length} points on a ${GRID}x${GRID} grid, ${Math.round(EDGE_SHARE * 100)}% of them on the
+ * stroke edges so the silhouette stays crisp when the stars are dim.
  */
 export const X_POINTS: ReadonlyArray<readonly [number, number]> = [
 ${body}
@@ -99,4 +127,7 @@ ${body}
 `,
 );
 
-console.log(`Wrote ${points.length} points to ${OUT} (from ${filled.length} opaque pixels)`);
+console.log(
+  `Wrote ${points.length} points to ${OUT} ` +
+    `(${edges.length} edge / ${interior.length} interior pixels available)`,
+);

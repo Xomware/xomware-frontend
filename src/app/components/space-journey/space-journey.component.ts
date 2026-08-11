@@ -21,8 +21,8 @@ gsap.registerPlugin(ScrollTrigger);
  * panel resolves.
  */
 const INTRO_END = 0.08;
-/** The mark owns the screen alone between the intro and the brief. */
-const BRIEF_START = 0.26;
+/** The brief rises while the mark is still assembling behind it. */
+const BRIEF_START = 0.12;
 /** The brief holds here, then clears — travel starts at BRIEF_END. */
 const BRIEF_END = 0.44;
 const TRAVEL_END = 0.88;
@@ -43,15 +43,15 @@ const SKIP_KEY = 'xomware:journey-skipped';
  *
  * It gathers as the wordmark clears, holds behind the brief, then scatters
  * again as the flight begins — so the mark is a beat you pass through rather
- * than decoration parked on screen. Deliberately behind the brief copy: the
- * stars are faint enough to read as sky, and the alternative (peaking under
- * the wordmark) put two versions of the logo on screen at once.
+ * than decoration parked on screen. It sits behind the brief on purpose: the
+ * stars are dim enough to read as sky, and the shape carries on the crispness
+ * of its outline rather than on brightness.
  */
 export function constellationStrength(progress: number): number {
-  const GATHER_FROM = 0.04;
-  const HOLD_FROM = 0.11;
-  const HOLD_UNTIL = 0.19;
-  const SCATTER_BY = 0.25;
+  const GATHER_FROM = 0.05;
+  const HOLD_FROM = 0.17;
+  const HOLD_UNTIL = 0.34;
+  const SCATTER_BY = 0.42;
 
   if (progress <= GATHER_FROM || progress >= SCATTER_BY) return 0;
   if (progress >= HOLD_FROM && progress <= HOLD_UNTIL) return 1;

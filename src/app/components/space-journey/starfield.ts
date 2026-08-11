@@ -260,9 +260,12 @@ export class Starfield {
       // back. Brightening the mark alone wasn't enough — against a full field
       // the shape stayed lost in the noise.
       const isMark = star.tx !== null;
-      const recede = isMark ? 1 : 1 - form * 0.72;
-      const alpha = Math.min(1, star.alpha * twinkle * recede + assembled * 0.85);
-      const size = star.size + assembled * 1.5;
+      const recede = isMark ? 1 : 1 - form * 0.62;
+      // Deliberately restrained. The mark reads from the crisp edge of its
+      // silhouette (62% of its points sit on the stroke boundary), not from
+      // being bright — blown out it looked like a graphic pasted on the sky.
+      const alpha = Math.min(0.92, star.alpha * twinkle * recede + assembled * 0.4);
+      const size = star.size + assembled * 0.75;
 
       if (star.luminous && this.glow) {
         const halo = (star.size + 1.5 + assembled * 2) * 7;

@@ -35,17 +35,14 @@
   color: $text-primary;
 }
 
-.nav-logo {
-  width: 32px;
-  height: 32px;
+// The brand's own painted lettering, rather than an icon plus typeset text.
+// Height-constrained so it can't push --nav-h (57px) out of step with the
+// sticky-stack offsets that depend on it.
+.nav-brandmark {
+  height: 30px;
+  width: auto;
   object-fit: contain;
-}
-
-.nav-wordmark {
-  font-weight: $font-weight-bold;
-  font-size: $text-base;
-  letter-spacing: $tracking-wider;
-  color: $text-primary;
+  display: block;
 }
 
 .nav-links {
