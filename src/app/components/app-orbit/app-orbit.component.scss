@@ -1,0 +1,298 @@
+@import 'styles/variables';
+
+// ─────────────────────────────────────────────────────────────
+// Orbital app directory.
+//
+// Same reasoning as the landing journey: light inside the system is diegetic
+// (a body is lit, so it has a rim), while the chrome around it — buttons,
+// pills, counters — stays flat per the house no-coloured-glow rule.
+// ─────────────────────────────────────────────────────────────
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.orbit {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-md $spacing-xl $spacing-3xl;
+}
+
+.orbit__stage {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  height: 360px;
+}
+
+.orbit__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 72%;
+  height: 60%;
+  transform: translate(-50%, -50%);
+  border: 1px dashed rgba(255, 255, 255, 0.07);
+  border-radius: 50%;
+}
+
+.orbit__core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, rgba(0, 180, 216, 0.22), transparent 65%),
+    rgba(10, 10, 20, 0.9);
+  border: 1px solid rgba(0, 180, 216, 0.25);
+}
+
+.orbit__core-mark {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
+// ── Orbiting bodies ──────────────────────────────
+.orbit__body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+  width: 116px;
+  text-decoration: none;
+  // Transform, opacity and z-index are all written from the component on each
+  // frame of the swing — do not add a CSS transition for them or it will
+  // fight the tween.
+  will-change: transform, opacity;
+
+  &:focus-visible {
+    outline: none;
+
+    .orbit__icon {
+      outline: 2px solid $brand-cyan;
+      outline-offset: 6px;
+    }
+  }
+}
+
+// Visually hidden: the accessible name lives on the link's aria-label, and a
+// caption here would repeat the panel heading immediately below it.
+.orbit__body-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.orbit__icon {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  border-radius: 50%;
+  padding: 10px;
+  background: radial-gradient(circle at 34% 28%, rgba(var(--app-rgb), 0.3) 0%, transparent 60%),
+    linear-gradient(150deg, rgba(26, 26, 46, 0.95), rgba(8, 8, 18, 0.98));
+  border: 1px solid rgba(var(--app-rgb), 0.22);
+  transition:
+    border-color $transition-base,
+    box-shadow $transition-base;
+}
+
+// The body currently at the front of the ring.
+.orbit__body.is-front {
+  .orbit__icon {
+    border-color: rgba(var(--app-rgb), 0.6);
+    box-shadow:
+      inset 0 0 30px rgba(var(--app-rgb), 0.18),
+      0 0 50px rgba(var(--app-rgb), 0.2);
+  }
+
+}
+
+// ── Detail panel ─────────────────────────────────
+.orbit__panel {
+  position: relative;
+  z-index: 200;
+  max-width: 34rem;
+  // Pulled up into the ring so the whole system — orbit plus readout — sits
+  // within one screen. Not further: the front body hangs below the ellipse,
+  // and at -48px the status pills sat underneath it.
+  margin-top: -$spacing-md;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.orbit__meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.orbit__status,
+.orbit__platform {
+  font-size: $text-3xs;
+  letter-spacing: $tracking-wide;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: $radius-pill;
+  border: 1px solid $glass-border;
+  color: $text-secondary;
+}
+
+.orbit__status {
+  &.is-live {
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.35);
+  }
+
+  &.is-soon {
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.35);
+  }
+}
+
+.orbit__name {
+  margin: 0;
+  font-family: $font-display;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-tight;
+  color: $text-primary;
+}
+
+.orbit__description {
+  margin: 0;
+  font-size: $text-base;
+  line-height: 1.6;
+  color: $text-secondary;
+  // Holds the panel height steady across products so the controls below it
+  // don't jump as the orbit advances.
+  min-height: 3.2em;
+}
+
+.orbit__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: $spacing-xs;
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wide;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--app-color);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+.orbit__controls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+}
+
+.orbit__step {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid $glass-border;
+  background: rgba(10, 10, 20, 0.6);
+  color: $text-secondary;
+  cursor: pointer;
+  transition:
+    color $transition-fast,
+    border-color $transition-fast;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      color: $text-primary;
+      border-color: $glass-border-hover;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+  }
+}
+
+.orbit__count {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  letter-spacing: $tracking-wide;
+  color: $text-muted;
+  min-width: 3.5rem;
+}
+
+// ── Responsive ───────────────────────────────────
+@media (max-width: $breakpoint-md) {
+  .orbit {
+    padding: $spacing-xl $spacing-md $spacing-2xl;
+  }
+
+  .orbit__stage {
+    height: 260px;
+  }
+
+  .orbit__body {
+    width: 84px;
+  }
+
+  .orbit__icon {
+    width: 60px;
+    height: 60px;
+    padding: 7px;
+  }
+
+  .orbit__core {
+    width: 64px;
+    height: 64px;
+  }
+
+  .orbit__core-mark {
+    width: 32px;
+    height: 32px;
+  }
+
+  .orbit__description {
+    font-size: $text-sm;
+  }
+}

@@ -49,8 +49,9 @@
 }
 
 .profile-name {
+  font-family: $font-display;
   font-size: clamp(1.9rem, 4.5vw, 3rem);
-  font-weight: $font-weight-extrabold;
+  font-weight: $font-weight-bold;
   color: $text-primary;
   margin-bottom: $spacing-sm;
   letter-spacing: $tracking-tight;

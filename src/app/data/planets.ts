@@ -13,7 +13,8 @@ export interface Planet {
   color: string;
   colorRgb: string;
   url: string;
-  logo: string;
+  /** Square mark — a planet is a circle, so the banner lockup can't be used. */
+  icon: string;
   status: 'live' | 'coming-soon';
   /** Human labels for every platform the product ships on, e.g. ['Web', 'iOS']. */
   platforms: string[];
@@ -99,7 +100,7 @@ function buildPlanets(): Planet[] {
       color: primary.color,
       colorRgb: primary.colorRgb,
       url: primary.url,
-      logo: primary.logo,
+      icon: primary.icon,
       // Live on any platform means the product is live and reachable.
       status: rows.some((r) => r.status === 'live') ? 'live' : 'coming-soon',
       platforms: [...new Set(rows.map((r) => PLATFORM_LABEL[r.platform]))],

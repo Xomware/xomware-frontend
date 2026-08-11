@@ -20,13 +20,46 @@ gsap.registerPlugin(ScrollTrigger);
  * the intro clears, the camera travels past the planets, then the arrival
  * panel resolves.
  */
-const INTRO_END = 0.12;
-const TRAVEL_END = 0.86;
+const INTRO_END = 0.1;
+/** The brief holds here, then clears — travel starts at BRIEF_END. */
+const BRIEF_END = 0.3;
+const TRAVEL_END = 0.88;
 
-/** Scroll distance of the pin, in viewport heights per planet. */
+/**
+ * Scroll distance of the pin, in viewport heights per planet.
+ *
+ * The `+ 4` buys room for the three non-planet beats (intro, brief, arrival)
+ * so adding them doesn't compress the flight itself.
+ */
 const VH_PER_PLANET = 0.85;
+const EXTRA_BEATS = 4;
 
 const SKIP_KEY = 'xomware:journey-skipped';
+
+/**
+ * How assembled the X constellation is at a given scroll progress, 0..1.
+ *
+ * It gathers as the wordmark clears, holds behind the brief, then scatters
+ * again as the flight begins — so the mark is a beat you pass through rather
+ * than decoration parked on screen. Deliberately behind the brief copy: the
+ * stars are faint enough to read as sky, and the alternative (peaking under
+ * the wordmark) put two versions of the logo on screen at once.
+ */
+export function constellationStrength(progress: number): number {
+  const GATHER_FROM = 0.04;
+  const HOLD_FROM = 0.13;
+  const HOLD_UNTIL = 0.26;
+  const SCATTER_BY = 0.36;
+
+  if (progress <= GATHER_FROM || progress >= SCATTER_BY) return 0;
+  if (progress >= HOLD_FROM && progress <= HOLD_UNTIL) return 1;
+
+  const ease = (t: number) => t * t * (3 - 2 * t); // smoothstep
+  if (progress < HOLD_FROM) {
+    return ease((progress - GATHER_FROM) / (HOLD_FROM - GATHER_FROM));
+  }
+  return ease(1 - (progress - HOLD_UNTIL) / (SCATTER_BY - HOLD_UNTIL));
+}
 
 /**
  * Whether the cinematic intro should mount at all.
@@ -65,6 +98,7 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('rail', { static: true }) rail!: ElementRef<HTMLElement>;
   @ViewChild('intro', { static: true }) intro!: ElementRef<HTMLElement>;
+  @ViewChild('brief', { static: true }) brief!: ElementRef<HTMLElement>;
   @ViewChild('arrival', { static: true }) arrival!: ElementRef<HTMLElement>;
   @ViewChild('focus', { static: true }) focus!: ElementRef<HTMLElement>;
   @ViewChildren('planetEl') planetEls!: QueryList<ElementRef<HTMLElement>>;
@@ -115,7 +149,7 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
     // Same measured fractions the highlight uses, so focus lands the planet
     // in the centre of the screen rather than merely somewhere nearby.
     const share = this.ensureFractions()[index] ?? 0;
-    const target = trigger.start + span * (INTRO_END + (TRAVEL_END - INTRO_END) * share);
+    const target = trigger.start + span * (BRIEF_END + (TRAVEL_END - BRIEF_END) * share);
 
     // Deferred a frame because the browser runs its own "scroll the focused
     // element into view" *after* this handler. That native scroll can't do
@@ -190,7 +224,8 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
       scrollTrigger: {
         trigger: this.root.nativeElement,
         start: 'top top',
-        end: () => `+=${window.innerHeight * VH_PER_PLANET * (this.planets.length + 2)}`,
+        end: () =>
+          `+=${window.innerHeight * VH_PER_PLANET * (this.planets.length + EXTRA_BEATS)}`,
         pin: true,
         // Anticipates the pin on fast scrolls; without it the section can
         // visibly jump at high scroll velocity.
@@ -202,6 +237,7 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
         onRefresh: () => (this.fractions = this.centreFractions(els)),
         onUpdate: (self) => {
           this.starfield?.setProgress(self.progress);
+          this.starfield?.setFormation(constellationStrength(self.progress));
           this.setActive(els, self.progress);
         },
       },
@@ -218,10 +254,23 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
         { opacity: 0, y: -60, ease: 'power2.in', duration: INTRO_END },
         0,
       )
+      // The brief rises, holds while the reader takes it in, then clears
+      // before the first planet arrives.
+      .fromTo(
+        this.brief.nativeElement,
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, ease: 'power2.out', duration: 0.06 },
+        INTRO_END,
+      )
+      .to(
+        this.brief.nativeElement,
+        { opacity: 0, y: -40, ease: 'power2.in', duration: 0.06 },
+        BRIEF_END - 0.06,
+      )
       .to(
         rail,
         {
-          duration: TRAVEL_END - INTRO_END,
+          duration: TRAVEL_END - BRIEF_END,
           // Measured from the last planet rather than the rail's scrollWidth:
           // the planets are max-width capped, so the padding-to-width ratio
           // shifts with viewport size and a scrollWidth-based travel would
@@ -230,7 +279,7 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
           x: () => -this.railTravel(els),
           ease: 'none',
         },
-        INTRO_END,
+        BRIEF_END,
       )
       // Keep flying once the last planet has been and gone, carrying the rail
       // a full viewport further so the planets exit stage left instead of
@@ -308,8 +357,8 @@ export class SpaceJourneyComponent implements AfterViewInit, OnDestroy {
    * this runs on every scrub frame, outside the Angular zone.
    */
   private setActive(els: HTMLElement[], progress: number): void {
-    const span = TRAVEL_END - INTRO_END;
-    const t = Math.min(Math.max((progress - INTRO_END) / span, 0), 1);
+    const span = TRAVEL_END - BRIEF_END;
+    const t = Math.min(Math.max((progress - BRIEF_END) / span, 0), 1);
 
     const fractions = this.ensureFractions();
     let index = 0;

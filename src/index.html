@@ -10,7 +10,15 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Inter carries body copy; Space Grotesk is the display face for the
+       wordmark, section titles and app names. Both in one request so there is
+       a single round trip. Space Grotesk has no 800 — the heaviest is 700, and
+       asking for more would synthesise faux-bold (same trap Inter's missing
+       900 caused). -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  >
 </head>
 <body>
   <app-root></app-root>

@@ -21,8 +21,10 @@
 }
 
 .section-title {
+  font-family: $font-display;
   font-size: clamp(1.5rem, 3vw, 2.2rem);
-  font-weight: $font-weight-extrabold;
+  // 700 is Space Grotesk's heaviest; 800 here would be synthesised.
+  font-weight: $font-weight-bold;
   color: $text-primary;
   margin-bottom: $spacing-sm;
   letter-spacing: $tracking-tight;
@@ -241,6 +243,7 @@
 }
 
 .card-name {
+  font-family: $font-display;
   font-size: $text-md;
   font-weight: $font-weight-bold;
   margin-bottom: $spacing-xs;
