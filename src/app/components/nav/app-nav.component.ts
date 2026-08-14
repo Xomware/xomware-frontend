@@ -100,6 +100,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
     { label: 'XomFit (iOS)', repo: 'Xomware/xomfit-ios' },
     { label: 'Float (iOS)', repo: 'Xomware/Float' },
     { label: 'Xom Appétit', repo: 'Xomware/xomappetit-frontend' },
+    { label: 'Today In Sports', repo: 'Xomware/today-in-sports-frontend' },
     { label: 'xomware.com', repo: 'Xomware/xomware-frontend' },
   ];
 

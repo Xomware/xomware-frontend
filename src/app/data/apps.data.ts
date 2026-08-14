@@ -11,9 +11,11 @@ export interface AppCard {
    */
   logo: string;
   /**
-   * Square icon mark, used wherever the art has to sit in a circle — the
-   * landing page planets and the /apps orbital system. Falls back to `logo`
-   * when an app has no square version.
+   * Square icon mark for the /apps orbital system, the one slot that masks its
+   * art to a circle (`.orbit__icon`, border-radius 50%). Art with an opaque
+   * square/squircle background gets corner-clipped into an octagon here, so a
+   * mark destined for this slot wants either a transparent background or a
+   * circular crop. The landing planets use `logo`, not this.
    */
   icon: string;
   tag: string;
@@ -140,6 +142,20 @@ export const APPS: AppCard[] = [
     url: 'https://xomforms.xomware.com',
     logo: 'assets/img/banners/xomforms.webp',
     icon: 'assets/img/apps/xomforms.webp',
+    logoStyle: 'banner',
+    tag: 'Web App',
+    status: 'live',
+    platform: 'web',
+  },
+  {
+    name: 'Today In Sports',
+    description:
+      "Daily sports history quiz. Five questions every day, anchored to what happened on today's date.",
+    color: '#f5a524',
+    colorRgb: '245, 165, 36',
+    url: 'https://todayinsports.app',
+    logo: 'assets/img/banners/today-in-sports.svg',
+    icon: 'assets/img/apps/today-in-sports.webp',
     logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
