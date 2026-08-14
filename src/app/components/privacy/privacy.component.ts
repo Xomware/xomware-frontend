@@ -6,5 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./privacy.component.scss'],
 })
 export class PrivacyComponent {
-  readonly lastUpdated = 'May 4, 2026';
+  // The policy's own "Changes" section promises this moves whenever the policy
+  // does. Bumped for the activity-logging disclosure.
+  readonly lastUpdated = 'August 14, 2026';
 }

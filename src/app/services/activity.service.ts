@@ -143,7 +143,40 @@ export class ActivityService {
     ]);
   }
 
+  /**
+   * Global Privacy Control and Do Not Track. A visitor who sets either has
+   * asked, in the only machine-readable way available to them, not to be
+   * tracked — so they are not, at all: no request, no visitor id, no row.
+   *
+   * This is what lets the site do first-party analytics without a consent
+   * banner in good conscience. Checked per-send rather than cached because a
+   * browser extension can flip it mid-session.
+   */
+  private get trackingRefused(): boolean {
+    if (typeof navigator === 'undefined') return false;
+    const nav = navigator as Navigator & {
+      globalPrivacyControl?: boolean;
+      doNotTrack?: string | null;
+      msDoNotTrack?: string | null;
+    };
+    if (nav.globalPrivacyControl === true) return true;
+    const dnt =
+      nav.doNotTrack ??
+      nav.msDoNotTrack ??
+      (typeof window !== 'undefined'
+        ? (window as Window & { doNotTrack?: string | null }).doNotTrack
+        : null);
+    return dnt === '1' || dnt === 'yes';
+  }
+
   private async send(events: ActivityEvent[]): Promise<void> {
+    if (this.trackingRefused) {
+      // Drop anything buffered too — the refusal applies retroactively within
+      // the session, not just to events raised after it was noticed.
+      this.pending = [];
+      return;
+    }
+
     if (!this.authResolved) {
       if (this.pending.length < ActivityService.MAX_PENDING) {
         this.pending.push(...events);
