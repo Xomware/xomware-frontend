@@ -26,6 +26,13 @@
         can see usage. Rows expire automatically after 90 days.
       </li>
       <li>
+        <strong>Pages you visit on xomware.com</strong> &mdash; the path (e.g. <code>/apps</code>), the time, which
+        app link you clicked through to, your browser's user-agent string, and any error the site hits while you
+        are using it. This is stored on Xomware's own servers, expires after 90 days, and is used only to see
+        which apps people are interested in and to find bugs. You do not need an account for this to be recorded
+        &mdash; see <a href="#tracking">Cookies and tracking</a> below, including how to turn it off.
+      </li>
+      <li>
         <strong>App-specific content you create</strong> &mdash; e.g. recipes you save in Xom App&eacute;tit, files
         you edit, or any other data you enter into a Xomware app.
       </li>
@@ -45,17 +52,34 @@
       authenticate you &mdash; we receive your email + display name + avatar URL and nothing else).
     </p>
 
-    <h2>Cookies and tracking</h2>
+    <h2 id="tracking">Cookies and tracking</h2>
     <p>
       Xomware uses session tokens issued by Cognito to keep you signed in. There is no third-party advertising,
-      no cross-site tracking, and no analytics that send your data outside Xomware.
+      no cross-site tracking, and no analytics product &mdash; no Google Analytics, no ad pixels, nothing that
+      sends your browsing to anyone else. The activity described above goes to Xomware's own servers and stays
+      there.
+    </p>
+    <p>
+      To count visitors without accounts, the site stores a random identifier in your browser's local storage.
+      It is a random string, it is not linked to anything about you, and it is only readable by
+      <code>xomware.com</code>. If you later sign in, that identifier is associated with your account so the
+      operator can see the visit that led to a sign-up as one session rather than two.
+    </p>
+    <p>
+      <strong>How to turn it off.</strong> If your browser sends
+      <a href="https://globalprivacycontrol.org/" rel="noopener">Global Privacy Control</a> or
+      &ldquo;Do Not Track&rdquo;, Xomware records nothing at all &mdash; no identifier is created and no request
+      is sent. Most privacy-focused browsers and extensions send one of these by default, and both are a setting
+      in your browser. Clearing your site data also removes the identifier.
     </p>
 
     <h2>Your rights</h2>
     <p>
       You can delete your account at any time from the profile page, which removes your row from the
       identity pool and your profile data from DynamoDB. App-specific content (recipes, etc.) is
-      removed as part of account deletion. To request a copy of your data or ask any other question, email
+      removed as part of account deletion. Activity rows are not deleted immediately &mdash; they expire on
+      their own within 90 days &mdash; but you can email to have them removed sooner.
+      To request a copy of your data or ask any other question, email
       <a href="mailto:dominickj.giordano&#64;gmail.com">dominickj.giordano&#64;gmail.com</a>.
     </p>
 

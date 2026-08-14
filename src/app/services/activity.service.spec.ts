@@ -191,6 +191,67 @@ describe('ActivityService', () => {
     });
   });
 
+  describe('privacy signals', () => {
+    const withSignal = (prop: string, value: unknown) => {
+      Object.defineProperty(navigator, prop, { value, configurable: true });
+    };
+    afterEach(() => {
+      for (const prop of ['globalPrivacyControl', 'doNotTrack']) {
+        if (prop in navigator) {
+          Object.defineProperty(navigator, prop, { value: undefined, configurable: true });
+        }
+      }
+    });
+
+    it('sends nothing at all when Global Privacy Control is set', async () => {
+      withSignal('globalPrivacyControl', true);
+      resolveAuth(false);
+      service.trackPageview('/');
+      service.trackOutbound('Xomify', 'https://xomify.xomware.com');
+      service.trackError('boom');
+      await flush();
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('sends nothing when Do Not Track is set', async () => {
+      withSignal('doNotTrack', '1');
+      resolveAuth(false);
+      service.trackPageview('/');
+      await flush();
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('never creates a visitor id for a visitor who refused', async () => {
+      withSignal('globalPrivacyControl', true);
+      resolveAuth(false);
+      service.trackPageview('/');
+      await flush();
+
+      expect(localStorage.getItem('xw_visitor_id')).toBeNull();
+    });
+
+    it('discards events buffered before the refusal was noticed', async () => {
+      // Buffered while auth was unresolved, then GPC turns up. The refusal
+      // applies to those too, not only to what comes after.
+      service.trackPageview('/');
+      withSignal('globalPrivacyControl', true);
+      resolveAuth(false);
+      await flush();
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('still tracks when no privacy signal is present', async () => {
+      resolveAuth(false);
+      service.trackPageview('/');
+      await flush();
+
+      expect(fetchSpy).toHaveBeenCalled();
+    });
+  });
+
   it('swallows transport failures rather than surfacing them', async () => {
     fetchSpy.and.returnValue(Promise.reject(new Error('offline')));
     resolveAuth(false);
