@@ -3,27 +3,54 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-export type AdminEventType = 'signin' | 'signup';
+/**
+ * `signin`/`signup` are written by the Cognito PostAuthentication trigger.
+ * The rest come from ActivityService via the public /events/track endpoint.
+ */
+export type AdminEventType =
+  | 'signin'
+  | 'signup'
+  | 'pageview'
+  | 'outbound'
+  | 'error';
 
 export interface AdminEvent {
   eventId: string;
   eventType: AdminEventType;
   eventTime: string;
   eventDate: string;
+  /** Cognito sub, or `anon:<visitorId>` for signed-out visitors. */
   userId: string;
-  email: string;
-  identityProvider: string;
-  appClientId: string;
+  email?: string;
+  identityProvider?: string;
+  appClientId?: string;
+  /** Stable per-browser id; survives sign-in so sessions can be stitched. */
+  visitorId?: string;
+  path?: string;
+  referrer?: string;
+  /** outbound only */
+  target?: string;
+  /** outbound only */
+  app?: string;
+  /** error only */
+  message?: string;
+  /** error only */
+  stack?: string;
+  userAgent?: string;
+  country?: string;
 }
 
 export interface EventsListRequest {
   date?: string;
+  /** Omit for every type that day; set to query the by-type index instead. */
+  eventType?: AdminEventType;
   limit?: number;
   cursor?: string;
 }
 
 export interface EventsListResponse {
   date: string;
+  eventType: AdminEventType | null;
   items: AdminEvent[];
   nextCursor?: string;
 }

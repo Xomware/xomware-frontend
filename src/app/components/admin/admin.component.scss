@@ -12,63 +12,21 @@
   font-family: $font-stack;
 }
 
-.admin-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: $spacing-sm $spacing-lg;
-  background: rgba($bg-card, 0.95);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.admin-header-left {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-}
-
-.admin-logo img {
-  width: 32px;
-  height: 32px;
-}
-
+// Page heading. The navbar is fixed, so the top padding clears it via --nav-h
+// the same way .apps-hero does.
 .admin-title {
-  font-size: $text-md;
-  font-weight: $font-weight-semibold;
+  max-width: 1100px;
+  margin: 0 auto $spacing-lg;
+  font-family: $font-display;
+  font-size: clamp(28px, 4vw, 38px);
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-tight;
   color: $text-primary;
-  white-space: nowrap;
-  margin: 0;
-}
-
-.admin-signout {
-  padding: $spacing-xs $spacing-md;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: $radius-md;
-  color: $text-muted;
-  font-size: $text-xs;
-  font-family: $font-stack;
-  cursor: pointer;
-  transition: all $transition-base;
-
-  &:hover {
-    border-color: rgba(255, 82, 82, 0.4);
-    color: #ff5252;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 2px;
-  }
 }
 
 .admin-content {
   flex: 1;
-  padding: $spacing-lg;
+  padding: calc(#{$spacing-lg} + var(--nav-h)) $spacing-lg $spacing-lg;
   overflow-y: auto;
 }
 
@@ -381,10 +339,116 @@
   border: 1px solid rgba(0, 255, 171, 0.3);
 }
 
+// Muted on purpose: pageviews are the highest-volume row by a wide margin,
+// so a bright pill would make the whole table read as alarming.
+.pill-pageview {
+  background: rgba(255, 255, 255, 0.05);
+  color: $text-muted;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.pill-outbound {
+  background: rgba(245, 165, 36, 0.08);
+  color: #f5a524;
+  border: 1px solid rgba(245, 165, 36, 0.3);
+}
+
+.pill-error {
+  background: rgba(255, 82, 82, 0.08);
+  color: #ff5252;
+  border: 1px solid rgba(255, 82, 82, 0.3);
+}
+
 .pill-cached {
   background: rgba(255, 255, 255, 0.05);
   color: $text-muted;
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// --- Errors ---
+.errors-card {
+  // Spans both columns: stacks read badly at half width once a message and a
+  // route are on the same row.
+  grid-column: 1 / -1;
+}
+
+.errors-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.error-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+  &:first-child {
+    border-top: none;
+  }
+}
+
+.error-summary {
+  display: grid;
+  grid-template-columns: 90px 1fr 200px;
+  gap: $spacing-sm;
+  align-items: baseline;
+  width: 100%;
+  padding: $spacing-sm 0;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  font-family: $font-stack;
+  font-size: $text-xs;
+  color: $text-primary;
+  cursor: pointer;
+
+  &:hover {
+    color: #ff5252;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: -2px;
+  }
+}
+
+.error-time {
+  color: $text-muted;
+  font-variant-numeric: tabular-nums;
+}
+
+.error-message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.error-path {
+  color: $text-muted;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.error-detail {
+  padding: 0 0 $spacing-sm;
+}
+
+.error-meta {
+  margin: 0 0 $spacing-xs;
+  font-size: $text-3xs;
+  color: $text-muted;
+}
+
+.error-stack {
+  margin: 0;
+  padding: $spacing-sm;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: $radius-md;
+  font-size: $text-3xs;
+  line-height: 1.5;
+  color: $text-muted;
+  // Stacks are long and must not stretch the grid column.
+  overflow-x: auto;
+  white-space: pre;
 }
 
 // --- Cost ---
@@ -453,11 +517,7 @@
 
 @media (max-width: $breakpoint-md) {
   .admin-content {
-    padding: $spacing-sm;
-  }
-
-  .admin-header {
-    padding: $spacing-sm;
+    padding: calc(#{$spacing-sm} + var(--nav-h)) $spacing-sm $spacing-sm;
   }
 
   .events-row {
