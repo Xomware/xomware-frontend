@@ -1,6 +1,6 @@
 # Plan: Today In Sports + Admin Portal Activity Logging
 
-**Status**: Executed (code complete, `terraform apply` not run — see EXECUTION_LOG.md)
+**Status**: Shipped 2026-08-14 — see EXECUTION_LOG.md
 **Created**: 2026-08-14
 **Last updated**: 2026-08-14
 **Repos**: `xomware-frontend`, `xomware-infrastructure`

@@ -166,40 +166,61 @@ spread it. Not worth doing now; worth knowing before it bites.
 | TIS card + planet + orbit | ✅ screenshotted |
 | Admin layout + Errors card | ✅ screenshotted with stubbed data |
 
-**`terraform apply` was NOT run.** Applying is the owner's call.
+---
+
+## Shipped
+
+| | |
+|---|---|
+| Infra | Xomware/xomware-infrastructure#51 → `856207f`, applied ✅ |
+| Frontend | Xomware/xomware-frontend#178 → `250b85c`, deployed ✅ |
+
+CI plan against live state matched local: **20 add / 3 change / 1 destroy**, the
+destroy being the API Gateway deployment replacement.
+
+### Verified against production, not assumed from the apply
+
+| Check | Result |
+|---|---|
+| `POST /events/track` anonymous | 204, row written as `anon:<visitorId>` |
+| Forged `signin` | **absent from the table** — rejected |
+| Spoofed body `userId` | ignored; written as `anon:smoke-spoof` |
+| Unknown origin | no CORS echo |
+| WAF on stage | `xomware-regional-waf-regional` attached |
+| Live site | TIS card + both assets load; 2 pageviews → 204 → rows in DynamoDB with a shared visitorId; no page errors |
+
+Smoke-test rows were deleted afterwards so the admin feed starts clean.
+
+**Gotcha for next time:** the first smoke test returned 403 on *every* route,
+which read as "the WAF association just broke the API". It had not — the custom
+domain had not finished propagating the new deployment. The execute-api URL
+returned 204 while `api.xomware.com` still 403'd, which isolated it. Note that
+`"Missing Authentication Token"` is API Gateway's response both for an unmatched
+route and for an auth-required one, so it does not distinguish the two.
+
+## Correction: the "Reese's would be destroyed" blocker was not real
+
+An earlier `terraform plan` showed `aws_cognito_user_pool_client.reeses will be
+destroyed`, and this log previously recorded that as a live drift between
+`master` and applied state, with a warning that #49 had to merge first.
+
+That was wrong. Remote `master` already contained the Reese's client — merged
+2026-08-05 as #50 (`84ce75f`). The **local** `master` was stale: `git fetch`
+updates `origin/master`, not the local branch, and the plan ran against the
+local one.
+
+The rebranch onto `feature/49-cognito-reeses-client` was harmless and the final
+plan was clean, but the hazard did not exist. **Pull before planning from a
+long-lived branch** — a stale local base makes Terraform propose deletions of
+things that are perfectly fine in production.
 
 ---
 
-## Blocker found during execution
+## Follow-ups (still open)
 
-**Planning from `master` wanted to destroy the live Reese's Cognito client.**
-
-The first `terraform plan` returned:
-
-```
-# aws_cognito_user_pool_client.reeses will be destroyed
-# aws_ssm_parameter.cognito_client_reeses_id will be destroyed
-#   (because ... is not in configuration)
-```
-
-`feature/49-cognito-reeses-client` is applied in live AWS but not merged to
-`master`. Any branch cut from `master` therefore plans to delete a resource that
-Reese's Playoff Challenge — just marked live — depends on.
-
-`feature/activity-logging` was rebranched off `feature/49-cognito-reeses-client`,
-which cleared both destroys. **Merge order matters: #49 must land before this.**
-The underlying problem is drift between `master` and applied state, and it will
-bite the next branch too.
-
----
-
-## Follow-ups (not done)
-
-- `terraform apply` — owner's call. Apply the WAF association **before** the
-  public route goes live.
 - **Cookie/consent decision.** `visitorId` in localStorage with no banner. Framed
   as first-party analytics; flagged, not decided.
-- Merge `feature/49-cognito-reeses-client`, or reconcile `master` with applied state.
-- **Frontend branch hygiene.** The changes sit uncommitted on `data/reeses-live`,
-  a branch about marking Reese's live. They want their own branch before commit.
 - Consider a composite `by-type` key if pageview volume ever grows (above).
+- Two pageview rows from the post-deploy verification remain in the table
+  (HeadlessChrome user agent, `/` and `/apps`). Genuine requests, left in place
+  rather than deleted; trivial to remove if they bother you.
