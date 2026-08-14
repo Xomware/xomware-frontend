@@ -365,6 +365,141 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+// --- Visitors ---
+.visitors-card {
+  // Full width: the summary row carries five columns and a journey below it.
+  grid-column: 1 / -1;
+}
+
+.visitors-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.visitor-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+  &:first-child {
+    border-top: none;
+  }
+}
+
+.visitor-summary {
+  display: grid;
+  grid-template-columns: 1fr 90px 130px auto 160px;
+  gap: $spacing-sm;
+  align-items: baseline;
+  width: 100%;
+  padding: $spacing-sm 0;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  font-family: $font-stack;
+  font-size: $text-xs;
+  color: $text-primary;
+  cursor: pointer;
+
+  &:hover {
+    color: $brand-cyan-light;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: -2px;
+  }
+}
+
+.visitor-who {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  // Anonymous visitors are the majority and the least interesting; a known
+  // email is what you actually scan for, so only that one gets full contrast.
+  color: $text-muted;
+
+  &.is-identified {
+    color: $text-primary;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.visitor-stat {
+  color: $text-muted;
+  font-variant-numeric: tabular-nums;
+}
+
+.visitor-errors {
+  color: #ff5252;
+}
+
+.visitor-time {
+  color: $text-muted;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.visitor-detail {
+  padding: 0 0 $spacing-sm;
+}
+
+.visitor-meta {
+  margin: 0 0 $spacing-xs;
+  font-size: $text-3xs;
+  text-transform: uppercase;
+  letter-spacing: $tracking-wide;
+  color: $text-muted;
+}
+
+.visitor-journey {
+  margin: 0 0 $spacing-sm;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+
+  li {
+    padding: 2px $spacing-sm;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: $radius-pill;
+    font-size: $text-3xs;
+    color: $text-muted;
+  }
+
+  // Arrows between steps make the order readable at a glance.
+  li + li::before {
+    content: '→ ';
+    opacity: 0.5;
+  }
+}
+
+.visitor-journey-empty {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.visitor-outbound {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+
+  li {
+    padding: 2px $spacing-sm;
+    background: rgba(245, 165, 36, 0.08);
+    border: 1px solid rgba(245, 165, 36, 0.3);
+    border-radius: $radius-pill;
+    font-size: $text-3xs;
+    color: #f5a524;
+  }
+}
+
 // --- Errors ---
 .errors-card {
   // Spans both columns: stacks read badly at half width once a message and a
@@ -518,6 +653,15 @@
 @media (max-width: $breakpoint-md) {
   .admin-content {
     padding: calc(#{$spacing-sm} + var(--nav-h)) $spacing-sm $spacing-sm;
+  }
+
+  // Drop to identity + recency; the counts are in the expanded detail.
+  .visitor-summary {
+    grid-template-columns: 1fr 110px;
+
+    .visitor-stat {
+      display: none;
+    }
   }
 
   .events-row {

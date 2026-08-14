@@ -31,6 +31,98 @@
     </section>
 
     <div class="admin-grid">
+      <!-- Visitors. Grouped by visitorId, which survives sign-in, so an
+           anonymous session that converts stays one row. -->
+      <section class="card visitors-card" aria-labelledby="visitors-heading">
+        <div class="card-header">
+          <div>
+            <h2 id="visitors-heading">Visitors</h2>
+            <p class="card-subtitle">
+              <ng-container *ngIf="visitors.length; else visitorsSubtitle">
+                {{ visitors.length }} unique · {{ identifiedCount }} signed in
+              </ng-container>
+              <ng-template #visitorsSubtitle>Who came, and where they went</ng-template>
+            </p>
+          </div>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="loadVisitors()"
+            [disabled]="visitorsLoading"
+          >
+            {{ visitorsLoading ? 'Loading…' : 'Refresh' }}
+          </button>
+        </div>
+
+        <div *ngIf="visitorsError" class="error-banner" role="alert">
+          <span>{{ visitorsError }}</span>
+          <button type="button" class="btn-link" (click)="loadVisitors()">Retry</button>
+        </div>
+
+        <div *ngIf="visitorsLoading && visitors.length === 0" class="loading-state">
+          Loading visitors…
+        </div>
+
+        <div
+          *ngIf="!visitorsLoading && visitors.length === 0 && !visitorsError"
+          class="empty-state"
+        >
+          No visitors recorded for {{ dateForm.value.date }}.
+        </div>
+
+        <div *ngIf="visitors.length > 0" class="visitors-list">
+          <div class="visitor-row" *ngFor="let v of visitors">
+            <button
+              type="button"
+              class="visitor-summary"
+              (click)="toggleVisitor(v.visitorId)"
+              [attr.aria-expanded]="expandedVisitor === v.visitorId"
+            >
+              <span class="visitor-who" [class.is-identified]="v.identified">
+                {{ v.identity }}
+                <span class="pill pill-signup" *ngIf="v.converted">converted</span>
+              </span>
+              <span class="visitor-stat">
+                {{ v.pageviews }} {{ v.pageviews === 1 ? 'view' : 'views' }}
+              </span>
+              <span class="visitor-stat">
+                {{ v.outbound.length }}
+                {{ v.outbound.length === 1 ? 'click-through' : 'click-throughs' }}
+              </span>
+              <span class="visitor-stat visitor-errors" *ngIf="v.errors">
+                {{ v.errors }} {{ v.errors === 1 ? 'error' : 'errors' }}
+              </span>
+              <span class="visitor-time">
+                {{ formatTime(v.lastSeen) }} · {{ formatSpan(v) }}
+              </span>
+            </button>
+
+            <div class="visitor-detail" *ngIf="expandedVisitor === v.visitorId">
+              <p class="visitor-meta">Journey</p>
+              <ol class="visitor-journey">
+                <li *ngFor="let step of v.journey">{{ step }}</li>
+                <li class="visitor-journey-empty" *ngIf="!v.journey.length">
+                  No pages recorded.
+                </li>
+              </ol>
+              <ng-container *ngIf="v.outbound.length">
+                <p class="visitor-meta">Left for</p>
+                <ul class="visitor-outbound">
+                  <li *ngFor="let o of v.outbound">{{ o.app }}</li>
+                </ul>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer" *ngIf="visitorsTruncated">
+          <p class="visitor-meta">
+            Showing the most recent 3,000 events for this day — older activity is
+            not included in these totals.
+          </p>
+        </div>
+      </section>
+
       <!-- Events card -->
       <section class="card events-card" aria-labelledby="events-heading">
         <div class="card-header">

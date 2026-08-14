@@ -14,6 +14,29 @@ interface EventFilter {
   value: AdminEventType | '';
 }
 
+/**
+ * One visitor's day, assembled from their events.
+ *
+ * Grouped by `visitorId` rather than `userId` on purpose: visitorId persists
+ * across sign-in, so someone who browses anonymously and then signs up is one
+ * visitor whose identity resolves partway through, not two separate rows.
+ */
+interface VisitorSession {
+  visitorId: string;
+  /** Email once known, otherwise a short anonymous tag. */
+  identity: string;
+  identified: boolean;
+  /** True when this visitor signed in or signed up during the day. */
+  converted: boolean;
+  firstSeen: string;
+  lastSeen: string;
+  pageviews: number;
+  /** Paths in the order visited, consecutive repeats collapsed. */
+  journey: string[];
+  outbound: { app: string; target: string }[];
+  errors: number;
+}
+
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
@@ -36,6 +59,12 @@ export class AdminComponent implements OnInit {
     { label: 'Sign-ins', value: 'signin' },
     { label: 'Sign-ups', value: 'signup' },
   ];
+
+  visitors: VisitorSession[] = [];
+  visitorsLoading = false;
+  visitorsError = '';
+  visitorsTruncated = false;
+  expandedVisitor: string | null = null;
 
   errors: AdminEvent[] = [];
   errorsCursor: string | undefined;
@@ -67,6 +96,7 @@ export class AdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadEvents();
+    this.loadVisitors();
     this.loadErrors();
     this.loadCost();
   }
@@ -130,6 +160,127 @@ export class AdminComponent implements OnInit {
       });
   }
 
+  /**
+   * Visitors needs the whole day, not the first page, so it walks the cursor.
+   * Bounded: at PAGE_LIMIT × MAX_PAGES the total stops growing and the card
+   * says so rather than quietly showing a partial day as if it were complete.
+   */
+  loadVisitors(): void {
+    const date = (this.dateForm.value.date as string) || this.todayIso();
+    this.visitorsLoading = true;
+    this.visitorsError = '';
+    this.visitors = [];
+    this.visitorsTruncated = false;
+    this.expandedVisitor = null;
+
+    const PAGE_LIMIT = 200;
+    const MAX_PAGES = 15;
+    const collected: AdminEvent[] = [];
+
+    const fetchPage = (cursor?: string, page = 1): void => {
+      this.admin.listEvents({ date, limit: PAGE_LIMIT, cursor }).subscribe({
+        next: (res: EventsListResponse) => {
+          collected.push(...res.items);
+          if (res.nextCursor && page < MAX_PAGES) {
+            fetchPage(res.nextCursor, page + 1);
+            return;
+          }
+          this.visitorsTruncated = !!res.nextCursor;
+          this.visitors = this.buildVisitors(collected);
+          this.visitorsLoading = false;
+        },
+        error: (err) => {
+          this.visitorsError = this.errorMessage(err, 'Failed to load visitors');
+          this.visitorsLoading = false;
+        },
+      });
+    };
+
+    fetchPage();
+  }
+
+  /** Fold a day of raw events into one row per visitor. */
+  private buildVisitors(events: AdminEvent[]): VisitorSession[] {
+    // Events arrive newest-first; the journey only reads correctly forwards.
+    const chronological = [...events].sort((a, b) =>
+      a.eventTime.localeCompare(b.eventTime),
+    );
+
+    const byVisitor = new Map<string, VisitorSession>();
+
+    for (const ev of chronological) {
+      // Pre-Visitors rows and the Cognito trigger's own rows have no
+      // visitorId; fall back to userId so they still appear.
+      const key = ev.visitorId || ev.userId;
+      if (!key) continue;
+
+      let v = byVisitor.get(key);
+      if (!v) {
+        v = {
+          visitorId: key,
+          identity: `anon · ${key.slice(0, 8)}`,
+          identified: false,
+          converted: false,
+          firstSeen: ev.eventTime,
+          lastSeen: ev.eventTime,
+          pageviews: 0,
+          journey: [],
+          outbound: [],
+          errors: 0,
+        };
+        byVisitor.set(key, v);
+      }
+
+      v.lastSeen = ev.eventTime;
+
+      // Identity can arrive on any event in the day — the sign-in row, or any
+      // row written after it. Once known it sticks.
+      if (!v.identified && ev.email) {
+        v.identity = ev.email;
+        v.identified = true;
+      }
+
+      switch (ev.eventType) {
+        case 'pageview':
+          v.pageviews += 1;
+          if (ev.path && v.journey[v.journey.length - 1] !== ev.path) {
+            v.journey.push(ev.path);
+          }
+          break;
+        case 'outbound':
+          v.outbound.push({ app: ev.app || '—', target: ev.target || '' });
+          break;
+        case 'error':
+          v.errors += 1;
+          break;
+        case 'signin':
+        case 'signup':
+          v.converted = true;
+          break;
+      }
+    }
+
+    // Most recently active first — that is the useful default when checking
+    // who is on the site right now.
+    return [...byVisitor.values()].sort((a, b) => b.lastSeen.localeCompare(a.lastSeen));
+  }
+
+  toggleVisitor(visitorId: string): void {
+    this.expandedVisitor = this.expandedVisitor === visitorId ? null : visitorId;
+  }
+
+  get identifiedCount(): number {
+    return this.visitors.filter((v) => v.identified).length;
+  }
+
+  formatSpan(v: VisitorSession): string {
+    const mins = Math.round(
+      (new Date(v.lastSeen).getTime() - new Date(v.firstSeen).getTime()) / 60000,
+    );
+    if (mins < 1) return '< 1 min';
+    return `${mins} min`;
+  }
+
   /** Errors get their own card — they are the one type you act on. */
   loadErrors(): void {
     const date = this.dateForm.value.date as string | null;
@@ -180,9 +331,10 @@ export class AdminComponent implements OnInit {
     this.expandedError = this.expandedError === eventId ? null : eventId;
   }
 
-  /** Both cards read the same date, so one submit reloads both. */
+  /** Every card reads the same date, so one submit reloads them all. */
   reload(): void {
     this.loadEvents();
+    this.loadVisitors();
     this.loadErrors();
   }
 
