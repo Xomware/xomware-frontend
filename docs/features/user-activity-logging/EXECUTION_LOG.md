@@ -216,6 +216,64 @@ things that are perfectly fine in production.
 
 ---
 
+## Phase 4 — Visitors view + the gating question ✅
+
+Added after the fact, from the question "should the landing page be gated so we
+can see who is coming?"
+
+### The landing page stayed public — deliberately
+
+Gating it would have worked against the stated goal. The activity log already
+identifies every visitor, and `visitorId` upgrades to a real Cognito identity on
+sign-in. A login wall means drive-by visitors bounce instead of signing up, so
+you would see *fewer* people, not more — trading a record of everyone for a
+record of only those motivated enough to make an account for a landing page.
+
+Two further costs: the `''` route is public specifically so Google can verify
+the home page renders without login for OAuth (see the comment above it), and
+xomware.com is the discovery surface for the whole app suite — gated, it is
+invisible to search.
+
+Confirmed against production with a clean browser context: no redirect, space
+journey renders, 18 planets, nav shows "Sign in". The pageview rows landing as
+`anon:` is independent proof, since the backend only writes that prefix when
+there are no verified claims.
+
+### Email confirmation was already built and enforced
+
+Checked rather than assumed:
+
+- `auto_verified_attributes = ["email"]` + `CONFIRM_WITH_CODE` — Cognito emails
+  a code on sign-up
+- sign-up routes to `/auth/verify`; verify calls `confirmSignUp` and can resend
+- `sign-in.component.ts:64` catches `CONFIRM_SIGN_UP` and redirects an
+  unconfirmed user to verify, preserving their `next` target
+
+Enforced server-side: Cognito will not issue tokens to an `UNCONFIRMED` user, so
+this is not merely a UI convention. **No work needed.**
+
+### Visitors card — Xomware/xomware-frontend#180 → `3749248`
+
+One row per visitor per day: identity, pageviews, click-throughs, errors, dwell
+time, and an expandable journey.
+
+Grouped by `visitorId`, **not** `userId` — the reason visitorId persists across
+sign-in. Someone who browses anonymously then signs up is one visitor whose
+identity resolves partway through, instead of an anonymous row and a signed-in
+row nothing connects. A test fails if the grouping key changes.
+
+Walks the pagination cursor across the whole day and reports truncation at the
+3,000-event cap rather than presenting a partial day as complete.
+
+### Test setup was structurally broken
+
+The `test` target in `angular.json` had no `stylePreprocessorOptions`, so any
+component spec importing `styles/variables` — every component — failed to
+compile under karma. That is why the suite held one trivial spec: component
+testing was blocked, not neglected. Now matches `build`.
+
+Suite: **27 tests** (16 ActivityService, 11 visitors) plus 16 on the lambda.
+
 ## Follow-ups (still open)
 
 - **Cookie/consent decision.** `visitorId` in localStorage with no banner. Framed
