@@ -1,5 +1,6 @@
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { GlobalErrorHandler } from './services/global-error-handler';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -71,7 +72,10 @@ import { MusicSnapshotComponent } from './components/music-snapshot/music-snapsh
     ReactiveFormsModule,
     AppRoutingModule,
   ],
-  providers: [provideHttpClient(withInterceptors([jwtInterceptor]))],
+  providers: [
+    provideHttpClient(withInterceptors([jwtInterceptor])),
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
