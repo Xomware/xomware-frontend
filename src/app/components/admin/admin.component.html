@@ -1,17 +1,12 @@
 <div class="admin">
-  <header class="admin-header">
-    <div class="admin-header-left">
-      <a routerLink="/" class="admin-logo" aria-label="Back to Xomware home">
-        <img src="assets/img/xomware-icon.webp" alt="Xomware" />
-      </a>
-      <h1 class="admin-title">Admin</h1>
-    </div>
-    <div class="admin-header-right">
-      <button type="button" class="admin-signout" (click)="signOut()">Sign out</button>
-    </div>
-  </header>
+  <!-- Shared site navbar — always-scrolled so the solid background is immediate
+       (no tall hero here, transparent nav would make links unreadable at the top).
+       The nav owns sign-out and the account menu; this page no longer rolls its own. -->
+  <app-nav [alwaysScrolled]="true"></app-nav>
 
   <main class="admin-content">
+    <h1 class="admin-title">Admin</h1>
+
     <!-- Internal tools — private apps kept off the public directory. -->
     <section
       class="internal-tools"
@@ -40,14 +35,25 @@
       <section class="card events-card" aria-labelledby="events-heading">
         <div class="card-header">
           <div>
-            <h2 id="events-heading">Events</h2>
-            <p class="card-subtitle">Recent sign-ins and sign-ups</p>
+            <h2 id="events-heading">Activity</h2>
+            <p class="card-subtitle">Visits, sign-ins and click-throughs</p>
           </div>
           <form
             class="date-form"
             [formGroup]="dateForm"
-            (ngSubmit)="loadEvents()"
+            (ngSubmit)="reload()"
           >
+            <label class="visually-hidden" for="events-type">Event type</label>
+            <select
+              id="events-type"
+              class="date-input"
+              formControlName="eventType"
+              (change)="loadEvents()"
+            >
+              <option *ngFor="let f of eventFilters" [value]="f.value">
+                {{ f.label }}
+              </option>
+            </select>
             <label class="visually-hidden" for="events-date">Date</label>
             <input
               id="events-date"
@@ -85,8 +91,8 @@
           <div class="events-row events-head" role="row">
             <span class="col-time" role="columnheader">Time</span>
             <span class="col-type" role="columnheader">Type</span>
-            <span class="col-email" role="columnheader">Email</span>
-            <span class="col-idp" role="columnheader">Provider</span>
+            <span class="col-email" role="columnheader">Who</span>
+            <span class="col-idp" role="columnheader">Detail</span>
           </div>
           <div
             *ngFor="let ev of events"
@@ -99,10 +105,13 @@
                 class="pill"
                 [class.pill-signin]="ev.eventType === 'signin'"
                 [class.pill-signup]="ev.eventType === 'signup'"
+                [class.pill-pageview]="ev.eventType === 'pageview'"
+                [class.pill-outbound]="ev.eventType === 'outbound'"
+                [class.pill-error]="ev.eventType === 'error'"
               >{{ ev.eventType }}</span>
             </span>
-            <span class="col-email" role="cell">{{ ev.email || '—' }}</span>
-            <span class="col-idp" role="cell">{{ ev.identityProvider || '—' }}</span>
+            <span class="col-email" role="cell">{{ actorLabel(ev) }}</span>
+            <span class="col-idp" role="cell">{{ detailLabel(ev) }}</span>
           </div>
         </div>
 
@@ -168,6 +177,72 @@
             </div>
           </div>
         </ng-container>
+      </section>
+
+      <!-- Errors. Split out of the activity feed because it is the one type
+           that is a to-do rather than a statistic. -->
+      <section class="card errors-card" aria-labelledby="errors-heading">
+        <div class="card-header">
+          <div>
+            <h2 id="errors-heading">Errors</h2>
+            <p class="card-subtitle">Uncaught frontend errors, newest first</p>
+          </div>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="loadErrors()"
+            [disabled]="errorsLoading"
+          >
+            {{ errorsLoading ? 'Refreshing…' : 'Refresh' }}
+          </button>
+        </div>
+
+        <div *ngIf="errorsError" class="error-banner" role="alert">
+          <span>{{ errorsError }}</span>
+          <button type="button" class="btn-link" (click)="loadErrors()">Retry</button>
+        </div>
+
+        <div *ngIf="errorsLoading && errors.length === 0" class="loading-state">
+          Loading errors…
+        </div>
+
+        <div
+          *ngIf="!errorsLoading && errors.length === 0 && !errorsError"
+          class="empty-state"
+        >
+          No errors logged for {{ dateForm.value.date }}. 🎉
+        </div>
+
+        <div *ngIf="errors.length > 0" class="errors-list">
+          <div class="error-row" *ngFor="let ev of errors">
+            <button
+              type="button"
+              class="error-summary"
+              (click)="toggleError(ev.eventId)"
+              [attr.aria-expanded]="expandedError === ev.eventId"
+            >
+              <span class="error-time">{{ formatTime(ev.eventTime) }}</span>
+              <span class="error-message">{{ ev.message || 'Unknown error' }}</span>
+              <span class="error-path">{{ ev.path || '—' }}</span>
+            </button>
+            <div class="error-detail" *ngIf="expandedError === ev.eventId">
+              <p class="error-meta">{{ actorLabel(ev) }}</p>
+              <pre class="error-stack" *ngIf="ev.stack">{{ ev.stack }}</pre>
+              <p class="error-meta" *ngIf="!ev.stack">No stack captured.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer" *ngIf="errorsCursor">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="loadMoreErrors()"
+            [disabled]="errorsLoadingMore"
+          >
+            {{ errorsLoadingMore ? 'Loading…' : 'Load more' }}
+          </button>
+        </div>
       </section>
     </div>
   </main>

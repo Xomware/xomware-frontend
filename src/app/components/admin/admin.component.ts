@@ -1,14 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
 import {
   AdminEvent,
+  AdminEventType,
   AdminService,
   CostSummaryResponse,
   EventsListResponse,
 } from '../../services/admin.service';
-import { CognitoService } from '../../services/cognito.service';
 import { AppCard, APPS } from '../../data/apps.data';
+
+interface EventFilter {
+  label: string;
+  value: AdminEventType | '';
+}
 
 @Component({
   selector: 'app-admin',
@@ -25,6 +29,22 @@ export class AdminComponent implements OnInit {
   eventsLoadingMore = false;
   eventsError = '';
 
+  readonly eventFilters: EventFilter[] = [
+    { label: 'All', value: '' },
+    { label: 'Pageviews', value: 'pageview' },
+    { label: 'Outbound', value: 'outbound' },
+    { label: 'Sign-ins', value: 'signin' },
+    { label: 'Sign-ups', value: 'signup' },
+  ];
+
+  errors: AdminEvent[] = [];
+  errorsCursor: string | undefined;
+  errorsLoading = false;
+  errorsLoadingMore = false;
+  errorsError = '';
+  /** eventId of the row whose stack is expanded; only one at a time. */
+  expandedError: string | null = null;
+
   cost: CostSummaryResponse | null = null;
   costLoading = false;
   costError = '';
@@ -37,18 +57,24 @@ export class AdminComponent implements OnInit {
 
   constructor(
     private admin: AdminService,
-    private cognito: CognitoService,
     private fb: FormBuilder,
-    private router: Router,
   ) {
     this.dateForm = this.fb.group({
       date: [this.todayIso()],
+      eventType: [''],
     });
   }
 
   ngOnInit(): void {
     this.loadEvents();
+    this.loadErrors();
     this.loadCost();
+  }
+
+  /** Current type filter, or undefined when showing every type. */
+  private get selectedType(): AdminEventType | undefined {
+    const value = this.dateForm.value.eventType as AdminEventType | '';
+    return value || undefined;
   }
 
   loadEvents(): void {
@@ -58,7 +84,10 @@ export class AdminComponent implements OnInit {
     this.events = [];
     this.eventsCursor = undefined;
 
-    this.admin.listEvents(date ? { date } : {}).subscribe({
+    this.admin.listEvents({
+      ...(date ? { date } : {}),
+      ...(this.selectedType ? { eventType: this.selectedType } : {}),
+    }).subscribe({
       next: (res: EventsListResponse) => {
         this.events = res.items;
         this.eventsCursor = res.nextCursor;
@@ -79,8 +108,15 @@ export class AdminComponent implements OnInit {
     this.eventsLoadingMore = true;
     const date = this.eventsDate || (this.dateForm.value.date as string);
 
+    // The filter has to be repeated: the cursor is a LastEvaluatedKey from
+    // whichever index the first page queried, so dropping eventType here
+    // would hand a by-type cursor to a by-day query.
     this.admin
-      .listEvents({ date, cursor: this.eventsCursor })
+      .listEvents({
+        date,
+        cursor: this.eventsCursor,
+        ...(this.selectedType ? { eventType: this.selectedType } : {}),
+      })
       .subscribe({
         next: (res: EventsListResponse) => {
           this.events = [...this.events, ...res.items];
@@ -92,6 +128,89 @@ export class AdminComponent implements OnInit {
           this.eventsLoadingMore = false;
         },
       });
+  }
+
+  /** Errors get their own card — they are the one type you act on. */
+  loadErrors(): void {
+    const date = this.dateForm.value.date as string | null;
+    this.errorsLoading = true;
+    this.errorsError = '';
+    this.errors = [];
+    this.errorsCursor = undefined;
+    this.expandedError = null;
+
+    this.admin
+      .listEvents({ ...(date ? { date } : {}), eventType: 'error' })
+      .subscribe({
+        next: (res: EventsListResponse) => {
+          this.errors = res.items;
+          this.errorsCursor = res.nextCursor;
+          this.errorsLoading = false;
+        },
+        error: (err) => {
+          this.errorsError = this.errorMessage(err, 'Failed to load errors');
+          this.errorsLoading = false;
+        },
+      });
+  }
+
+  loadMoreErrors(): void {
+    if (!this.errorsCursor || this.errorsLoadingMore) {
+      return;
+    }
+    this.errorsLoadingMore = true;
+    const date = this.dateForm.value.date as string;
+
+    this.admin
+      .listEvents({ date, eventType: 'error', cursor: this.errorsCursor })
+      .subscribe({
+        next: (res: EventsListResponse) => {
+          this.errors = [...this.errors, ...res.items];
+          this.errorsCursor = res.nextCursor;
+          this.errorsLoadingMore = false;
+        },
+        error: (err) => {
+          this.errorsError = this.errorMessage(err, 'Failed to load more errors');
+          this.errorsLoadingMore = false;
+        },
+      });
+  }
+
+  toggleError(eventId: string): void {
+    this.expandedError = this.expandedError === eventId ? null : eventId;
+  }
+
+  /** Both cards read the same date, so one submit reloads both. */
+  reload(): void {
+    this.loadEvents();
+    this.loadErrors();
+  }
+
+  /**
+   * Who the row belongs to. Anonymous visitors are written as
+   * `anon:<visitorId>`; showing the raw uuid is noise, so they collapse to a
+   * short tag that is still distinguishable between visitors.
+   */
+  actorLabel(ev: AdminEvent): string {
+    if (ev.email) return ev.email;
+    if (ev.userId?.startsWith('anon:')) {
+      return `anon · ${ev.userId.slice(5, 13)}`;
+    }
+    return ev.userId || '—';
+  }
+
+  /** The most useful column varies by type, so the table shows one "detail". */
+  detailLabel(ev: AdminEvent): string {
+    switch (ev.eventType) {
+      case 'outbound':
+        return ev.app ? `→ ${ev.app}` : ev.target || '—';
+      case 'error':
+        return ev.message || '—';
+      case 'pageview':
+        return ev.path || '—';
+      default:
+        return ev.identityProvider || '—';
+    }
   }
 
   loadCost(): void {
@@ -109,13 +228,6 @@ export class AdminComponent implements OnInit {
         this.costError = this.errorMessage(err, 'Failed to load cost summary');
         this.costLoading = false;
       },
-    });
-  }
-
-  signOut(): void {
-    this.cognito.signOut().subscribe({
-      next: () => this.router.navigate(['/']),
-      error: () => this.router.navigate(['/']),
     });
   }
 
