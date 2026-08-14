@@ -1,0 +1,205 @@
+# Execution Log — Today In Sports + Activity Logging
+
+**Date**: 2026-08-14
+**Plan**: `PLAN.md`
+
+---
+
+## Phase 1 — Today In Sports ✅
+
+- `src/assets/img/banners/today-in-sports.svg` ← TIS `public/brand/logo.svg`
+- `src/assets/img/apps/today-in-sports.webp` ← TIS `public/icon-512.png`, **circle-cropped**
+- `APPS` entry in `apps.data.ts` (amber `#f5a524`, `status: 'live'`, `platform: 'web'`)
+- `reportTargets` entry in `app-nav.component.ts`
+
+**Deviations from plan:**
+
+1. **The icon needed a circle crop, not a straight convert.** `.orbit__icon` is a
+   110px circle (`border-radius: 50%`) and the TIS source is an app-icon squircle
+   with an opaque background and a metallic rim. Dropped in as-is it rendered as
+   an octagon — the squircle's corners clipped by the circular mask. Compared four
+   treatments side by side in the real slot CSS; an inscribed circle crop was the
+   only one that filled the slot like the other planets, and it keeps the full
+   "TIS" and all four balls. Compositing onto a dark circle was rejected: the rim
+   traces the squircle, so the square outline survived.
+
+2. **Banner viewBox left alone.** Measured content bounds at
+   x 35.1–592.9, y 34.4–273.0 of a 628×316 viewBox — symmetric padding, not dead
+   space. The 1.99:1 aspect sits mid-range against existing banners (1.55–4.54).
+
+3. **`status: 'live'` despite the TIS README** saying "phase 1 ships the admin
+   portal only". That README is stale — `/play` is public and unguarded in
+   `app-routing.module.ts`, and the commit log shows a built play surface.
+
+4. **Fixed a stale doc comment** on `AppCard.icon` claiming the landing planets
+   use it. They use `logo` (`.planet__mark`, space-journey). `icon` is referenced
+   in exactly one place, the `/apps` orbit. The comment now records the
+   circle-mask constraint that caused deviation 1.
+
+## Phase 2 — Admin under the site navbar ✅
+
+- `admin.component.html`: bespoke `<header class="admin-header">` → `<app-nav [alwaysScrolled]="true">`
+- `admin.component.scss`: deleted `.admin-header*`, `.admin-logo`, `.admin-signout`
+  and the header media-query block; `.admin-title` restyled as a page heading;
+  `.admin-content` padding now clears the fixed nav via `var(--nav-h)`
+- `admin.component.ts`: removed `signOut()` + the now-unused `CognitoService`/`Router`
+
+Verified: one h1, top 81px against a 57px fixed nav; nav owns sign-out.
+
+## Phase 3 — Activity + error logging ✅ (code) / ⏸ (not applied)
+
+### Infra — `xomware-infrastructure`, branch `feature/activity-logging`
+
+- `terraform/waf_associations.tf` — **new**, associates the existing regional WAF
+  with the users API stage
+- `lambda/events/events-track/index.js` — **new** public ingest
+- `terraform/lambdas_events.tf` — **new**, the function
+- `terraform/api_users.tf` — `events_endpoints` local + `events` service
+- `terraform/lambdas_admin.tf` — added `dynamodb:BatchWriteItem`
+- `lambda/admin/admin-events-list/index.js` — optional `eventType` via the
+  `by-type` GSI
+
+### Frontend — `xomware-frontend`
+
+- `services/activity.service.ts` — **new**
+- `services/global-error-handler.ts` — **new**
+- `app.component.ts` — `NavigationEnd` → pageview; delegated outbound listener
+- `app.module.ts` — `ErrorHandler` provider
+- `services/admin.service.ts` — widened event types
+- `components/admin/*` — type filter, adaptive Who/Detail columns, Errors card
+
+**Deviations from plan:**
+
+1. **Two ingest routes, not one.** The plan assumed one public endpoint deriving
+   identity from a JWT. With `authorization = "NONE"` API Gateway does not verify
+   the token or populate claims, so decoding it in the lambda would let a client
+   forge any `userId`. Rather than add JWKS verification, there are now two routes
+   onto one handler: `/events/track` (NONE, anonymous) and `/events/track-user`
+   (Cognito-verified). Plan-confirmed: `authorization = "NONE"` / `"COGNITO_USER_POOLS"`.
+
+2. **`fetch(keepalive)` instead of `sendBeacon`.** `sendBeacon` cannot set an
+   `Authorization` header, which would have made every signed-in outbound click
+   record as anonymous. `keepalive` survives unload *and* carries headers.
+
+3. **Delegated outbound listener instead of per-link handlers.** App URLs appear
+   in at least four templates; one document-level listener matching against `APPS`
+   covers all of them and any future surface.
+
+4. **`loadMoreEvents` had to repeat the filter.** The cursor is a
+   `LastEvaluatedKey` from whichever index page 1 used, so omitting `eventType`
+   on page 2 would hand a by-type cursor to a by-day query.
+
+---
+
+## Post-review pass
+
+Reviewing the above turned up three defects in my own work.
+
+### 1. First pageview of every session was filed as anonymous — fixed
+
+`CognitoService.userSubject` is a `BehaviorSubject(null)` whose `bootstrap()`
+resolves asynchronously. Subscribing to `user$` alone means the first
+`NavigationEnd` fires while `signedIn` is still `false`, so every signed-in
+visitor's first pageview went to the public endpoint and was recorded as
+`anon:`. This is the same "stale null on first paint" problem `isReady$` was
+added to solve for route guards.
+
+`AppComponent` now gates on `combineLatest([isReady$, user$])`, and
+`ActivityService` buffers events raised before auth settles (capped at 20) and
+flushes them once it does.
+
+### 2. The 8KB body cap dropped whole error reports — fixed
+
+Caught by a test. Per-field truncation lives *behind* the body-size check, but
+`MAX_EVENTS` (10) at the field limits comes to roughly 41KB, so the 8KB cap
+rejected legitimate payloads outright. A deep framework stack lost the entire
+error rather than being trimmed — losing exactly the reports worth having.
+
+Cap raised to 64KB, so per-field truncation is what governs. `ActivityService`
+now also trims message/stack client-side rather than shipping 40KB for the
+backend to cut down.
+
+### 3. `GlobalErrorHandler` did not do what its comment claimed — fixed
+
+It said it deferred to Angular's default handler; it actually just called
+`console.error`. Now `extends ErrorHandler` and calls `super.handleError`.
+
+### Refactor
+
+`events-track` validation moved to `validate.js`, leaving `index.js` as
+transport. The security-relevant logic — the type whitelist, never trusting a
+client `userId`, the size caps — is now testable without the AWS SDK.
+
+## Tests added
+
+| Suite | Count | Command |
+|---|---|---|
+| `ActivityService` | 16 | `npm test` |
+| `events-track` validation | 16 | `node --test lambda/events/events-track/validate.test.js` |
+
+Both were mutation-checked rather than trusted for going green: deleting the
+auth buffer failed 2 tests, deleting the error cap failed 1, confirming they
+fail on the regressions they exist to catch.
+
+The lambda tests use Node's built-in runner deliberately — the infra repo has
+no package.json, and adding a framework for 16 assertions is not worth the
+footprint. Documented in that repo's README.
+
+## Scaling note (not a defect)
+
+The `by-type` GSI hashes on `eventType`, so every `pageview` row for all time
+shares one partition key. Fine at hobby scale, but it is the first thing that
+will hurt if traffic grows — a composite key like `eventType#eventDate` would
+spread it. Not worth doing now; worth knowing before it bites.
+
+## Verification
+
+| Check | Result |
+|---|---|
+| `npm run build:prod` | ✅ clean |
+| `npm test` | ✅ 16/16 |
+| `node --test` (lambda) | ✅ 16/16 |
+| `terraform validate` | ✅ (2 pre-existing warnings in the `web` module) |
+| `terraform plan` | ✅ 20 add / 4 change / 1 destroy (the destroy is the API GW deployment replacement) |
+| Per-route auth in plan | ✅ `track` = NONE, `track-user` = COGNITO_USER_POOLS |
+| Ingest fires end to end | ✅ pageview `/` → `/apps`, outbound "Today In Sports", stable visitorId, no client userId |
+| TIS card + planet + orbit | ✅ screenshotted |
+| Admin layout + Errors card | ✅ screenshotted with stubbed data |
+
+**`terraform apply` was NOT run.** Applying is the owner's call.
+
+---
+
+## Blocker found during execution
+
+**Planning from `master` wanted to destroy the live Reese's Cognito client.**
+
+The first `terraform plan` returned:
+
+```
+# aws_cognito_user_pool_client.reeses will be destroyed
+# aws_ssm_parameter.cognito_client_reeses_id will be destroyed
+#   (because ... is not in configuration)
+```
+
+`feature/49-cognito-reeses-client` is applied in live AWS but not merged to
+`master`. Any branch cut from `master` therefore plans to delete a resource that
+Reese's Playoff Challenge — just marked live — depends on.
+
+`feature/activity-logging` was rebranched off `feature/49-cognito-reeses-client`,
+which cleared both destroys. **Merge order matters: #49 must land before this.**
+The underlying problem is drift between `master` and applied state, and it will
+bite the next branch too.
+
+---
+
+## Follow-ups (not done)
+
+- `terraform apply` — owner's call. Apply the WAF association **before** the
+  public route goes live.
+- **Cookie/consent decision.** `visitorId` in localStorage with no banner. Framed
+  as first-party analytics; flagged, not decided.
+- Merge `feature/49-cognito-reeses-client`, or reconcile `master` with applied state.
+- **Frontend branch hygiene.** The changes sit uncommitted on `data/reeses-live`,
+  a branch about marking Reese's live. They want their own branch before commit.
+- Consider a composite `by-type` key if pageview volume ever grows (above).
