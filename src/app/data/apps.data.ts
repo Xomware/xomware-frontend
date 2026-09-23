@@ -21,8 +21,8 @@ export interface AppCard {
   tag: string;
   status: 'live' | 'coming-soon';
   /**
-   * 'pool' is for annual/seasonal event pools (Sun God Derby, Reese's Playoff
-   * Challenge) rather than ongoing products. They are built differently — a
+   * 'pool' is for seasonal leagues and event pools (Smirnoff League, Sun God
+   * Derby, Reese's Playoff Challenge) rather than ongoing products. They are built differently — a
    * derby-style Next.js app rather than the Angular three-repo product
    * template — and they read wrong sitting next to Xomify in a "Web Apps"
    * list, so they get their own group.
@@ -118,6 +118,20 @@ export const APPS: AppCard[] = [
     logoStyle: 'banner',
     logoPulse: true,
     tag: 'Annual Pool',
+    status: 'live',
+    platform: 'pool',
+  },
+  {
+    name: 'Smirnoff League',
+    description:
+      'A 14-team fantasy league where every zero means a Smirnoff Ice. Live ice watch, chug videos and the toilet bowl.',
+    color: '#1E3A8A',
+    colorRgb: '30, 58, 138',
+    url: 'https://smirnoff-league.com',
+    logo: 'assets/img/banners/smirnoff-league.webp',
+    icon: 'assets/img/apps/smirnoff-league.webp',
+    logoStyle: 'banner',
+    tag: 'Season League',
     status: 'live',
     platform: 'pool',
   },
