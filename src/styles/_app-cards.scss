@@ -44,7 +44,7 @@
   z-index: 1;
 }
 
-// Short note under a platform heading (e.g. what "Pools & Events" means).
+// Short note under a platform heading (e.g. what "Leagues & Pools" means).
 .platform-note {
   font-size: $text-sm;
   color: $text-secondary;
@@ -58,7 +58,7 @@
   // breakpoints. auto-fit lets the grid choose its own column count, and
   // minmax(0, 1fr) (not 1fr) stops long words pushing a column past its track.
   // auto-FILL, not auto-fit: auto-fit collapses unused tracks, so a two-card
-  // group (Pools & Events) stretched to full width while the three-card groups
+  // group (Leagues & Pools) stretched to full width while the three-card groups
   // stayed narrower. auto-fill keeps the empty track, so every card in every
   // group is the same width.
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

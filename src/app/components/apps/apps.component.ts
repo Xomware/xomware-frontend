@@ -22,7 +22,7 @@ export class AppsComponent {
     return this.apps.filter((a) => a.platform === 'web');
   }
 
-  /** Annual/seasonal event pools — grouped apart from ongoing products. */
+  /** Seasonal leagues and event pools — grouped apart from ongoing products. */
   get poolApps(): AppCard[] {
     return this.apps.filter((a) => a.platform === 'pool');
   }
