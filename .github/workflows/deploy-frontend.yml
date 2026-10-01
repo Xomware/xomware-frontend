@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   deploy:
-    uses: Xomware/github-actions/.github/workflows/deploy-frontend-s3.yml@feature/deploy-frontend-s3
+    uses: Xomware/github-actions/.github/workflows/deploy-frontend-s3.yml@v1
     with:
       app: xomware
       node-version: '18'
