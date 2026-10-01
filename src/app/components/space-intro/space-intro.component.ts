@@ -10,10 +10,30 @@ import {
   output,
   viewChild,
 } from '@angular/core';
-import { PLANETS } from '../../data/planets';
-import { INTRO_END, INTRO_IMPACT, IntroScene } from '../../space/intro-scene';
+import { PLANETS, Planet } from '../../data/planets';
+import { INTRO_END, INTRO_IMPACT } from '../../space/intro-timing';
 
 let played = false;
+
+/** How long the dark cover may wait for the scene's chunk before the page shows without it. */
+export const INTRO_PATIENCE = 4000;
+
+export interface IntroView {
+  resize(width: number, height: number): void;
+  draw(t: number): void;
+  dispose(): void;
+}
+
+/**
+ * Loads the three.js scene as its own chunk, so nothing else on the site
+ * pays for it. Resolves null without WebGL 2. An object so tests can stub it.
+ */
+export const introStage = {
+  async open(canvas: HTMLCanvasElement, planets: Planet[]): Promise<IntroView | null> {
+    const { openIntroScene } = await import('../../space/intro-scene');
+    return openIntroScene(canvas, planets);
+  },
+};
 
 /**
  * Whether the landing should run the intro. True once per page load, so an
@@ -29,7 +49,8 @@ export function claimIntro(): boolean {
 
 /**
  * Full-screen intro over the landing page. The page renders underneath from
- * the first frame; this only covers it, then blows a hole through to it.
+ * the first frame; this covers it in the dark until the scene draws, then the
+ * blast tears a hole through to it.
  */
 @Component({
   selector: 'app-space-intro',
@@ -48,9 +69,10 @@ export class SpaceIntroComponent implements AfterViewInit, OnDestroy {
   private readonly host: HTMLElement = inject(ElementRef).nativeElement;
   private readonly zone = inject(NgZone);
 
-  private scene?: IntroScene;
+  private scene: IntroView | null = null;
   private frame = 0;
   private start = 0;
+  private patience = 0;
   private hit = false;
   private finished = false;
   private previousOverflow = '';
@@ -60,21 +82,35 @@ export class SpaceIntroComponent implements AfterViewInit, OnDestroy {
     this.previousOverflow = root.style.overflow;
     root.style.overflow = 'hidden';
 
-    // One rAF loop for the life of the intro; outside the zone so it never
-    // triggers change detection.
-    this.zone.runOutsideAngular(() => {
-      this.scene = new IntroScene(this.canvas().nativeElement, PLANETS);
-      this.resize();
-      window.addEventListener('resize', this.resize);
-      this.start = performance.now();
-      this.frame = requestAnimationFrame(this.tick);
-    });
+    // A chunk that never arrives costs the intro, not the page.
+    this.patience = window.setTimeout(() => {
+      if (!this.scene) this.zone.run(() => this.finish());
+    }, INTRO_PATIENCE);
+
+    introStage.open(this.canvas().nativeElement, PLANETS).then(
+      (scene) => {
+        if (this.finished) return scene?.dispose();
+        if (!scene) return this.finish();
+        this.scene = scene;
+        // One rAF loop for the life of the intro; outside the zone so it never
+        // triggers change detection.
+        this.zone.runOutsideAngular(() => {
+          this.resize();
+          window.addEventListener('resize', this.resize);
+          this.frame = requestAnimationFrame(this.tick);
+        });
+      },
+      () => this.finish(),
+    );
   }
 
   ngOnDestroy(): void {
+    this.finished = true;
     cancelAnimationFrame(this.frame);
+    clearTimeout(this.patience);
     window.removeEventListener('resize', this.resize);
     document.documentElement.style.overflow = this.previousOverflow;
+    this.scene?.dispose();
   }
 
   @HostListener('document:keydown.escape')
@@ -87,7 +123,10 @@ export class SpaceIntroComponent implements AfterViewInit, OnDestroy {
   };
 
   private readonly tick = (): void => {
-    const t = (performance.now() - this.start) / 1000;
+    const now = performance.now();
+    // The clock starts on the scene's first frame, not when the chunk was asked for.
+    if (!this.start) this.start = now;
+    const t = (now - this.start) / 1000;
     this.scene?.draw(t);
     // The host paints a dark cover until the canvas has a frame of its own,
     // so the page never flashes before the intro.
