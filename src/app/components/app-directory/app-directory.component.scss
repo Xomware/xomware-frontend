@@ -1,0 +1,305 @@
+@import 'styles/variables';
+
+:host {
+  display: block;
+}
+
+.group + .group {
+  margin-top: $spacing-3xl;
+}
+
+.group__head {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding-bottom: $spacing-sm;
+  margin-bottom: $spacing-md;
+  border-bottom: 1px solid $glass-border;
+}
+
+.group__title {
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  color: $text-secondary;
+}
+
+.group__count {
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
+  color: $text-muted;
+  padding: 1px $spacing-sm;
+  border: 1px solid $glass-border;
+  border-radius: $radius-pill;
+}
+
+.group__note {
+  font-size: $text-sm;
+  color: $text-secondary;
+  margin: 0 0 $spacing-md;
+  max-width: 60ch;
+  line-height: 1.5;
+}
+
+.group__note-link {
+  color: $brand-cyan;
+  font-weight: $font-weight-medium;
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+.grid {
+  list-style: none;
+  display: grid;
+  // auto-fill keeps empty tracks, so a two-app group has the same tile width
+  // as a three-app one.
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: $spacing-md;
+}
+
+.tile {
+  --app-color: #{$brand-cyan};
+  --app-rgb: 0, 180, 216;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg $spacing-md $spacing-md;
+  background: $glass-bg;
+  border: 1px solid $glass-border;
+  border-radius: $radius-lg;
+  // A brand-colour edge identifies each app at a glance without putting
+  // low-contrast brand colours (Smirnoff navy) into the text.
+  box-shadow: inset 3px 0 0 rgba(var(--app-rgb), 0.7);
+  transition:
+    border-color $transition-fast,
+    background-color $transition-fast,
+    transform $transition-fast;
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background: $bg-glass-heavy;
+      border-color: rgba(var(--app-rgb), 0.45);
+
+      .tile__icon {
+        transform: translateY(-2px);
+      }
+
+      .tile__arrow {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  }
+}
+
+.tile__icon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  padding: $spacing-xs;
+  border-radius: $radius-lg;
+  background: rgba(var(--app-rgb), 0.12);
+  transition: transform $transition-fast;
+}
+
+.tile__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.tile__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+}
+
+.tile__name {
+  font-family: $font-display;
+  font-size: $text-md;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+  letter-spacing: $tracking-tight;
+}
+
+.tile__link {
+  color: $text-primary;
+
+  &:hover {
+    color: $text-primary;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: $radius-lg;
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    &::after {
+      outline: 2px solid $brand-cyan;
+      outline-offset: 3px;
+    }
+  }
+}
+
+.tile__description {
+  font-size: $text-sm;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+.tile__wip {
+  font-size: $text-xs;
+  color: #facc15;
+}
+
+.tile__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-top: $spacing-xs;
+}
+
+.tile__tag {
+  font-size: $text-2xs;
+  font-weight: $font-weight-medium;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  color: $text-muted;
+}
+
+// Sits above the stretched tile link so it stays its own target.
+.tile__sublink {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 32px;
+  padding: 0 $spacing-sm 0 $spacing-md;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  background: rgba(var(--app-rgb), 0.14);
+  border: 1px solid rgba(var(--app-rgb), 0.4);
+  border-radius: $radius-pill;
+  transition: background-color $transition-fast;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(var(--app-rgb), 0.28);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+  }
+}
+
+.tile__arrow {
+  position: absolute;
+  top: $spacing-md;
+  right: $spacing-xs;
+  width: 18px;
+  height: 18px;
+  color: $text-muted;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity $transition-fast,
+    transform $transition-fast;
+}
+
+.badge {
+  flex-shrink: 0;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  padding: 2px $spacing-sm;
+  border: 1px solid;
+  border-radius: $radius-pill;
+}
+
+.badge--live {
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+// Dashed and yellow, so it reads as "under construction" next to the amber
+// solid of Coming soon.
+.badge--beta {
+  color: #facc15;
+  border-style: dashed;
+  border-color: rgba(250, 204, 21, 0.6);
+  background: rgba(250, 204, 21, 0.08);
+}
+
+.badge--soon {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+@media (max-width: $breakpoint-md) {
+  .tile {
+    padding-right: $spacing-md;
+  }
+
+  .tile__arrow {
+    display: none;
+  }
+}
+
+// Slow colour pulse for the one app that gets it (see AppCard.logoPulse).
+@keyframes logo-colour-pulse {
+  0%,
+  100% {
+    filter: saturate(1) brightness(1);
+  }
+
+  50% {
+    filter: saturate(1.55) brightness(1.3) hue-rotate(14deg);
+  }
+}
+
+.is-pulsing {
+  animation: logo-colour-pulse 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-pulsing {
+    animation: none;
+  }
+
+  .tile,
+  .tile__icon,
+  .tile__arrow {
+    transition: none;
+  }
+}

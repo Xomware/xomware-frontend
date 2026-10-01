@@ -20,6 +20,8 @@ export interface Planet {
   /** See AppCard.logoPulse. */
   logoPulse: boolean;
   status: 'live' | 'coming-soon';
+  /** See AppCard.beta. */
+  beta: boolean;
   /** Human labels for every platform the product ships on, e.g. ['Web', 'iOS']. */
   platforms: string[];
   /** Layout and surface treatment only — see LAYOUT below. */
@@ -125,6 +127,7 @@ function buildPlanets(): Planet[] {
       logoPulse: !!primary.logoPulse,
       // Live on any platform means the product is live and reachable.
       status: rows.some((r) => r.status === 'live') ? 'live' : 'coming-soon',
+      beta: !!primary.beta,
       platforms: [...new Set(rows.map((r) => PLATFORM_LABEL[r.platform]))],
       ...layout,
     };

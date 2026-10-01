@@ -34,6 +34,7 @@ import { MusicXomtracksComponent } from './components/music-xomtracks/music-xomt
 import { AppNavComponent } from './components/nav/app-nav.component';
 import { NowPlayingComponent } from './components/now-playing/now-playing.component';
 import { MusicSnapshotComponent } from './components/music-snapshot/music-snapshot.component';
+import { AppDirectoryComponent } from './components/app-directory/app-directory.component';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import { MusicSnapshotComponent } from './components/music-snapshot/music-snapsh
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
+    AppDirectoryComponent,
   ],
   providers: [
     provideHttpClient(withInterceptors([jwtInterceptor])),

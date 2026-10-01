@@ -303,11 +303,6 @@
   }
 }
 
-// Note: .apps-section / .section-header / .cards-container / .app-card /
-// .card-* / .platform-heading / .ios-whitelist-* all come from the shared
-// styles/app-cards partial (imported at the top of this file) — kept in
-// sync with /apps automatically.
-
 // ── Footer ───────────────────────────────────────
 .footer {
   width: 100%;
@@ -407,9 +402,6 @@
 }
 
 // ── Responsive ───────────────────────────────────
-// Note: .cards-container / .app-card responsive rules live in
-// styles/app-cards (shared with /apps) — only landing-specific overrides
-// live here.
 @media (max-width: $breakpoint-md) {
   .profile-name {
     font-size: clamp(1.6rem, 6vw, 2.2rem);

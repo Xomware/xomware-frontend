@@ -56,7 +56,7 @@ export class AppComponent implements OnInit, OnDestroy {
     const href = anchor.getAttribute('href') ?? '';
     if (!href.startsWith('http')) return;
 
-    const app = APPS.find((a) => a.url === href);
+    const app = APPS.find((a) => a.url === href || a.links?.some((l) => l.url === href));
     if (app) {
       this.activity.trackOutbound(app.name, href);
     }

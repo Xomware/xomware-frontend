@@ -37,9 +37,10 @@
     <div class="orbit__meta">
       <span
         class="orbit__status"
-        [class.is-live]="focused.status === 'live'"
+        [class.is-live]="focused.status === 'live' && !focused.beta"
+        [class.is-beta]="focused.status === 'live' && focused.beta"
         [class.is-soon]="focused.status === 'coming-soon'"
-        >{{ focused.status === 'live' ? 'Live' : 'Coming Soon' }}</span
+        >{{ focused.status === 'coming-soon' ? 'Coming Soon' : focused.beta ? 'Beta' : 'Live' }}</span
       >
       <span class="orbit__platform" *ngFor="let p of focused.platforms">{{ p }}</span>
     </div>

@@ -153,7 +153,7 @@ test('app card hover state', async ({ page }, testInfo) => {
   await page.goto('/apps', { waitUntil: 'domcontentloaded' });
   await settle(page);
 
-  const card = page.locator('.app-card').first();
+  const card = page.locator('app-directory .tile').first();
   await card.hover();
   // Let the glow/transform transitions finish ($transition-slow is 500ms).
   await page.waitForTimeout(700);

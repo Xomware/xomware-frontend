@@ -1,0 +1,70 @@
+@for (group of groups; track group.id) {
+  <section class="group" [attr.aria-labelledby]="'directory-' + group.id">
+    <div class="group__head">
+      <h3 class="group__title" [id]="'directory-' + group.id">{{ group.title }}</h3>
+      <span class="group__count">{{ group.entries.length }}</span>
+    </div>
+
+    @switch (group.id) {
+      @case ('pool') {
+        <p class="group__note">Seasonal leagues and pools with friends. They run for a season and reset.</p>
+      }
+      @case ('ios') {
+        <p class="group__note">
+          TestFlight builds &mdash; email
+          <a href="mailto:dominickj.giordano@gmail.com" class="group__note-link">dominickj.giordano&#64;gmail.com</a>
+          to be whitelisted.
+        </p>
+      }
+    }
+
+    <ul class="grid">
+      @for (entry of group.entries; track entry.app.name) {
+        <li class="tile" [style.--app-color]="entry.app.color" [style.--app-rgb]="entry.app.colorRgb">
+          <img
+            class="tile__icon"
+            [class.is-pulsing]="entry.app.logoPulse"
+            [src]="entry.app.icon"
+            alt=""
+            width="56"
+            height="56"
+            loading="lazy"
+            decoding="async"
+          />
+
+          <div class="tile__body">
+            <div class="tile__top">
+              <h4 class="tile__name">
+                <!-- Stretched over the whole tile, so the tile is one big target
+                     while the sub-links below stay separately clickable. -->
+                <a class="tile__link" [href]="entry.app.url" target="_blank" rel="noopener">{{ entry.app.name }}</a>
+              </h4>
+              <span class="badge" [class]="'badge--' + entry.badge">{{ badgeLabel[entry.badge] }}</span>
+            </div>
+
+            <p class="tile__description">{{ entry.app.description }}</p>
+            @if (entry.app.beta) {
+              <p class="tile__wip">Work in progress. Expect rough edges.</p>
+            }
+
+            <div class="tile__foot">
+              <span class="tile__tag">{{ entry.app.tag }}</span>
+              @for (link of entry.app.links ?? []; track link.url) {
+                <a class="tile__sublink" [href]="link.url" target="_blank" rel="noopener">
+                  {{ link.label }}
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor" />
+                  </svg>
+                </a>
+              }
+            </div>
+          </div>
+
+          <svg class="tile__arrow" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor" />
+          </svg>
+        </li>
+      }
+    </ul>
+  </section>
+}

@@ -1,3 +1,8 @@
+export interface AppLink {
+  label: string;
+  url: string;
+}
+
 export interface AppCard {
   name: string;
   description: string;
@@ -20,6 +25,10 @@ export interface AppCard {
   icon: string;
   tag: string;
   status: 'live' | 'coming-soon';
+  /** Live and usable, but unfinished. Shown as a Beta badge wherever status is. */
+  beta?: boolean;
+  /** Products inside the app that have their own address, e.g. a show under a hub. */
+  links?: AppLink[];
   /**
    * 'pool' is for seasonal leagues and event pools (Smirnoff League, Sun God
    * Derby, Reese's Playoff Challenge) rather than ongoing products. They are built differently — a
@@ -146,6 +155,7 @@ export const APPS: AppCard[] = [
     logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
+    beta: true,
     platform: 'web',
   },
   {
@@ -159,6 +169,7 @@ export const APPS: AppCard[] = [
     logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
+    beta: true,
     platform: 'web',
   },
   {
@@ -174,6 +185,19 @@ export const APPS: AppCard[] = [
     tag: 'Web App',
     status: 'live',
     platform: 'web',
+  },
+  {
+    name: 'Armchair Judge',
+    description: 'Rate TV competitions like a judge. Score every dance blind, then see how the panel scored it.',
+    color: '#e83fd0',
+    colorRgb: '232, 63, 208',
+    url: 'https://armchairjudge.com',
+    logo: 'assets/img/apps/armchair-judge.webp',
+    icon: 'assets/img/apps/armchair-judge.webp',
+    tag: 'Web App',
+    status: 'live',
+    platform: 'web',
+    links: [{ label: 'Dancing with the Stars', url: 'https://dwts.armchairjudge.com' }],
   },
   {
     name: 'Xomify',

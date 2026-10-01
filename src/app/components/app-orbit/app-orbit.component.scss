@@ -170,6 +170,12 @@
     color: #f59e0b;
     border-color: rgba(245, 158, 11, 0.35);
   }
+
+  &.is-beta {
+    color: #facc15;
+    border-style: dashed;
+    border-color: rgba(250, 204, 21, 0.6);
+  }
 }
 
 .orbit__name {
