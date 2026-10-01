@@ -1,5 +1,3 @@
-import { drawShip } from './ship';
-
 /**
  * Parallax starfield, rendered to a 2D canvas.
  *
@@ -39,12 +37,33 @@ interface Meteor {
 /** Somebody out there. Crosses the field now and then, and is gone. */
 interface Rocket {
   x: number;
+  /** Course line; the ship weaves gently about it. */
+  y0: number;
   y: number;
   vx: number;
-  vy: number;
+  /** Amplitude (px) and rate of the weave. */
+  weave: number;
+  rate: number;
   /** Counts up; the ship despawns once it has cleared the far edge. */
   life: number;
 }
+
+/**
+ * The courier, pre-rendered from the intro's 3D model (ship-model.ts) at five
+ * bank angles, -24 to +24 degrees, each 320 x 160, nose to the right.
+ */
+const SHIP_SHEET = 'assets/img/ship/courier.webp';
+const SHIP_FRAMES = 5;
+const FRAME_W = 320;
+const FRAME_H = 160;
+/** The hull spans x 61-226 of a frame; the bells end at x 62. */
+const HULL_PX = 165;
+const TAIL_X = 62;
+/**
+ * Heights of the engine bells visible in each frame, as a fraction of its
+ * height. The far engine hides behind the hull once the ship banks away.
+ */
+const BELLS: readonly (readonly number[])[] = [[0.675, 0.334], [0.653, 0.354], [0.625], [0.59], [0.55]];
 
 /** A tumbling rock. Drawn as an irregular polygon so no two look alike. */
 interface Asteroid {
@@ -135,6 +154,7 @@ export class Starfield {
   private asteroids: Asteroid[] = [];
   private meteors: Meteor[] = [];
   private rocket: Rocket | null = null;
+  private readonly shipSheet = new Image();
   private nextMeteorAt = METEOR_INTERVAL;
   private nextRocketAt = ROCKET_INTERVAL;
   private rand: () => number = mulberry32(1);
@@ -153,6 +173,8 @@ export class Starfield {
       ...options,
     };
     this.ctx = canvas.getContext('2d');
+    this.shipSheet.decoding = 'async';
+    if (this.opts.animateScene) this.shipSheet.src = SHIP_SHEET;
     this.seed(this.opts.starCount);
     this.buildSprites();
   }
@@ -352,9 +374,10 @@ export class Starfield {
     }
 
     if (this.rocket) {
-      this.rocket.x += this.rocket.vx;
-      this.rocket.y += this.rocket.vy;
-      this.rocket.life += 1;
+      const r = this.rocket;
+      r.x += r.vx;
+      r.life += 1;
+      r.y = r.y0 + Math.sin(r.life * r.rate) * r.weave;
       // Gone once it has cleared the far edge with room to spare.
       const margin = 140;
       if (this.rocket.x < -margin || this.rocket.x > this.width + margin) this.rocket = null;
@@ -365,15 +388,17 @@ export class Starfield {
     const rand = this.rand;
     const leftToRight = rand() > 0.5;
     // Much slower than a meteor: this one is under power, not falling.
-    const speed = 1.9 + rand() * 1.5;
-    // Only a slight climb or dive, so it reads as a course rather than a dive.
-    const climb = (rand() - 0.5) * 0.5;
+    const speed = 1.6 + rand() * 1.2;
+    const y0 = this.height * (0.15 + rand() * 0.6);
 
     this.rocket = {
-      x: leftToRight ? -120 : this.width + 120,
-      y: this.height * (0.12 + rand() * 0.68),
+      x: leftToRight ? -140 : this.width + 140,
+      y0,
+      y: y0,
       vx: (leftToRight ? 1 : -1) * speed,
-      vy: climb,
+      // A long, lazy weave: a course correction, not a wobble.
+      weave: 18 + rand() * 30,
+      rate: 0.006 + rand() * 0.006,
       life: 0,
     };
   }
@@ -439,16 +464,86 @@ export class Starfield {
     ctx.globalAlpha = 1;
   }
 
+  /**
+   * The courier: heat shimmer behind the bells, the exhaust, then the hull
+   * sprite banked into its weave. Drawn in the ship's frame, nose along +x.
+   */
   private drawRocket(ctx: CanvasRenderingContext2D): void {
     const r = this.rocket;
-    if (!r) return;
+    const sheet = this.shipSheet;
+    if (!r || !sheet.complete || !sheet.naturalWidth) return;
 
-    ctx.globalAlpha = 1;
+    const dir = Math.sign(r.vx);
+    const vy = Math.cos(r.life * r.rate) * r.weave * r.rate;
+    // Lateral acceleration sets the bank, as it would in a coordinated turn.
+    const accel = -Math.sin(r.life * r.rate) * r.weave * r.rate * r.rate;
+    const bank = Math.max(-1, Math.min(1, accel * 400 * dir));
+    const frame = Math.round((bank + 1) * 0.5 * (SHIP_FRAMES - 1));
+    const len = this.width < 600 ? 58 : 82;
+    const k = len / HULL_PX;
+    const fw = FRAME_W * k;
+    const fh = FRAME_H * k;
+    // Where the frame's left edge and the tail sit, relative to the ship's centre.
+    const left = -fw * 0.45;
+    const tail = left + TAIL_X * k;
+    const throttle = 0.85 + 0.15 * Math.sin(this.time * 3.1) + 0.05 * Math.sin(this.time * 41);
+
     ctx.save();
     ctx.translate(r.x, r.y);
-    ctx.rotate(Math.atan2(r.vy, r.vx));
-    drawShip(ctx, this.time);
+    ctx.rotate(Math.atan2(vy, Math.abs(r.vx)) * dir);
+    ctx.scale(dir, 1);
+    ctx.globalAlpha = 1;
+
+    const top = -fh / 2;
+    for (const [i, bellY] of BELLS[frame].entries()) {
+      const y = top + bellY * fh;
+      const power = (i === 0 ? 1 : 0.8) * throttle;
+      const bell = len * 0.05;
+      const reach = len * (0.5 + 0.08 * Math.sin(this.time * 17 + i));
+      this.shimmer(ctx, tail, y, len, dir);
+      // Exhaust: as wide as the bell where it leaves, tapering to nothing.
+      ctx.globalCompositeOperation = 'lighter';
+      const plume = ctx.createLinearGradient(tail, y, tail - reach, y);
+      plume.addColorStop(0, `rgba(255, 226, 190, ${0.75 * power})`);
+      plume.addColorStop(0.2, `rgba(255, 150, 80, ${0.35 * power})`);
+      plume.addColorStop(1, 'rgba(255, 110, 50, 0)');
+      ctx.fillStyle = plume;
+      ctx.beginPath();
+      ctx.moveTo(tail + 1, y - bell);
+      ctx.quadraticCurveTo(tail - reach * 0.35, y - bell * 1.1, tail - reach, y);
+      ctx.quadraticCurveTo(tail - reach * 0.35, y + bell * 1.1, tail + 1, y + bell);
+      ctx.closePath();
+      ctx.fill();
+      const glow = ctx.createRadialGradient(tail, y, 0, tail, y, len * 0.1);
+      glow.addColorStop(0, `rgba(255, 214, 170, ${0.5 * power})`);
+      glow.addColorStop(1, 'rgba(255, 140, 70, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(tail - len * 0.1, y - len * 0.1, len * 0.2, len * 0.2);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    ctx.drawImage(sheet, frame * FRAME_W, 0, FRAME_W, FRAME_H, left, top, fw, fh);
     ctx.restore();
+  }
+
+  /**
+   * Hot exhaust bends the light passing through it: copy the strip of sky
+   * just behind a bell back over itself in thin slices, each nudged by a
+   * travelling ripple, so the stars behind the plume swim.
+   */
+  private shimmer(ctx: CanvasRenderingContext2D, tail: number, y: number, len: number, dir: number): void {
+    const t = ctx.getTransform();
+    const slices = 14;
+    const w = (len * 0.6) / slices;
+    const h = len * 0.16;
+    for (let i = 0; i < slices; i++) {
+      const x = tail - (i + 1) * w;
+      const fade = 1 - i / slices;
+      const dy = Math.sin(this.time * 26 + i * 0.9) * 0.9 * fade;
+      // Source in device pixels, from where this slice sits on the canvas now.
+      const p = t.transformPoint(new DOMPoint(x + (dir < 0 ? w : 0), y - h / 2));
+      ctx.drawImage(this.canvas, p.x, p.y, w * this.dpr, h * this.dpr, x, y - h / 2 + dy, w, h);
+    }
   }
 
   /** Tumbling rocks drifting through the field. */
