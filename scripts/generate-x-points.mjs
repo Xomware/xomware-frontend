@@ -7,13 +7,13 @@
  * uneven edges, tapered ends and the gap where the strokes cross included.
  *
  * Run: node scripts/generate-x-points.mjs
- * Output: src/app/components/space-journey/x-points.ts (committed)
+ * Output: src/app/space/x-points.ts (committed)
  */
 import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 
 const SOURCE = 'src/assets/img/xomware-icon.webp';
-const OUT = 'src/app/components/space-journey/x-points.ts';
+const OUT = 'src/app/space/x-points.ts';
 /** Sampling grid. Higher = finer detail in the stroke edges. */
 const GRID = 132;
 /** How many stars end up in the mark. */

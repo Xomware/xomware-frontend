@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, AfterViewInit, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, AfterViewInit, OnInit, ViewChild, signal } from '@angular/core';
 import { BehaviorSubject, EMPTY, Subscription, interval, of } from 'rxjs';
 import { switchMap, startWith, catchError, distinctUntilChanged } from 'rxjs/operators';
 import { gsap } from 'gsap';
@@ -8,8 +8,7 @@ import { NowPlayingService } from '../../services/now-playing.service';
 import { MusicProfile } from '../../models/music.model';
 import { NowPlayingState } from '../../models/now-playing.model';
 import { environment } from '../../../environments/environment';
-import { AppCard, APPS } from '../../data/apps.data';
-import { shouldPlayJourney } from '../space-journey/space-journey.component';
+import { claimIntro } from '../space-intro/space-intro.component';
 
 const IDLE_STATE: NowPlayingState = {
   isPlaying: false,
@@ -28,20 +27,13 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
-  /**
-   * Whether to mount the cinematic intro. Read once, before the first render,
-   * so the page never mounts the journey and then yanks it away.
-   */
-  readonly showJourney = shouldPlayJourney();
+  /** Claimed before the first render, so the page never shows and then gets covered. */
+  readonly introActive = signal(claimIntro());
+  /** The intro's ship has hit and the page is arriving under the blast. */
+  readonly arriving = signal(false);
 
   landingTickerProfile: MusicProfile | null = null;
   nowPlayingState: NowPlayingState | null = null;
-
-  /**
-   * Public app directory — see src/app/data/apps.data.ts (shared with /apps).
-   * Internal tools (`adminOnly`) are excluded; they surface in /admin only.
-   */
-  apps: AppCard[] = APPS.filter((a) => !a.adminOnly);
 
   private tickerSub?: Subscription;
   private nowPlayingSub?: Subscription;
@@ -132,19 +124,6 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
     return !!(p.topTracks?.length || p.topArtists?.length || p.topGenres?.length);
   }
 
-  get webApps(): AppCard[] {
-    return this.apps.filter(a => a.platform === 'web');
-  }
-
-  /** Seasonal leagues and event pools — grouped apart from ongoing products. */
-  get poolApps(): AppCard[] {
-    return this.apps.filter((a) => a.platform === 'pool');
-  }
-
-  get iosApps(): AppCard[] {
-    return this.apps.filter(a => a.platform === 'ios');
-  }
-
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.initScrollAnimations();
@@ -185,27 +164,6 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
         duration: 0.8,
         ease: 'power3.out',
       });
-    });
-
-    // App cards stagger in — one trigger per grid so each fires as it enters viewport
-    const containers = gsap.utils.toArray<Element>('.cards-container');
-    containers.forEach((container) => {
-      const gridCards = gsap.utils.toArray<Element>('.app-card', container);
-      if (gridCards.length) {
-        gsap.set(gridCards, { opacity: 0, y: 60 });
-        gsap.to(gridCards, {
-          scrollTrigger: {
-            trigger: container,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
-          opacity: 1,
-          y: 0,
-          stagger: 0.1,
-          duration: 0.7,
-          ease: 'power3.out',
-        });
-      }
     });
 
     // Footer slide in

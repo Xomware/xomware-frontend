@@ -15,7 +15,7 @@ import { test, expect, type Page } from '@playwright/test';
 const ROUTES = [
   // The landing page is public — there is no longer a signed-out gate to
   // capture. Note this run happens under reducedMotion: 'reduce', so what is
-  // baselined is the grounded page; the space journey does not mount and is
+  // baselined is the grounded page; the space intro does not mount and is
   // therefore NOT covered by these tests.
   { path: '/', name: 'landing' },
   { path: '/apps', name: 'apps' },
@@ -153,7 +153,7 @@ test('app card hover state', async ({ page }, testInfo) => {
   await page.goto('/apps', { waitUntil: 'domcontentloaded' });
   await settle(page);
 
-  const card = page.locator('.app-card').first();
+  const card = page.locator('app-directory .tile').first();
   await card.hover();
   // Let the glow/transform transitions finish ($transition-slow is 500ms).
   await page.waitForTimeout(700);

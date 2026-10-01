@@ -303,11 +303,6 @@
   }
 }
 
-// Note: .apps-section / .section-header / .cards-container / .app-card /
-// .card-* / .platform-heading / .ios-whitelist-* all come from the shared
-// styles/app-cards partial (imported at the top of this file) — kept in
-// sync with /apps automatically.
-
 // ── Footer ───────────────────────────────────────
 .footer {
   width: 100%;
@@ -395,6 +390,23 @@
   color: $text-muted;
 }
 
+// ── Arrival out of the intro ─────────────────────
+// The intro's blast opens onto the page; the page settles in under it.
+.landing.is-arriving {
+  .hero,
+  .apps-section {
+    animation: arrive 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0.4;
+    transform: scale(1.06);
+    filter: brightness(1.8) blur(4px);
+  }
+}
+
 // ── Animations ───────────────────────────────────
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
@@ -407,9 +419,6 @@
 }
 
 // ── Responsive ───────────────────────────────────
-// Note: .cards-container / .app-card responsive rules live in
-// styles/app-cards (shared with /apps) — only landing-specific overrides
-// live here.
 @media (max-width: $breakpoint-md) {
   .profile-name {
     font-size: clamp(1.6rem, 6vw, 2.2rem);

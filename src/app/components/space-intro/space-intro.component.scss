@@ -1,0 +1,78 @@
+@import 'styles/variables';
+
+// Above the nav (1000-1002), so nothing of the page shows through but the hole.
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: block;
+  background: #04050d;
+
+  &.is-drawn {
+    background: none;
+  }
+}
+
+.intro__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.intro__skip {
+  position: absolute;
+  right: $spacing-lg;
+  bottom: calc(#{$spacing-lg} + env(safe-area-inset-bottom, 0px));
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  min-height: 44px;
+  padding: 0 $spacing-md 0 $spacing-lg;
+  font-family: $font-stack;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  background: rgba(20, 20, 40, 0.55);
+  border: 1px solid $glass-border-hover;
+  border-radius: $radius-pill;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  animation: skip-in 400ms ease-out 400ms backwards;
+  transition:
+    background-color $transition-fast,
+    border-color $transition-fast,
+    opacity $transition-base;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: rgba(40, 40, 70, 0.75);
+    border-color: rgba($brand-cyan, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 3px;
+  }
+}
+
+// Nothing left to skip once the ship has hit.
+:host(.is-hit) .intro__skip {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes skip-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
