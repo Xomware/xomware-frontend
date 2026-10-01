@@ -1,4 +1,9 @@
-<div class="landing">
+@if (introActive()) {
+  <app-space-intro (impact)="arriving.set(true)" (done)="introActive.set(false)"></app-space-intro>
+}
+
+<!-- inert while the intro covers it, so keyboard focus can't wander in behind. -->
+<div class="landing" [class.is-arriving]="arriving()" [attr.inert]="introActive() ? '' : null">
   <!-- Page-level sky: the site stays in the same space the flight opens in. -->
   <app-space-backdrop></app-space-backdrop>
 
@@ -7,12 +12,6 @@
        surface, not a gated dashboard. -->
   <app-nav></app-nav>
 
-  <!-- Act I-III: the cinematic flight past every app. Skipped entirely under
-       prefers-reduced-motion or after a skip this session — every app on the
-       rail is also in the directory below, so nothing is lost when it's off. -->
-  <app-space-journey *ngIf="showJourney"></app-space-journey>
-
-  <!-- Act IV: the grounded site. -->
   <!-- Hero / Profile Section -->
   <header class="hero" id="site">
     <div class="hero-content">

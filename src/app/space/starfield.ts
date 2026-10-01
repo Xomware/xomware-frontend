@@ -1,4 +1,4 @@
-import { X_POINTS } from './x-points';
+import { drawShip } from './ship';
 
 /**
  * Parallax starfield, rendered to a 2D canvas.
@@ -6,12 +6,6 @@ import { X_POINTS } from './x-points';
  * Deliberately hand-written rather than pulled from a particle library: the
  * app ships every route in the initial bundle (no lazy loading), so a WebGL
  * or particle dependency would eat the whole remaining budget.
- *
- * There are no drawn lines anywhere in here. An earlier version connected
- * neighbouring stars and traced the mark with two strokes, which read as a
- * diagram rather than a sky. The constellation is made of stars alone — 460 of
- * them, sampled from the real logo artwork (see x-points.ts), so the brush
- * texture of the painted X is what actually forms.
  *
  * Angular-free on purpose — it owns a canvas and a rAF loop, nothing else.
  */
@@ -29,9 +23,6 @@ interface Star {
   tint: number;
   /** Bright enough to get a drawn halo. */
   luminous: boolean;
-  /** Target in the mark, -1..1 about centre. Null for stars not in the X. */
-  tx: number | null;
-  ty: number | null;
 }
 
 /** A shooting star: a short-lived streak with a fading tail. */
@@ -104,16 +95,11 @@ export interface StarfieldOptions {
   meteors?: boolean;
   /** Tumbling rocks. */
   asteroids?: boolean;
-  /** Whether stars are reserved to assemble the Xomware mark. */
-  mark?: boolean;
-  /** Self-propelled drift per frame, for surfaces not driven by scroll. */
+  /** Self-propelled drift per frame. */
   drift?: number;
 }
 
-/** Half-extent of the assembled mark, as a fraction of the smaller viewport side. */
-const X_SPAN = 0.42;
-
-function mulberry32(seed: number): () => number {
+export function mulberry32(seed: number): () => number {
   let a = seed;
   return () => {
     a |= 0;
@@ -136,8 +122,6 @@ function pickColour(r: number): number {
 export class Starfield {
   private ctx: CanvasRenderingContext2D | null;
   private stars: Star[] = [];
-  /** Only the stars that belong to the mark, cached to avoid re-filtering. */
-  private xStars: Star[] = [];
   /** One pre-rendered sprite per star colour, plus a spiked variant. */
   private starSprites: HTMLCanvasElement[] = [];
   private spikeSprites: HTMLCanvasElement[] = [];
@@ -156,9 +140,6 @@ export class Starfield {
   private rand: () => number = mulberry32(1);
 
   private progress = 0;
-  private renderedProgress = 0;
-  private formation = 0;
-  private renderedFormation = 0;
 
   private readonly opts: Required<StarfieldOptions>;
 
@@ -168,7 +149,6 @@ export class Starfield {
       starCount: BASE_STAR_COUNT,
       meteors: true,
       asteroids: true,
-      mark: true,
       drift: 0,
       ...options,
     };
@@ -199,13 +179,10 @@ export class Starfield {
           phase: rand() * Math.PI * 2,
           tint: pickColour(rand()),
           luminous: rand() > 0.975,
-          tx: null,
-          ty: null,
         });
       }
     });
 
-    if (this.opts.mark) this.assignMark(rand);
     if (this.opts.asteroids) this.seedAsteroids(rand);
     // Kept for meteor spawning, which needs randomness past construction.
     this.rand = rand;
@@ -230,26 +207,6 @@ export class Starfield {
         angle: rand() * Math.PI * 2,
         layer: rand() > 0.5 ? 1 : 2,
       });
-    }
-  }
-
-  /**
-   * Hand out the mark's sampled points to a random spread of stars.
-   *
-   * Drawn from the whole field rather than one layer, so the X assembles from
-   * every depth at once instead of a single plane sliding into place.
-   */
-  private assignMark(rand: () => number): void {
-    const pool = [...this.stars];
-    this.xStars = [];
-
-    const count = Math.min(X_POINTS.length, pool.length);
-    for (let i = 0; i < count; i++) {
-      const star = pool.splice(Math.floor(rand() * pool.length), 1)[0];
-      const [tx, ty] = X_POINTS[i];
-      star.tx = tx;
-      star.ty = ty;
-      this.xStars.push(star);
     }
   }
 
@@ -335,22 +292,6 @@ export class Starfield {
     this.draw();
   }
 
-  setProgress(p: number): void {
-    this.progress = p;
-  }
-
-  /** 0 = scattered, 1 = assembled into the mark. Driven by the timeline. */
-  setFormation(v: number): void {
-    this.formation = Math.min(Math.max(v, 0), 1);
-  }
-
-  /** Paint one frame without starting the loop — used for reduced motion. */
-  renderStatic(): void {
-    this.renderedProgress = this.progress;
-    this.renderedFormation = this.formation;
-    this.draw();
-  }
-
   start(): void {
     if (this.running || !this.ctx) return;
     this.running = true;
@@ -366,7 +307,6 @@ export class Starfield {
   destroy(): void {
     this.stop();
     this.stars = [];
-    this.xStars = [];
     this.asteroids = [];
     this.meteors = [];
     this.rocket = null;
@@ -377,17 +317,14 @@ export class Starfield {
 
   private tick = (): void => {
     if (!this.running) return;
-    // A backdrop has no scroll driving it, so it advances itself.
-    if (this.opts.drift) this.progress += this.opts.drift;
-    this.renderedProgress += (this.progress - this.renderedProgress) * 0.08;
-    this.renderedFormation += (this.formation - this.renderedFormation) * 0.055;
+    this.progress += this.opts.drift;
     this.time += 0.016;
     this.update();
     this.draw();
     this.frame = requestAnimationFrame(this.tick);
   };
 
-  /** Advance everything that has its own motion, independent of scroll. */
+  /** Advance everything that has its own motion. */
   private update(): void {
     if (!this.animateScene) return;
 
@@ -465,47 +402,25 @@ export class Starfield {
 
     ctx.clearRect(0, 0, this.width, this.height);
 
-    const travel = this.renderedProgress * this.width * 6;
-    const form = this.renderedFormation;
-    const cx = this.width / 2;
-    const cy = this.height / 2;
-    const scale = Math.min(this.width, this.height) * X_SPAN;
+    const travel = this.progress * this.width * 6;
 
-    this.drawAsteroids(ctx, travel, form);
+    this.drawAsteroids(ctx, travel);
 
     for (const star of this.stars) {
       let x = (star.x * this.width - travel * LAYER_SPEED[star.layer]) % this.width;
       if (x < 0) x += this.width;
-      let y = star.y * this.height;
-
-      // Stars belonging to the mark ease toward their sampled point.
-      let assembled = 0;
-      if (form > 0.001 && star.tx !== null && star.ty !== null) {
-        assembled = form;
-        x += (cx + star.tx * scale - x) * form;
-        y += (cy + star.ty * scale - y) * form;
-      }
+      const y = star.y * this.height;
 
       // Slow twinkle. Small amplitude — the sky should read as alive, not
       // as blinking.
       const twinkle = 0.78 + Math.sin(this.time * 1.3 + star.phase) * 0.22;
-
-      // Contrast is what makes the mark readable without drawing a single
-      // line: its stars brighten and swell while the rest of the sky falls
-      // back. Brightening the mark alone wasn't enough — against a full field
-      // the shape stayed lost in the noise.
-      const isMark = star.tx !== null;
-      const recede = isMark ? 1 : 1 - form * 0.62;
-      // Deliberately restrained. The mark reads from the crisp edge of its
-      // silhouette (62% of its points sit on the stroke boundary), not from
-      // being bright — blown out it looked like a graphic pasted on the sky.
-      const alpha = Math.min(0.92, star.alpha * twinkle * recede + assembled * 0.4);
+      const alpha = Math.min(0.92, star.alpha * twinkle);
       const sprite = this.starSprites[star.tint];
       if (!sprite) continue;
 
       // The sprite's visible core is a fraction of its box, so it is drawn
       // several times the nominal star size.
-      const box = (star.size + assembled * 0.9) * 6.5;
+      const box = star.size * 6.5;
       ctx.globalAlpha = alpha;
       ctx.drawImage(sprite, x - box / 2, y - box / 2, box, box);
 
@@ -520,73 +435,24 @@ export class Starfield {
     }
 
     this.drawMeteors(ctx);
-    this.drawRocket(ctx, form);
+    this.drawRocket(ctx);
     ctx.globalAlpha = 1;
   }
 
-  /** The ship, drawn nose-first along its own heading. */
-  private drawRocket(ctx: CanvasRenderingContext2D, form: number): void {
+  private drawRocket(ctx: CanvasRenderingContext2D): void {
     const r = this.rocket;
     if (!r) return;
 
-    // Recedes with the rest of the sky while the mark assembles.
-    ctx.globalAlpha = 1 - form * 0.7;
+    ctx.globalAlpha = 1;
     ctx.save();
     ctx.translate(r.x, r.y);
     ctx.rotate(Math.atan2(r.vy, r.vx));
-
-    // Exhaust first, so the hull paints over its root. Length flickers.
-    const flame = 13 + Math.sin(this.time * 22) * 4;
-    const plume = ctx.createLinearGradient(-9, 0, -9 - flame, 0);
-    plume.addColorStop(0, 'rgba(255, 214, 130, 0.95)');
-    plume.addColorStop(0.45, 'rgba(255, 138, 46, 0.6)');
-    plume.addColorStop(1, 'rgba(255, 108, 32, 0)');
-    ctx.fillStyle = plume;
-    ctx.beginPath();
-    ctx.moveTo(-9, -3.4);
-    ctx.lineTo(-9 - flame, 0);
-    ctx.lineTo(-9, 3.4);
-    ctx.closePath();
-    ctx.fill();
-
-    // Fins.
-    ctx.fillStyle = 'rgba(196, 84, 74, 0.95)';
-    ctx.beginPath();
-    ctx.moveTo(-7, -3);
-    ctx.lineTo(-13, -8.5);
-    ctx.lineTo(-5, -3);
-    ctx.closePath();
-    ctx.moveTo(-7, 3);
-    ctx.lineTo(-13, 8.5);
-    ctx.lineTo(-5, 3);
-    ctx.closePath();
-    ctx.fill();
-
-    // Hull: a nose cone tapering back to the engine.
-    ctx.fillStyle = 'rgba(226, 232, 246, 0.96)';
-    ctx.beginPath();
-    ctx.moveTo(17, 0);
-    ctx.quadraticCurveTo(6, -5.4, -9, -4.2);
-    ctx.lineTo(-9, 4.2);
-    ctx.quadraticCurveTo(6, 5.4, 17, 0);
-    ctx.closePath();
-    ctx.fill();
-
-    // Porthole.
-    ctx.fillStyle = 'rgba(0, 180, 216, 0.95)';
-    ctx.beginPath();
-    ctx.arc(4.5, 0, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-
+    drawShip(ctx, this.time);
     ctx.restore();
   }
 
   /** Tumbling rocks drifting through the field. */
-  private drawAsteroids(ctx: CanvasRenderingContext2D, travel: number, form: number): void {
-    // They are not part of the mark, so they fade back with the rest of the
-    // sky while it assembles.
-    const dim = 1 - form * 0.55;
-
+  private drawAsteroids(ctx: CanvasRenderingContext2D, travel: number): void {
     for (const rock of this.asteroids) {
       let x = (rock.x * this.width - travel * LAYER_SPEED[rock.layer] * 0.85) % this.width;
       if (x < 0) x += this.width;
@@ -612,13 +478,13 @@ export class Starfield {
       const shade = ctx.createLinearGradient(-rock.radius, -rock.radius, rock.radius, rock.radius);
       // Kept dark. Brighter than this and they stop reading as distant rock
       // and start competing with the stars for attention.
-      shade.addColorStop(0, `rgba(96, 100, 122, ${0.6 * dim})`);
-      shade.addColorStop(0.55, `rgba(44, 46, 62, ${0.62 * dim})`);
-      shade.addColorStop(1, `rgba(18, 19, 30, ${0.7 * dim})`);
+      shade.addColorStop(0, 'rgba(96, 100, 122, 0.6)');
+      shade.addColorStop(0.55, 'rgba(44, 46, 62, 0.62)');
+      shade.addColorStop(1, 'rgba(18, 19, 30, 0.7)');
       ctx.fillStyle = shade;
       ctx.fill();
 
-      ctx.strokeStyle = `rgba(150, 158, 186, ${0.18 * dim})`;
+      ctx.strokeStyle = 'rgba(150, 158, 186, 0.18)';
       ctx.lineWidth = 0.8;
       ctx.stroke();
       ctx.restore();

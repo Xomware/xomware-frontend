@@ -15,7 +15,7 @@ import { test, expect, type Page } from '@playwright/test';
 const ROUTES = [
   // The landing page is public — there is no longer a signed-out gate to
   // capture. Note this run happens under reducedMotion: 'reduce', so what is
-  // baselined is the grounded page; the space journey does not mount and is
+  // baselined is the grounded page; the space intro does not mount and is
   // therefore NOT covered by these tests.
   { path: '/', name: 'landing' },
   { path: '/apps', name: 'apps' },

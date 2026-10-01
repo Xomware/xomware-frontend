@@ -1,7 +1,8 @@
 import { APPS, AppCard } from './apps.data';
 
 /**
- * A single body in the space journey on the landing page.
+ * One product in the Xomware system: a body in the landing intro and in the
+ * /apps orbit.
  *
  * Planets are a *presentation* grouping derived from APPS — they are not a
  * second source of truth. Add or change an app in apps.data.ts and it shows
@@ -13,60 +14,14 @@ export interface Planet {
   color: string;
   colorRgb: string;
   url: string;
-  /** Wide banner lockup — what the planets show on the landing flight. */
-  logo: string;
   /** Square mark, for surfaces that must be circular (the /apps orbit). */
   icon: string;
-  /** See AppCard.logoPulse. */
-  logoPulse: boolean;
   status: 'live' | 'coming-soon';
   /** See AppCard.beta. */
   beta: boolean;
   /** Human labels for every platform the product ships on, e.g. ['Web', 'iOS']. */
   platforms: string[];
-  /** Layout and surface treatment only — see LAYOUT below. */
-  size: number;
-  offsetY: number;
-  depth: number;
-  /** Surface treatment. Purely cosmetic; see LAYOUT. */
-  surface: 'cratered' | 'banded' | 'swirled' | 'icy';
-  /** Whether the body carries a ring. */
-  ring: boolean;
-  /** Degrees of tilt on that ring, so no two sit at the same angle. */
-  ringTilt: number;
-  /** A small inhabitant waving from the rim. Two of them, so it stays a find. */
-  alien: boolean;
 }
-
-/**
- * Per-position layout values, applied by index rather than randomised.
- *
- * Randomising would re-roll the composition on every render and make the
- * journey untestable; a fixed table gives the same varied-but-deliberate
- * arrangement every time. Cycled with `%` so adding a 9th app still works.
- *
- * size     — multiplier on the base planet diameter
- * offsetY  — vertical drift from the travel line, in vh
- * depth    — parallax rate; >1 passes nearer the camera than the star layers
- * surface  — which surface treatment the body wears
- * ring     — whether it carries a ring
- * ringTilt — that ring's tilt in degrees
- * alien    — a small waving inhabitant on the rim
- *
- * Rings are spread out rather than given to neighbours, so two ringed bodies
- * are never on screen together — one at a time reads as a feature, a row of
- * them reads as a texture.
- */
-const LAYOUT = [
-  { size: 1.0, offsetY: -7, depth: 0.9, surface: 'swirled', ring: false, ringTilt: 0, alien: false },
-  { size: 0.84, offsetY: 11, depth: 0.7, surface: 'cratered', ring: false, ringTilt: 0, alien: true },
-  { size: 1.12, offsetY: -13, depth: 1.05, surface: 'banded', ring: true, ringTilt: -16, alien: false },
-  { size: 0.92, offsetY: 5, depth: 0.8, surface: 'icy', ring: false, ringTilt: 0, alien: false },
-  { size: 1.04, offsetY: -4, depth: 0.95, surface: 'cratered', ring: false, ringTilt: 0, alien: false },
-  { size: 0.88, offsetY: 13, depth: 0.72, surface: 'swirled', ring: true, ringTilt: 12, alien: false },
-  { size: 1.16, offsetY: -10, depth: 1.1, surface: 'banded', ring: false, ringTilt: 0, alien: true },
-  { size: 0.96, offsetY: 6, depth: 0.85, surface: 'icy', ring: true, ringTilt: -24, alien: false },
-] as const;
 
 const PLATFORM_LABEL: Record<AppCard['platform'], string> = {
   web: 'Web',
@@ -78,9 +33,9 @@ const PLATFORM_LABEL: Record<AppCard['platform'], string> = {
  * Order products before seasonal pools.
  *
  * Pools reset every year and aren't ongoing products, so they read as a
- * coda to the journey rather than being scattered through the middle of it.
+ * coda rather than being scattered through the middle.
  */
-function journeyRank(platform: AppCard['platform']): number {
+function rank(platform: AppCard['platform']): number {
   return platform === 'pool' ? 1 : 0;
 }
 
@@ -88,10 +43,9 @@ function journeyRank(platform: AppCard['platform']): number {
  * Group the flat app list into one planet per *product*.
  *
  * Xomify and Xomper each appear twice in APPS (a web row and an iOS row) —
- * that split is deliberate and drives the /apps grid, so it is left alone
- * there. A visitor flying past two identical Xomify planets would read it as
- * a bug, so the journey merges rows that share a name and shows the
- * platforms as badges instead.
+ * that split is deliberate and drives the directory, so it is left alone
+ * there. Two identical Xomify planets would read as a bug, so rows that share
+ * a name merge here and the platforms become badges instead.
  */
 function buildPlanets(): Planet[] {
   const byName = new Map<string, AppCard[]>();
@@ -107,14 +61,13 @@ function buildPlanets(): Planet[] {
   }
 
   const grouped = [...byName.values()].sort(
-    (a, b) => journeyRank(a[0].platform) - journeyRank(b[0].platform),
+    (a, b) => rank(a[0].platform) - rank(b[0].platform),
   );
 
-  return grouped.map((rows, i) => {
+  return grouped.map((rows) => {
     // Prefer the web row: it owns the product's real URL and the description
     // written for the product itself, not the "…on iOS" variant.
     const primary = rows.find((r) => r.platform === 'web') ?? rows[0];
-    const layout = LAYOUT[i % LAYOUT.length];
 
     return {
       name: primary.name,
@@ -122,14 +75,11 @@ function buildPlanets(): Planet[] {
       color: primary.color,
       colorRgb: primary.colorRgb,
       url: primary.url,
-      logo: primary.logo,
       icon: primary.icon,
-      logoPulse: !!primary.logoPulse,
       // Live on any platform means the product is live and reachable.
       status: rows.some((r) => r.status === 'live') ? 'live' : 'coming-soon',
       beta: !!primary.beta,
       platforms: [...new Set(rows.map((r) => PLATFORM_LABEL[r.platform]))],
-      ...layout,
     };
   });
 }

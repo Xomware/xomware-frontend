@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, AfterViewInit, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, AfterViewInit, OnInit, ViewChild, signal } from '@angular/core';
 import { BehaviorSubject, EMPTY, Subscription, interval, of } from 'rxjs';
 import { switchMap, startWith, catchError, distinctUntilChanged } from 'rxjs/operators';
 import { gsap } from 'gsap';
@@ -8,7 +8,7 @@ import { NowPlayingService } from '../../services/now-playing.service';
 import { MusicProfile } from '../../models/music.model';
 import { NowPlayingState } from '../../models/now-playing.model';
 import { environment } from '../../../environments/environment';
-import { shouldPlayJourney } from '../space-journey/space-journey.component';
+import { claimIntro } from '../space-intro/space-intro.component';
 
 const IDLE_STATE: NowPlayingState = {
   isPlaying: false,
@@ -27,11 +27,10 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
-  /**
-   * Whether to mount the cinematic intro. Read once, before the first render,
-   * so the page never mounts the journey and then yanks it away.
-   */
-  readonly showJourney = shouldPlayJourney();
+  /** Claimed before the first render, so the page never shows and then gets covered. */
+  readonly introActive = signal(claimIntro());
+  /** The intro's ship has hit and the page is arriving under the blast. */
+  readonly arriving = signal(false);
 
   landingTickerProfile: MusicProfile | null = null;
   nowPlayingState: NowPlayingState | null = null;

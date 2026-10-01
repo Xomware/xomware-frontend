@@ -9,7 +9,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { jwtInterceptor } from './interceptors/jwt.interceptor';
 import { AppComponent } from './app.component';
 import { LandingComponent } from './components/landing/landing.component';
-import { SpaceJourneyComponent } from './components/space-journey/space-journey.component';
 import { AppOrbitComponent } from './components/app-orbit/app-orbit.component';
 import { SpaceBackdropComponent } from './components/space-backdrop/space-backdrop.component';
 import { CommandCenterComponent } from './components/command-center/command-center.component';
@@ -35,12 +34,12 @@ import { AppNavComponent } from './components/nav/app-nav.component';
 import { NowPlayingComponent } from './components/now-playing/now-playing.component';
 import { MusicSnapshotComponent } from './components/music-snapshot/music-snapshot.component';
 import { AppDirectoryComponent } from './components/app-directory/app-directory.component';
+import { SpaceIntroComponent } from './components/space-intro/space-intro.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LandingComponent,
-    SpaceJourneyComponent,
     AppOrbitComponent,
     SpaceBackdropComponent,
     CommandCenterComponent,
@@ -73,6 +72,7 @@ import { AppDirectoryComponent } from './components/app-directory/app-directory.
     ReactiveFormsModule,
     AppRoutingModule,
     AppDirectoryComponent,
+    SpaceIntroComponent,
   ],
   providers: [
     provideHttpClient(withInterceptors([jwtInterceptor])),

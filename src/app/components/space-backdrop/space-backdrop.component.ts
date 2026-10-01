@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild } from '@angular/core';
-import { Starfield } from '../space-journey/starfield';
+import { Starfield } from '../../space/starfield';
 import { environment } from '../../../environments/environment';
 
 /** Calmer than the flight's field — this sits behind text all the way down. */
@@ -46,9 +46,6 @@ export class SpaceBackdropComponent implements AfterViewInit, OnDestroy {
       const field = new Starfield(this.canvasRef.nativeElement, {
         animateScene: !still,
         starCount: BACKDROP_STARS,
-        // The mark belongs to the flight's own field; assembling it here would
-        // put a second Xomware X on screen behind the page content.
-        mark: false,
         drift: still ? 0 : DRIFT,
       });
       this.field = field;
