@@ -10,10 +10,19 @@ export interface AppCard {
   colorRgb: string;
   url: string;
   /**
-   * Wide banner/wordmark: the app directory, the /apps orbit and the intro's
-   * planet labels. It's the fuller lockup and reads as the more finished mark.
+   * Wide banner/wordmark, used on the app cards and the /apps grid where there
+   * is horizontal room for it. This is the fuller lockup and reads as the more
+   * finished mark, so it wins wherever the layout allows.
    */
   logo: string;
+  /**
+   * Square icon mark for the /apps orbital system, the one slot that masks its
+   * art to a circle (`.orbit__icon`, border-radius 50%). Art with an opaque
+   * square/squircle background gets corner-clipped into an octagon here, so a
+   * mark destined for this slot wants either a transparent background or a
+   * circular crop. The landing planets use `logo`, not this.
+   */
+  icon: string;
   tag: string;
   status: 'live' | 'coming-soon';
   /** Live and usable, but unfinished. Shown as a Beta badge wherever status is. */
@@ -61,6 +70,7 @@ export const APPS: AppCard[] = [
     colorRgb: '156, 10, 191',
     url: 'https://xomify.xomware.com',
     logo: 'assets/img/banners/xomify.webp',
+    icon: 'assets/img/apps/xomify.webp',
     logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
@@ -73,6 +83,7 @@ export const APPS: AppCard[] = [
     colorRgb: '255, 107, 53',
     url: 'https://xomcloud.xomware.com',
     logo: 'assets/img/banners/xomcloud.webp',
+    icon: 'assets/img/apps/xomcloud.webp',
     logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
@@ -85,6 +96,7 @@ export const APPS: AppCard[] = [
     colorRgb: '0, 255, 171',
     url: 'https://xomper.xomware.com',
     logo: 'assets/img/banners/xomper.webp',
+    icon: 'assets/img/apps/xomper.webp',
     logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
@@ -97,6 +109,7 @@ export const APPS: AppCard[] = [
     colorRgb: '200, 16, 46',
     url: 'https://derby.xomware.com',
     logo: 'assets/img/banners/sun-god-derby.webp',
+    icon: 'assets/img/apps/sun-god-derby.webp',
     logoStyle: 'banner',
     tag: 'Annual Pool',
     status: 'live',
@@ -110,6 +123,7 @@ export const APPS: AppCard[] = [
     colorRgb: '139, 69, 19',
     url: 'https://playoffs.xomware.com',
     logo: 'assets/img/banners/reeses.webp',
+    icon: 'assets/img/apps/reeses.webp',
     logoStyle: 'banner',
     logoPulse: true,
     tag: 'Annual Pool',
@@ -124,6 +138,7 @@ export const APPS: AppCard[] = [
     colorRgb: '30, 58, 138',
     url: 'https://smirnoff-league.com',
     logo: 'assets/img/banners/smirnoff-league.webp',
+    icon: 'assets/img/apps/smirnoff-league.webp',
     logoStyle: 'banner',
     tag: 'Season League',
     status: 'live',
@@ -136,6 +151,7 @@ export const APPS: AppCard[] = [
     colorRgb: '255, 107, 107',
     url: 'https://xomappetit.xomware.com',
     logo: 'assets/img/banners/xomappetit.webp',
+    icon: 'assets/img/apps/xomappetit.webp',
     logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
@@ -149,6 +165,7 @@ export const APPS: AppCard[] = [
     colorRgb: '76, 175, 80',
     url: 'https://xomforms.xomware.com',
     logo: 'assets/img/banners/xomforms.webp',
+    icon: 'assets/img/apps/xomforms.webp',
     logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
@@ -163,6 +180,7 @@ export const APPS: AppCard[] = [
     colorRgb: '245, 165, 36',
     url: 'https://todayinsports.app',
     logo: 'assets/img/banners/today-in-sports.svg',
+    icon: 'assets/img/apps/today-in-sports.webp',
     logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
@@ -175,6 +193,7 @@ export const APPS: AppCard[] = [
     colorRgb: '232, 63, 208',
     url: 'https://armchairjudge.com',
     logo: 'assets/img/apps/armchair-judge.webp',
+    icon: 'assets/img/apps/armchair-judge.webp',
     tag: 'Web App',
     status: 'live',
     platform: 'web',
@@ -187,6 +206,7 @@ export const APPS: AppCard[] = [
     colorRgb: '156, 10, 191',
     url: 'https://testflight.apple.com/join/5CQaJ2mB',
     logo: 'assets/img/banners/xomify.webp',
+    icon: 'assets/img/apps/xomify.webp',
     logoStyle: 'banner',
     tag: 'iOS · TestFlight',
     status: 'live',
@@ -199,6 +219,7 @@ export const APPS: AppCard[] = [
     colorRgb: '0, 255, 171',
     url: 'https://xomper.xomware.com',
     logo: 'assets/img/banners/xomper.webp',
+    icon: 'assets/img/apps/xomper.webp',
     logoStyle: 'banner',
     tag: 'iOS · Coming Soon',
     status: 'coming-soon',
@@ -211,6 +232,7 @@ export const APPS: AppCard[] = [
     colorRgb: '52, 199, 89',
     url: 'https://testflight.apple.com/join/xttcUQwT',
     logo: 'assets/img/banners/xomfit.webp',
+    icon: 'assets/img/apps/xomfit.webp',
     logoStyle: 'banner',
     tag: 'iOS · TestFlight',
     status: 'live',
@@ -223,6 +245,7 @@ export const APPS: AppCard[] = [
     colorRgb: '37, 99, 235',
     url: 'https://crons.xomware.com',
     logo: 'assets/img/xomcron-logo.svg',
+    icon: 'assets/img/xomcron-logo.svg',
     tag: 'Internal',
     status: 'live',
     platform: 'web',

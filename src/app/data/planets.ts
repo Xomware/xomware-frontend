@@ -14,8 +14,8 @@ export interface Planet {
   color: string;
   colorRgb: string;
   url: string;
-  /** The banner lockup: the /apps orbit and the intro's planet labels. */
-  logo: string;
+  /** Square mark, for surfaces that must be circular (the /apps orbit). */
+  icon: string;
   status: 'live' | 'coming-soon';
   /** See AppCard.beta. */
   beta: boolean;
@@ -75,7 +75,7 @@ function buildPlanets(): Planet[] {
       color: primary.color,
       colorRgb: primary.colorRgb,
       url: primary.url,
-      logo: primary.logo,
+      icon: primary.icon,
       // Live on any platform means the product is live and reachable.
       status: rows.some((r) => r.status === 'live') ? 'live' : 'coming-soon',
       beta: !!primary.beta,

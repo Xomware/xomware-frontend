@@ -100,11 +100,11 @@
 }
 
 .orbit__icon {
-  width: 146px;
-  height: 84px;
+  width: 110px;
+  height: 110px;
   object-fit: contain;
-  border-radius: $radius-lg;
-  padding: 12px 14px;
+  border-radius: 50%;
+  padding: 13px;
   background: radial-gradient(circle at 34% 28%, rgba(var(--app-rgb), 0.3) 0%, transparent 60%),
     linear-gradient(150deg, rgba(26, 26, 46, 0.95), rgba(8, 8, 18, 0.98));
   border: 1px solid rgba(var(--app-rgb), 0.22);
@@ -283,9 +283,9 @@
   }
 
   .orbit__icon {
-    width: 84px;
-    height: 50px;
-    padding: 6px 8px;
+    width: 60px;
+    height: 60px;
+    padding: 7px;
   }
 
   .orbit__core {

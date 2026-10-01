@@ -113,14 +113,6 @@
   transition: transform $transition-fast;
 }
 
-// A wide lockup needs width, not a tinted square behind it.
-.tile__icon--banner {
-  width: 112px;
-  padding: 0;
-  border-radius: 0;
-  background: none;
-}
-
 .tile__body {
   flex: 1;
   min-width: 0;
