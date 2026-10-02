@@ -39,6 +39,17 @@ describe('AppDirectoryComponent', () => {
     expect(sub?.href).toBe('https://dwts.armchairjudge.com/');
   });
 
+  it('shows each app by its banner where it has one, not its square mark', () => {
+    const root = render();
+
+    const xomify = tile(root, 'Xomify').querySelector<HTMLImageElement>('.tile__icon');
+    expect(xomify?.getAttribute('src')).toBe('assets/img/banners/xomify.webp');
+    expect(xomify?.classList).toContain('tile__icon--banner');
+    // Armchair Judge has no banner yet; its mark keeps the square slot.
+    const armchair = tile(root, 'Armchair Judge').querySelector<HTMLImageElement>('.tile__icon');
+    expect(armchair?.classList).not.toContain('tile__icon--banner');
+  });
+
   it('keeps admin-only tools off the public directory', () => {
     const names = Array.from(render().querySelectorAll('.tile__link')).map((a) => a.textContent?.trim());
 
