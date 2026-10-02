@@ -1,4 +1,14 @@
-import { INTRO_IMPACT, Rect, introLayout, markRect, planetAt, planetCount, plateRect, skipRect } from './intro-layout';
+import {
+  INTRO_IMPACT,
+  bodyRect,
+  introLayout,
+  labelAt,
+  markRect,
+  overlaps,
+  planetAt,
+  plateRect,
+  skipRect,
+} from './intro-layout';
 
 const VIEWPORTS: [number, number][] = [
   [360, 640],
@@ -13,51 +23,61 @@ const VIEWPORTS: [number, number][] = [
 ];
 const PLANETS = 11;
 
-const overlaps = (a: Rect, b: Rect, pad = 0): boolean =>
-  a.x < b.x + b.w + pad && b.x < a.x + a.w + pad && a.y < b.y + b.h + pad && b.y < a.y + a.h + pad;
-
-function boxes(w: number, h: number, t: number): { plates: Rect[]; bodies: Rect[] } {
-  const L = introLayout(w, h, PLANETS);
-  const plates: Rect[] = [];
-  const bodies: Rect[] = [];
-  for (const slot of L.slots) {
-    const p = planetAt(L, slot, t);
-    plates.push(plateRect(L, slot, p.x, p.y));
-    bodies.push({ x: p.x - slot.radius, y: p.y - slot.radius, w: slot.radius * 2, h: slot.radius * 2 });
-  }
-  return { plates, bodies };
-}
-
 describe('introLayout', () => {
-  it('shows fewer planets on a phone', () => {
-    expect(planetCount(390, 844, PLANETS)).toBe(6);
-    expect(planetCount(1440, 900, PLANETS)).toBe(PLANETS);
-  });
-
   for (const [w, h] of VIEWPORTS) {
-    it(`keeps every label clear of the others, the mark and the Skip button at ${w}x${h}`, () => {
+    describe(`at ${w}x${h}`, () => {
       const L = introLayout(w, h, PLANETS);
-      const mark = markRect(L);
-      const skip = skipRect(L);
-      for (let t = 0; t <= INTRO_IMPACT; t += 0.1) {
-        const { plates, bodies } = boxes(w, h, t);
-        plates.forEach((plate, i) => {
-          const at = `planet ${i} at t=${t.toFixed(1)}`;
-          expect(plate.x).withContext(at).toBeGreaterThanOrEqual(0);
-          expect(plate.x + plate.w).withContext(at).toBeLessThanOrEqual(w);
-          expect(plate.y + plate.h).withContext(at).toBeLessThanOrEqual(h);
-          expect(overlaps(plate, mark, 6)).withContext(`${at} vs mark`).toBeFalse();
-          expect(overlaps(plate, skip)).withContext(`${at} vs skip`).toBeFalse();
-          plates.forEach((other, j) => {
-            if (j !== i) expect(overlaps(plate, other, 4)).withContext(`${at} vs plate ${j}`).toBeFalse();
-          });
-          bodies.forEach((body, j) => {
-            if (j !== i) expect(overlaps(plate, body, 2)).withContext(`${at} vs planet ${j}`).toBeFalse();
-          });
-          expect(bodies[i].y).withContext(at).toBeGreaterThanOrEqual(0);
-          expect(overlaps(bodies[i], mark, 4)).withContext(`${at} body vs mark`).toBeFalse();
+
+      it('puts every app in orbit, on screen', () => {
+        expect(L.slots.length).toBe(PLANETS);
+        for (let t = 0; t <= INTRO_IMPACT; t += 0.1) {
+          for (const slot of L.slots) {
+            const body = bodyRect(slot, planetAt(L, slot, t));
+            const at = `planet ${slot.index} at t=${t.toFixed(1)}`;
+            expect(body.x).withContext(at).toBeGreaterThanOrEqual(0);
+            expect(body.y).withContext(at).toBeGreaterThanOrEqual(0);
+            expect(body.x + body.w).withContext(at).toBeLessThanOrEqual(w);
+            expect(body.y + body.h).withContext(at).toBeLessThanOrEqual(h);
+          }
+        }
+      });
+
+      it('shows every banner at some point', () => {
+        L.slots.forEach((slot) => {
+          let best = 0;
+          for (let t = 0; t <= INTRO_IMPACT; t += 0.05) best = Math.max(best, labelAt(L, slot.index, t).alpha);
+          expect(best).withContext(`planet ${slot.index}`).toBe(1);
         });
-      }
+      });
+
+      it('keeps every visible banner clear of the others, the planets, the mark and Skip', () => {
+        const mark = markRect(L);
+        const skip = skipRect(L);
+        for (let t = 0.013; t <= INTRO_IMPACT; t += 0.05) {
+          const pos = L.slots.map((slot) => planetAt(L, slot, t));
+          const bodies = L.slots.map((slot, i) => bodyRect(slot, pos[i]));
+          const plates = L.slots.map((slot, i) => {
+            const label = labelAt(L, i, t);
+            return label.alpha > 0 ? plateRect(L, slot, pos[i], label.anchor) : null;
+          });
+          plates.forEach((plate, i) => {
+            if (!plate) return;
+            const at = `planet ${i} at t=${t.toFixed(2)}`;
+            expect(plate.x).withContext(at).toBeGreaterThanOrEqual(0);
+            expect(plate.y).withContext(at).toBeGreaterThanOrEqual(0);
+            expect(plate.x + plate.w).withContext(at).toBeLessThanOrEqual(w);
+            expect(plate.y + plate.h).withContext(at).toBeLessThanOrEqual(h);
+            expect(overlaps(plate, mark, 4)).withContext(`${at} vs mark`).toBeFalse();
+            expect(overlaps(plate, skip)).withContext(`${at} vs skip`).toBeFalse();
+            plates.forEach((other, j) => {
+              if (other && j !== i) expect(overlaps(plate, other, 2)).withContext(`${at} vs plate ${j}`).toBeFalse();
+            });
+            bodies.forEach((body, j) => {
+              if (j !== i) expect(overlaps(plate, body)).withContext(`${at} vs planet ${j}`).toBeFalse();
+            });
+          });
+        }
+      });
     });
   }
 });

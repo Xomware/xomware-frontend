@@ -29,20 +29,60 @@ function path(ctx: CanvasRenderingContext2D, pts: readonly (readonly [number, nu
   ctx.closePath();
 }
 
-function plume(ctx: CanvasRenderingContext2D, y: number, length: number, width: number): void {
-  const g = ctx.createLinearGradient(NOZZLE_X, 0, NOZZLE_X - length, 0);
+/** Engine colours: white-hot core, mid, and the fading tail. */
+type Flame = readonly [string, string, string];
+const BLUE_FLAME: Flame = ['178, 240, 255', '60, 150, 255', '40, 90, 255'];
+const RED_FLAME: Flame = ['255, 200, 170', '255, 92, 60', '200, 40, 40'];
+const AMBER_FLAME: Flame = ['255, 236, 180', '255, 170, 60', '220, 110, 30'];
+
+function plume(ctx: CanvasRenderingContext2D, x: number, y: number, length: number, width: number, flame = BLUE_FLAME): void {
+  const g = ctx.createLinearGradient(x, 0, x - length, 0);
   g.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-  g.addColorStop(0.18, 'rgba(178, 240, 255, 0.85)');
-  g.addColorStop(0.55, 'rgba(60, 150, 255, 0.35)');
-  g.addColorStop(1, 'rgba(40, 90, 255, 0)');
+  g.addColorStop(0.18, `rgba(${flame[0]}, 0.85)`);
+  g.addColorStop(0.55, `rgba(${flame[1]}, 0.35)`);
+  g.addColorStop(1, `rgba(${flame[2]}, 0)`);
   ctx.fillStyle = g;
   ctx.beginPath();
-  ctx.moveTo(NOZZLE_X + 1, y - width);
-  ctx.quadraticCurveTo(NOZZLE_X - length * 0.35, y - width * 1.15, NOZZLE_X - length, y);
-  ctx.quadraticCurveTo(NOZZLE_X - length * 0.35, y + width * 1.15, NOZZLE_X + 1, y + width);
+  ctx.moveTo(x + 1, y - width);
+  ctx.quadraticCurveTo(x - length * 0.35, y - width * 1.15, x - length, y);
+  ctx.quadraticCurveTo(x - length * 0.35, y + width * 1.15, x + 1, y + width);
   ctx.closePath();
   ctx.fill();
 }
+
+/** Engine halo and plume at each nozzle, drawn before the hull so it covers their roots. */
+function engines(ctx: CanvasRenderingContext2D, nozzles: readonly Nozzle[], time: number, thrust: number, flame: Flame, width: number): void {
+  ctx.globalCompositeOperation = 'lighter';
+  const flicker = Math.sin(time * 47) * 0.12 + Math.sin(time * 29 + 1) * 0.08;
+  for (const [x, y] of nozzles) {
+    const halo = ctx.createRadialGradient(x - 2, y, 0, x - 2, y, 13);
+    halo.addColorStop(0, `rgba(${flame[0]}, ${0.55 * thrust})`);
+    halo.addColorStop(1, `rgba(${flame[2]}, 0)`);
+    ctx.fillStyle = halo;
+    ctx.fillRect(x - 15, y - 13, 26, 26);
+    plume(ctx, x, y, (15 + 9 * thrust) * (1 + flicker), width, flame);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+function navLights(ctx: CanvasRenderingContext2D, lights: readonly (readonly [number, number, string, number])[]): void {
+  ctx.globalCompositeOperation = 'lighter';
+  for (const [x, y, rgb, a] of lights) {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, 4);
+    g.addColorStop(0, `rgba(${rgb}, ${a})`);
+    g.addColorStop(1, `rgba(${rgb}, 0)`);
+    ctx.fillStyle = g;
+    ctx.fillRect(x - 4, y - 4, 8, 8);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+/** A nozzle exit in the craft's own units. */
+export type Nozzle = readonly [number, number];
+export const COURIER_NOZZLES: readonly Nozzle[] = [
+  [NOZZLE_X, -NOZZLE_Y],
+  [NOZZLE_X, NOZZLE_Y],
+];
 
 /**
  * A twin-engine courier in plan view, nose along +x at the origin. The caller
@@ -60,18 +100,7 @@ export function drawShip(ctx: CanvasRenderingContext2D, pose: ShipPose, time: nu
   ctx.save();
   ctx.scale(1, 1 - 0.38 * Math.abs(bank));
 
-  // Engine light first, so the hull covers its root.
-  ctx.globalCompositeOperation = 'lighter';
-  const flicker = Math.sin(time * 47) * 0.12 + Math.sin(time * 29 + 1) * 0.08;
-  for (const y of [-NOZZLE_Y, NOZZLE_Y]) {
-    const halo = ctx.createRadialGradient(NOZZLE_X - 2, y, 0, NOZZLE_X - 2, y, 13);
-    halo.addColorStop(0, `rgba(150, 225, 255, ${0.55 * thrust})`);
-    halo.addColorStop(1, 'rgba(60, 140, 255, 0)');
-    ctx.fillStyle = halo;
-    ctx.fillRect(NOZZLE_X - 15, y - 13, 26, 26);
-    plume(ctx, y, (15 + 9 * thrust) * (1 + flicker), 2.6);
-  }
-  ctx.globalCompositeOperation = 'source-over';
+  engines(ctx, COURIER_NOZZLES, time, thrust, BLUE_FLAME, 2.6);
 
   for (const side of [-1, 1]) {
     const s = side;
@@ -224,18 +253,237 @@ export function drawShip(ctx: CanvasRenderingContext2D, pose: ShipPose, time: nu
 
   // Nav lights: red to port, green to starboard, a white strobe on the tail.
   const blink = Math.sin(time * 5.2) > 0.55 ? 1 : 0.25;
-  ctx.globalCompositeOperation = 'lighter';
-  for (const [x, y, rgb, a] of [
+  navLights(ctx, [
     [-20, -25.5, '255, 70, 70', 0.9],
     [-20, 25.5, '80, 255, 140', 0.9],
     [-30, 0, '255, 255, 255', blink],
-  ] as const) {
-    const g = ctx.createRadialGradient(x, y, 0, x, y, 4);
-    g.addColorStop(0, `rgba(${rgb}, ${a})`);
-    g.addColorStop(1, `rgba(${rgb}, 0)`);
-    ctx.fillStyle = g;
-    ctx.fillRect(x - 4, y - 4, 8, 8);
+  ]);
+  ctx.restore();
+}
+
+export const RAIDER_NOZZLES: readonly Nozzle[] = [[-27, 0]];
+
+/**
+ * The pursuer: a gunmetal raider with forward-swept wings, one big engine
+ * and a cannon on each wingtip. Same conventions as `drawShip`.
+ */
+export function drawRaider(ctx: CanvasRenderingContext2D, pose: ShipPose, time: number, thrust = 1): void {
+  const bank = Math.max(-1, Math.min(1, pose.bank));
+  const lit = Math.sin(LIGHT - pose.heading);
+  const sideLight = (side: number): number => 0.42 - 0.28 * lit * side - 0.32 * bank * side;
+
+  ctx.save();
+  ctx.scale(1, 1 - 0.38 * Math.abs(bank));
+  engines(ctx, RAIDER_NOZZLES, time, thrust, RED_FLAME, 3.6);
+
+  for (const side of [-1, 1]) {
+    const s = side;
+    const tone = sideLight(s);
+    // Forward-swept wing: the tip sits ahead of the root.
+    const wing = ctx.createLinearGradient(0, 4 * s, 4, 22 * s);
+    wing.addColorStop(0, metal(tone + 0.02));
+    wing.addColorStop(1, metal(tone - 0.22));
+    ctx.fillStyle = wing;
+    path(ctx, [
+      [-4, 4 * s],
+      [8, 20 * s],
+      [12, 22 * s],
+      [9, 24 * s],
+      [-2, 23 * s],
+      [-16, 7 * s],
+    ]);
+    ctx.fill();
+    ctx.lineWidth = 0.7;
+    ctx.strokeStyle = metal(tone + 0.3, 0.85);
+    ctx.beginPath();
+    ctx.moveTo(-4, 4 * s);
+    ctx.lineTo(8, 20 * s);
+    ctx.stroke();
+    // Red flash along the wing.
+    ctx.fillStyle = 'rgba(196, 44, 52, 0.95)';
+    path(ctx, [
+      [-3, 9 * s],
+      [4, 18 * s],
+      [1, 18.5 * s],
+      [-7, 9.5 * s],
+    ]);
+    ctx.fill();
+    // Wingtip cannon.
+    ctx.fillStyle = metal(tone + 0.15);
+    ctx.fillRect(-2, 21.6 * s - 1.1, 22, 2.2);
+    ctx.fillStyle = 'rgba(30, 32, 42, 1)';
+    ctx.fillRect(18, 21.6 * s - 0.7, 3, 1.4);
+    // Tailplane.
+    ctx.fillStyle = metal(tone - 0.1);
+    path(ctx, [
+      [-17, 3 * s],
+      [-24, 12 * s],
+      [-28, 12 * s],
+      [-26, 3 * s],
+    ]);
+    ctx.fill();
   }
+
+  const shadeSide = lit + bank * 0.9;
+  const hull = ctx.createLinearGradient(0, -6, 0, 6);
+  hull.addColorStop(0, metal(0.36 + 0.3 * shadeSide));
+  hull.addColorStop(0.45, metal(0.74));
+  hull.addColorStop(1, metal(0.3 - 0.3 * shadeSide));
+  ctx.fillStyle = hull;
+  ctx.beginPath();
+  ctx.moveTo(30, 0);
+  ctx.lineTo(18, -3.4);
+  ctx.lineTo(-6, -5.6);
+  ctx.lineTo(-22, -5.2);
+  ctx.lineTo(-27, -3.6);
+  ctx.lineTo(-27, 3.6);
+  ctx.lineTo(-22, 5.2);
+  ctx.lineTo(-6, 5.6);
+  ctx.lineTo(18, 3.4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(16, 18, 28, 0.55)';
+  ctx.lineWidth = 0.55;
+  ctx.beginPath();
+  for (const x of [8, -4, -16]) {
+    ctx.moveTo(x, -5);
+    ctx.lineTo(x - 1, 5);
+  }
+  ctx.stroke();
+
+  // A narrow slit canopy, amber glass.
+  const glass = ctx.createLinearGradient(20, -2, 6, 2);
+  glass.addColorStop(0, 'rgba(255, 200, 120, 1)');
+  glass.addColorStop(0.45, 'rgba(110, 50, 24, 1)');
+  glass.addColorStop(1, 'rgba(24, 10, 8, 1)');
+  ctx.fillStyle = glass;
+  ctx.beginPath();
+  ctx.ellipse(13, 0, 7, 2.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 236, 210, 0.75)';
+  ctx.lineWidth = 0.7;
+  ctx.beginPath();
+  ctx.moveTo(17, lit > 0 ? -1 : 1);
+  ctx.lineTo(10, lit > 0 ? -1.4 : 1.4);
+  ctx.stroke();
+
+  const blink = Math.sin(time * 6.1 + 1) > 0.5 ? 1 : 0.2;
+  navLights(ctx, [
+    [-1, -23.5, '255, 70, 70', 0.9],
+    [-1, 23.5, '80, 255, 140', 0.9],
+    [-27, 0, '255, 120, 90', blink],
+  ]);
+  ctx.restore();
+}
+
+export const HAULER_NOZZLES: readonly Nozzle[] = [
+  [-30, -14],
+  [-30, 14],
+  [-26, 0],
+];
+
+/**
+ * The heavy: a broad arrowhead gunship with engine pods on outriggers and
+ * an amber brand band. Same conventions as `drawShip`.
+ */
+export function drawHauler(ctx: CanvasRenderingContext2D, pose: ShipPose, time: number, thrust = 1): void {
+  const bank = Math.max(-1, Math.min(1, pose.bank));
+  const lit = Math.sin(LIGHT - pose.heading);
+  const sideLight = (side: number): number => 0.5 - 0.28 * lit * side - 0.32 * bank * side;
+
+  ctx.save();
+  ctx.scale(1, 1 - 0.38 * Math.abs(bank));
+  engines(ctx, HAULER_NOZZLES, time, thrust, AMBER_FLAME, 3);
+
+  for (const side of [-1, 1]) {
+    const s = side;
+    const tone = sideLight(s);
+    // The arrowhead's half: a broad swept plate.
+    const plate = ctx.createLinearGradient(10, 0, -14, 20 * s);
+    plate.addColorStop(0, metal(tone + 0.12));
+    plate.addColorStop(1, metal(tone - 0.2));
+    ctx.fillStyle = plate;
+    path(ctx, [
+      [30, 0],
+      [-8, 19 * s],
+      [-20, 19 * s],
+      [-22, 8 * s],
+      [-22, 0],
+    ]);
+    ctx.fill();
+    ctx.lineWidth = 0.8;
+    ctx.strokeStyle = metal(tone + 0.38, 0.9);
+    ctx.beginPath();
+    ctx.moveTo(30, 0);
+    ctx.lineTo(-8, 19 * s);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(16, 20, 32, 0.5)';
+    ctx.lineWidth = 0.55;
+    ctx.beginPath();
+    ctx.moveTo(12, 6 * s);
+    ctx.lineTo(-18, 6 * s);
+    ctx.moveTo(4, 11 * s);
+    ctx.lineTo(-18, 13 * s);
+    ctx.stroke();
+    // Amber band across the plate.
+    ctx.fillStyle = 'rgba(232, 168, 56, 0.92)';
+    path(ctx, [
+      [6, 7.5 * s],
+      [-2, 13.5 * s],
+      [-6, 13.5 * s],
+      [2, 7.5 * s],
+    ]);
+    ctx.fill();
+    // Engine pod on its outrigger.
+    const pod = ctx.createLinearGradient(0, 10.5 * s, 0, 17.5 * s);
+    pod.addColorStop(0, metal(tone + 0.25));
+    pod.addColorStop(1, metal(tone - 0.3));
+    ctx.fillStyle = pod;
+    ctx.beginPath();
+    ctx.roundRect(-30, 14 * s - 3.6, 26, 7.2, 3.4);
+    ctx.fill();
+    ctx.fillStyle = `rgba(255, 220, 160, ${0.6 + 0.3 * thrust})`;
+    ctx.fillRect(-30.6, 14 * s - 2.4, 1.2, 4.8);
+  }
+
+  const shadeSide = lit + bank * 0.9;
+  const spine = ctx.createLinearGradient(0, -5, 0, 5);
+  spine.addColorStop(0, metal(0.5 + 0.35 * shadeSide));
+  spine.addColorStop(0.45, metal(0.9));
+  spine.addColorStop(1, metal(0.42 - 0.35 * shadeSide));
+  ctx.fillStyle = spine;
+  ctx.beginPath();
+  ctx.moveTo(26, 0);
+  ctx.lineTo(16, -4.6);
+  ctx.lineTo(-24, -5.2);
+  ctx.lineTo(-27, 0);
+  ctx.lineTo(-24, 5.2);
+  ctx.lineTo(16, 4.6);
+  ctx.closePath();
+  ctx.fill();
+
+  // Wide bridge glass set back on the spine.
+  const glass = ctx.createLinearGradient(14, -3, 2, 3);
+  glass.addColorStop(0, 'rgba(150, 226, 240, 1)');
+  glass.addColorStop(0.4, 'rgba(20, 64, 90, 1)');
+  glass.addColorStop(1, 'rgba(6, 14, 28, 1)');
+  ctx.fillStyle = glass;
+  ctx.beginPath();
+  ctx.roundRect(2, -3.6, 12, 7.2, 3);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(240, 252, 255, 0.8)';
+  ctx.lineWidth = 0.7;
+  ctx.beginPath();
+  ctx.moveTo(12, lit > 0 ? -2.4 : 2.4);
+  ctx.lineTo(5, lit > 0 ? -2.4 : 2.4);
+  ctx.stroke();
+
+  const blink = Math.sin(time * 4.4 + 2) > 0.55 ? 1 : 0.25;
+  navLights(ctx, [
+    [-14, -19.5, '255, 70, 70', 0.9],
+    [-14, 19.5, '80, 255, 140', 0.9],
+    [-27, 0, '255, 255, 255', blink],
+  ]);
   ctx.restore();
 }
 
@@ -257,6 +505,8 @@ export function drawExhaust(
   time: number,
   scale: number,
   smoke = 0,
+  nozzles = COURIER_NOZZLES,
+  wake = '120, 200, 255',
 ): void {
   const rate = 160;
   const life = 0.3;
@@ -270,11 +520,11 @@ export function drawExhaust(
   for (let i = 0; i <= steps; i++) {
     const p = poseAt(time - i * 0.016);
     if (!p) break;
-    const back = (NOZZLE_X - 3) * scale;
+    const back = (nozzles[0][0] - 3) * scale;
     const pt: [number, number] = [p.x + Math.cos(p.heading) * back, p.y + Math.sin(p.heading) * back];
     if (prev) {
       const k = 1 - i / steps;
-      ctx.strokeStyle = `rgba(120, 200, 255, ${0.5 * k})`;
+      ctx.strokeStyle = `rgba(${wake}, ${0.5 * k})`;
       ctx.lineWidth = (1 + 6 * k) * scale;
       ctx.beginPath();
       ctx.moveTo(prev[0], prev[1]);
@@ -290,12 +540,12 @@ export function drawExhaust(
     if (!p || age < 0) continue;
     const r1 = hash(n);
     const r2 = hash(n + 0.5);
-    const side = n % 2 ? 1 : -1;
+    const [nx, ny] = nozzles[n % nozzles.length];
     const squash = 1 - 0.38 * Math.abs(p.bank);
     const cos = Math.cos(p.heading);
     const sin = Math.sin(p.heading);
-    const lx = NOZZLE_X - 4;
-    const ly = NOZZLE_Y * side * squash;
+    const lx = nx - 4;
+    const ly = ny * squash;
     // Thrown back along the heading it had when it left, spreading as it slows.
     const travel = (1 - Math.exp(-4 * age)) / 4;
     const back = 120 * travel;
