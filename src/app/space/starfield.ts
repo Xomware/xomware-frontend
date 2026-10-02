@@ -1,4 +1,4 @@
-import { drawShip } from './ship';
+import { ShipPose, drawExhaust, drawShip } from './ship';
 
 /**
  * Parallax starfield, rendered to a 2D canvas.
@@ -36,14 +36,18 @@ interface Meteor {
   maxLife: number;
 }
 
-/** Somebody out there. Crosses the field now and then, and is gone. */
+/**
+ * Somebody out there. Crosses the field now and then, weaving gently, and is
+ * gone. Its course is a function of time so the exhaust can look back along it.
+ */
 interface Rocket {
   x: number;
   y: number;
+  /** Pixels per second. */
   vx: number;
   vy: number;
-  /** Counts up; the ship despawns once it has cleared the far edge. */
-  life: number;
+  born: number;
+  weave: number;
 }
 
 /** A tumbling rock. Drawn as an irregular polygon so no two look alike. */
@@ -351,32 +355,45 @@ export class Starfield {
       this.nextRocketAt = this.time + ROCKET_INTERVAL + this.rand() * 14;
     }
 
-    if (this.rocket) {
-      this.rocket.x += this.rocket.vx;
-      this.rocket.y += this.rocket.vy;
-      this.rocket.life += 1;
-      // Gone once it has cleared the far edge with room to spare.
-      const margin = 140;
-      if (this.rocket.x < -margin || this.rocket.x > this.width + margin) this.rocket = null;
-    }
+    const pose = this.rocketPose(this.time);
+    // Gone once it has cleared the far edge with room to spare.
+    if (pose && (pose.x < -140 || pose.x > this.width + 140)) this.rocket = null;
   }
 
   private spawnRocket(): void {
     const rand = this.rand;
     const leftToRight = rand() > 0.5;
     // Much slower than a meteor: this one is under power, not falling.
-    const speed = 1.9 + rand() * 1.5;
+    const speed = 110 + rand() * 80;
     // Only a slight climb or dive, so it reads as a course rather than a dive.
-    const climb = (rand() - 0.5) * 0.5;
+    const climb = (rand() - 0.5) * 30;
 
     this.rocket = {
       x: leftToRight ? -120 : this.width + 120,
       y: this.height * (0.12 + rand() * 0.68),
       vx: (leftToRight ? 1 : -1) * speed,
       vy: climb,
-      life: 0,
+      born: this.time,
+      weave: rand() * Math.PI * 2,
     };
   }
+
+  private readonly rocketPose = (time: number): ShipPose | null => {
+    const r = this.rocket;
+    if (!r || time < r.born) return null;
+    const age = time - r.born;
+    const amp = 26;
+    const w = 0.8;
+    const dy = Math.cos(age * w + r.weave) * amp * w;
+    const ddy = -Math.sin(age * w + r.weave) * amp * w * w;
+    return {
+      x: r.x + r.vx * age,
+      y: r.y + r.vy * age + Math.sin(age * w + r.weave) * amp,
+      heading: Math.atan2(r.vy + dy, r.vx),
+      // Rolls into each swing of the weave.
+      bank: Math.max(-0.7, Math.min(0.7, (ddy / Math.abs(r.vx)) * 9 * Math.sign(r.vx))),
+    };
+  };
 
   private spawnMeteor(): void {
     const rand = this.rand;
@@ -440,14 +457,17 @@ export class Starfield {
   }
 
   private drawRocket(ctx: CanvasRenderingContext2D): void {
-    const r = this.rocket;
-    if (!r) return;
-
-    ctx.globalAlpha = 1;
+    const pose = this.rocketPose(this.time);
+    const exhaust = this.starSprites[2];
+    if (!pose || !exhaust) return;
+    // Further off than the intro's ship, so smaller.
+    const scale = 0.55;
+    drawExhaust(ctx, exhaust, this.rocketPose, this.time, scale);
     ctx.save();
-    ctx.translate(r.x, r.y);
-    ctx.rotate(Math.atan2(r.vy, r.vx));
-    drawShip(ctx, this.time);
+    ctx.translate(pose.x, pose.y);
+    ctx.rotate(pose.heading);
+    ctx.scale(scale, scale);
+    drawShip(ctx, pose, this.time);
     ctx.restore();
   }
 

@@ -21,12 +21,14 @@
     <ul class="grid">
       @for (entry of group.entries; track entry.app.name) {
         <li class="tile" [style.--app-color]="entry.app.color" [style.--app-rgb]="entry.app.colorRgb">
+          <!-- The banner lockup reads better than the bare mark wherever it fits. -->
           <img
             class="tile__icon"
+            [class.tile__icon--banner]="entry.app.logoStyle === 'banner'"
             [class.is-pulsing]="entry.app.logoPulse"
-            [src]="entry.app.icon"
+            [src]="entry.app.logo"
             alt=""
-            width="56"
+            [attr.width]="entry.app.logoStyle === 'banner' ? 112 : 56"
             height="56"
             loading="lazy"
             decoding="async"

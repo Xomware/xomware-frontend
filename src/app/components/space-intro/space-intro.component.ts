@@ -11,7 +11,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { PLANETS } from '../../data/planets';
-import { INTRO_END, INTRO_IMPACT, IntroScene } from '../../space/intro-scene';
+import { INTRO_END, INTRO_IMPACT } from '../../space/intro-layout';
+import { IntroScene } from '../../space/intro-scene';
 
 let played = false;
 
