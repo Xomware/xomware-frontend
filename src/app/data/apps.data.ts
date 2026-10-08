@@ -21,7 +21,7 @@ export interface AppCard {
   /** Products inside the app that have their own address, e.g. a show under a hub. */
   links?: AppLink[];
   /**
-   * 'pool' is for seasonal leagues and event pools (Smirnoff League, Sun God
+   * 'pool' is for seasonal leagues and event pools (Smirnoff League, CLT Dynasty, Sun God
    * Derby, Reese's Playoff Challenge) rather than ongoing products. They are built differently — a
    * derby-style Next.js app rather than the Angular three-repo product
    * template — and they read wrong sitting next to Xomify in a "Web Apps"
@@ -126,6 +126,19 @@ export const APPS: AppCard[] = [
     logo: 'assets/img/banners/smirnoff-league.webp',
     logoStyle: 'banner',
     tag: 'Season League',
+    status: 'live',
+    platform: 'pool',
+  },
+  {
+    name: 'CLT Dynasty',
+    description:
+      "The CLT Dynasty League's home. Live standings and scores, playoffs, the World Cup, taxi steals and AI recaps.",
+    color: '#00A3B4',
+    colorRgb: '0, 163, 180',
+    url: 'https://clt.dynasty.xomware.com',
+    logo: 'assets/img/banners/clt-dynasty.webp',
+    logoStyle: 'banner',
+    tag: 'Dynasty League',
     status: 'live',
     platform: 'pool',
   },

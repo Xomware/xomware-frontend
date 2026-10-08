@@ -66,7 +66,7 @@ const EDGE = 10;
 const SKIP_W = 160;
 const SKIP_H = 76;
 const RING_SPEED = [0.55, 0.28, 0.17];
-const RING_PHASE = [1, 1.3, 2.2];
+const RING_PHASE = [2, 1.3, 2.2];
 /** Depth scales a planet by this much either way. */
 const DEPTH_SCALE = 0.2;
 
@@ -124,7 +124,7 @@ export function introLayout(w: number, h: number, count: number): IntroLayout {
     return { a: fa, b: fb, tilt, speed: RING_SPEED[k] };
   });
 
-  // The seasonal pools, listed last, ride the small inner ring across the mark.
+  // The last few, the seasonal pools, ride the small inner ring across the mark.
   const inner = Math.round(count * 0.27);
   const middle = Math.round((count - inner) / 2);
   const ringOf = (i: number): number => (i >= count - inner ? 0 : i < middle ? 1 : 2);
