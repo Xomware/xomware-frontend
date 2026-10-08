@@ -1,3 +1,4 @@
+import { PLANETS as APPS_IN_ORBIT } from '../data/planets';
 import {
   INTRO_IMPACT,
   bodyRect,
@@ -21,7 +22,8 @@ const VIEWPORTS: [number, number][] = [
   [1440, 900],
   [1920, 1080],
 ];
-const PLANETS = 11;
+// The real list, so adding an app re-runs the layout sweep against it.
+const PLANETS = APPS_IN_ORBIT.length;
 
 describe('introLayout', () => {
   for (const [w, h] of VIEWPORTS) {

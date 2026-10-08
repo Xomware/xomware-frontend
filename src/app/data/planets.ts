@@ -23,11 +23,13 @@ export interface Planet {
   platforms: string[];
 }
 
-const PLATFORM_LABEL: Record<AppCard['platform'], string> = {
+// Pools label themselves with their tag: a dynasty league isn't an annual pool.
+const PLATFORM_LABEL: Record<Exclude<AppCard['platform'], 'pool'>, string> = {
   web: 'Web',
   ios: 'iOS',
-  pool: 'Annual Pool',
 };
+
+const platformLabel = (app: AppCard): string => (app.platform === 'pool' ? app.tag : PLATFORM_LABEL[app.platform]);
 
 /**
  * Order products before seasonal pools.
@@ -79,7 +81,7 @@ function buildPlanets(): Planet[] {
       // Live on any platform means the product is live and reachable.
       status: rows.some((r) => r.status === 'live') ? 'live' : 'coming-soon',
       beta: !!primary.beta,
-      platforms: [...new Set(rows.map((r) => PLATFORM_LABEL[r.platform]))],
+      platforms: [...new Set(rows.map(platformLabel))],
     };
   });
 }
