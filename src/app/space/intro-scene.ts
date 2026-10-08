@@ -272,7 +272,7 @@ export class IntroScene {
     this.dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
     this.canvas.width = Math.round(width * this.dpr);
     this.canvas.height = Math.round(height * this.dpr);
-    const L = introLayout(width, height, this.planets.length);
+    const L = introLayout(width, height, this.planets.length, this.planets.filter((p) => p.pool).length);
     this.layout = L;
 
     // Baked lit from +x; drawn turned toward the mark, the sun of this system.

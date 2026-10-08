@@ -24,11 +24,12 @@ const VIEWPORTS: [number, number][] = [
 ];
 // The real list, so adding an app re-runs the layout sweep against it.
 const PLANETS = APPS_IN_ORBIT.length;
+const POOLS = APPS_IN_ORBIT.filter((p) => p.pool).length;
 
 describe('introLayout', () => {
   for (const [w, h] of VIEWPORTS) {
     describe(`at ${w}x${h}`, () => {
-      const L = introLayout(w, h, PLANETS);
+      const L = introLayout(w, h, PLANETS, POOLS);
 
       it('puts every app in orbit, on screen', () => {
         expect(L.slots.length).toBe(PLANETS);
@@ -49,6 +50,27 @@ describe('introLayout', () => {
           let best = 0;
           for (let t = 0; t <= INTRO_IMPACT; t += 0.05) best = Math.max(best, labelAt(L, slot.index, t).alpha);
           expect(best).withContext(`planet ${slot.index}`).toBe(1);
+        });
+      });
+
+      it('shows every banner for more than a glimpse', () => {
+        L.slots.forEach((slot) => {
+          const windows = L.labels.filter((row) => row[slot.index] >= 0).length;
+          expect(windows).withContext(`planet ${slot.index}`).toBeGreaterThanOrEqual(4);
+        });
+      });
+
+      it('circles the leagues and pools round the mark on the inner ring, not over it', () => {
+        const mark = markRect(L);
+        L.slots.forEach((slot) => {
+          expect(slot.ring === 0).withContext(`planet ${slot.index}`).toBe(APPS_IN_ORBIT[slot.index].pool);
+          if (slot.ring > 0) return;
+          let on = 0;
+          let n = 0;
+          for (let t = 0.6; t <= INTRO_IMPACT; t += 0.05, n++) {
+            if (overlaps(bodyRect(slot, planetAt(L, slot, t)), mark, -4)) on++;
+          }
+          expect(on / n).withContext(`planet ${slot.index} over the mark`).toBeLessThan(0.1);
         });
       });
 
