@@ -1,56 +1,58 @@
 @for (group of groups; track group.id) {
   <section class="group" [attr.aria-labelledby]="'directory-' + group.id">
-    <div class="group__head">
-      <h3 class="group__title" [id]="'directory-' + group.id">{{ group.title }}</h3>
-      <span class="group__count">{{ group.entries.length }}</span>
-    </div>
+    <header class="group__head">
+      <div class="group__title-row">
+        <h3 class="group__title" [id]="'directory-' + group.id">{{ group.title }}</h3>
+        <span class="group__count">{{ group.entries.length }} {{ group.entries.length === 1 ? 'app' : 'apps' }}</span>
+      </div>
 
-    @switch (group.id) {
-      @case ('pool') {
-        <p class="group__note">Leagues and pools with friends, from one-season pools to dynasty leagues that carry over year to year.</p>
+      @switch (group.id) {
+        @case ('pool') {
+          <p class="group__note">Leagues and pools with friends, from one-season pools to dynasty leagues that carry over year to year.</p>
+        }
+        @case ('ios') {
+          <p class="group__note">
+            TestFlight builds. Email
+            <a href="mailto:dominickj.giordano@gmail.com" class="group__note-link">dominickj.giordano&#64;gmail.com</a>
+            to be whitelisted.
+          </p>
+        }
       }
-      @case ('ios') {
-        <p class="group__note">
-          TestFlight builds &mdash; email
-          <a href="mailto:dominickj.giordano@gmail.com" class="group__note-link">dominickj.giordano&#64;gmail.com</a>
-          to be whitelisted.
-        </p>
-      }
-    }
+    </header>
 
     <ul class="grid">
       @for (entry of group.entries; track entry.app.name) {
-        <li class="tile" [style.--app-color]="entry.app.color" [style.--app-rgb]="entry.app.colorRgb">
-          <!-- The banner lockup reads better than the bare mark wherever it fits. -->
-          <img
-            class="tile__icon"
-            [class.tile__icon--banner]="entry.app.logoStyle === 'banner'"
-            [class.is-pulsing]="entry.app.logoPulse"
-            [src]="entry.app.logo"
-            alt=""
-            [attr.width]="entry.app.logoStyle === 'banner' ? 112 : 56"
-            height="56"
-            loading="lazy"
-            decoding="async"
-          />
+        <li class="tile" [style.--app-rgb]="entry.app.colorRgb">
+          <!-- Each app's banner over the rim of its own planet, lit in its colour. -->
+          <div class="tile__stage" aria-hidden="true">
+            <img
+              class="tile__art"
+              [class.tile__art--mark]="entry.app.logoStyle !== 'banner'"
+              [class.is-pulsing]="entry.app.logoPulse"
+              [src]="entry.app.logo"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
 
           <div class="tile__body">
-            <div class="tile__top">
+            <div class="tile__head">
               <h4 class="tile__name">
                 <!-- Stretched over the whole tile, so the tile is one big target
                      while the sub-links below stay separately clickable. -->
                 <a class="tile__link" [href]="entry.app.url" target="_blank" rel="noopener">{{ entry.app.name }}</a>
               </h4>
-              <span class="badge" [class]="'badge--' + entry.badge">{{ badgeLabel[entry.badge] }}</span>
+              <span class="status" [class]="'status--' + entry.badge">{{ badgeLabel[entry.badge] }}</span>
             </div>
 
             <p class="tile__description">{{ entry.app.description }}</p>
-            @if (entry.app.beta) {
-              <p class="tile__wip">Work in progress. Expect rough edges.</p>
-            }
 
-            <div class="tile__foot">
+            <div class="tile__meta">
               <span class="tile__tag">{{ entry.app.tag }}</span>
+              @if (entry.app.beta) {
+                <span class="tile__wip">Work in progress</span>
+              }
               @for (link of entry.app.links ?? []; track link.url) {
                 <a class="tile__sublink" [href]="link.url" target="_blank" rel="noopener">
                   {{ link.label }}
@@ -59,12 +61,11 @@
                   </svg>
                 </a>
               }
+              <svg class="tile__go" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 17L17 7M17 7H9M17 7v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
             </div>
           </div>
-
-          <svg class="tile__arrow" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor" />
-          </svg>
         </li>
       }
     </ul>
