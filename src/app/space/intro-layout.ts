@@ -66,7 +66,7 @@ const EDGE = 10;
 const SKIP_W = 160;
 const SKIP_H = 76;
 const RING_SPEED = [0.55, 0.28, 0.17];
-const RING_PHASE = [2, 1.3, 2.2];
+const RING_PHASE = [0.4, 1, 1.6];
 /** Depth scales a planet by this much either way. */
 const DEPTH_SCALE = 0.2;
 
@@ -91,7 +91,8 @@ function fit(a: number, ratio: number, tilt: number, ax: number, ay: number): [n
   return [a * k, b * k];
 }
 
-export function introLayout(w: number, h: number, count: number): IntroLayout {
+/** `pools` is how many planets, listed last, are leagues and pools: they get the inner ring. */
+export function introLayout(w: number, h: number, count: number, pools: number): IntroLayout {
   const m = Math.min(w, h);
   const phone = w < 600;
   const portrait = h > w * 1.15;
@@ -108,14 +109,17 @@ export function introLayout(w: number, h: number, count: number): IntroLayout {
   const ax = Math.min(w / 2 - EDGE - reach * 1.6, 760);
   const ay = Math.min(cy - reach - 8, h - cy - reach - PLATE_GAP - plateH - EDGE);
 
+  // The inner ring is round enough to circle the mark, not cut across it. A
+  // flat one parked its planets on the X half the time, and CLT Dynasty's
+  // teal vanished into it.
   const specs: [number, number, number][] = portrait
     ? [
-        [markW * 1.85, 0.3, -0.35],
+        [markW * 2.2, 0.85, -0.35],
         [ay * 0.74, 0.44, Math.PI / 2 + 0.3],
         [ay, 0.5, Math.PI / 2 - 0.08],
       ]
     : [
-        [markW * 2, 0.3, -0.3],
+        [markW * 2.4, 0.8, -0.3],
         [ax * 0.66, 0.42, 0.24],
         [ax, 0.5, -0.06],
       ];
@@ -124,11 +128,9 @@ export function introLayout(w: number, h: number, count: number): IntroLayout {
     return { a: fa, b: fb, tilt, speed: RING_SPEED[k] };
   });
 
-  // The last few, the seasonal pools, ride the small inner ring across the mark.
-  const inner = Math.round(count * 0.27);
-  const middle = Math.round((count - inner) / 2);
-  const ringOf = (i: number): number => (i >= count - inner ? 0 : i < middle ? 1 : 2);
-  const sizes = [inner, middle, count - inner - middle];
+  const middle = Math.round((count - pools) / 2);
+  const ringOf = (i: number): number => (i >= count - pools ? 0 : i < middle ? 1 : 2);
+  const sizes = [pools, middle, count - pools - middle];
   const seen = [0, 0, 0];
 
   const slots: PlanetSlot[] = [];
@@ -139,7 +141,7 @@ export function introLayout(w: number, h: number, count: number): IntroLayout {
       index: i,
       ring,
       phase: (n / sizes[ring]) * Math.PI * 2 + RING_PHASE[ring],
-      radius: base * (ring === 0 ? 0.72 : 0.9 + 0.3 * ((i * 0.618) % 1)),
+      radius: base * (ring === 0 ? 0.85 : 0.9 + 0.3 * ((i * 0.618) % 1)),
       moon: i % 3 === 1,
       belt: i % 4 === 2,
     });

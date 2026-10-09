@@ -21,6 +21,8 @@ export interface Planet {
   beta: boolean;
   /** Human labels for every platform the product ships on, e.g. ['Web', 'iOS']. */
   platforms: string[];
+  /** A league or pool. These sort last. */
+  pool: boolean;
 }
 
 // Pools label themselves with their tag: a dynasty league isn't an annual pool.
@@ -82,6 +84,7 @@ function buildPlanets(): Planet[] {
       status: rows.some((r) => r.status === 'live') ? 'live' : 'coming-soon',
       beta: !!primary.beta,
       platforms: [...new Set(rows.map(platformLabel))],
+      pool: primary.platform === 'pool',
     };
   });
 }
