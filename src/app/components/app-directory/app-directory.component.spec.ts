@@ -23,10 +23,10 @@ describe('AppDirectoryComponent', () => {
 
     for (const name of ['Xom Appétit', 'Xom Forms']) {
       const t = tile(root, name);
-      expect(t.querySelector('.badge')?.textContent?.trim()).toBe('Beta');
+      expect(t.querySelector('.status')?.textContent?.trim()).toBe('Beta');
       expect(t.querySelector('.tile__wip')?.textContent).toContain('Work in progress');
     }
-    expect(tile(root, 'Xomify').querySelector('.badge')?.textContent?.trim()).toBe('Live');
+    expect(tile(root, 'Xomify').querySelector('.status')?.textContent?.trim()).toBe('Live');
     expect(tile(root, 'Xomify').querySelector('.tile__wip')).toBeNull();
   });
 
@@ -42,12 +42,12 @@ describe('AppDirectoryComponent', () => {
   it('shows each app by its banner where it has one, not its square mark', () => {
     const root = render();
 
-    const xomify = tile(root, 'Xomify').querySelector<HTMLImageElement>('.tile__icon');
+    const xomify = tile(root, 'Xomify').querySelector<HTMLImageElement>('.tile__art');
     expect(xomify?.getAttribute('src')).toBe('assets/img/banners/xomify.webp');
-    expect(xomify?.classList).toContain('tile__icon--banner');
-    // Armchair Judge has no banner yet; its mark keeps the square slot.
-    const armchair = tile(root, 'Armchair Judge').querySelector<HTMLImageElement>('.tile__icon');
-    expect(armchair?.classList).not.toContain('tile__icon--banner');
+    expect(xomify?.classList).not.toContain('tile__art--mark');
+    // Armchair Judge has no banner yet; its mark keeps a square slot.
+    const armchair = tile(root, 'Armchair Judge').querySelector<HTMLImageElement>('.tile__art');
+    expect(armchair?.classList).toContain('tile__art--mark');
   });
 
   it('keeps admin-only tools off the public directory', () => {
