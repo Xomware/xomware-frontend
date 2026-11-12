@@ -13,7 +13,7 @@
   // Orbs are handled by .bg-orbs overflow:hidden instead
 }
 
-// ── Profile / Hero Section ───────────────────────
+// ── Hero ─────────────────────────────────────────
 .hero {
   width: 100%;
   min-height: 100vh;
@@ -29,195 +29,46 @@
 
 .hero-content {
   max-width: 720px;
+  // Shares the free height with the scroll hint's auto margin, so the block
+  // sits mid-screen instead of pinned under the nav.
+  margin-top: auto;
 }
 
-// ── Profile Block ────────────────────────────────
-.profile-headshot {
-  margin-bottom: $spacing-lg;
+.hero-mark {
+  display: block;
+  width: clamp(96px, 16vw, 140px);
+  height: auto;
+  margin: 0 auto $spacing-md;
   animation: fadeIn 0.6s ease-out both;
 }
 
-.profile-avatar {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid rgba($brand-cyan, 0.35);
-  box-shadow: 0 0 0 6px rgba($brand-cyan, 0.07), $shadow-lg;
-  display: block;
-  margin: 0 auto;
-}
-
-.profile-name {
+.hero-title {
   font-family: $font-display;
-  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  // 700 is Space Grotesk's heaviest; 800 here would be synthesised.
   font-weight: $font-weight-bold;
   color: $text-primary;
-  margin-bottom: $spacing-sm;
-  letter-spacing: $tracking-tight;
-  animation: fadeIn 0.7s ease-out 0.1s both;
-}
-
-.profile-role {
-  font-size: $text-base;
-  color: $text-secondary;
+  line-height: 1.1;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
   margin-bottom: $spacing-md;
-  animation: fadeIn 0.7s ease-out 0.15s both;
-}
-
-.profile-role-link {
-  color: $brand-cyan;
-  font-weight: $font-weight-semibold;
-  text-decoration: none;
-  transition: color $transition-fast;
-
-  &:hover {
-    color: $brand-cyan-light;
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
-}
-
-.profile-bio {
-  font-size: $text-base;
-  color: $text-secondary;
-  line-height: 1.65;
-  max-width: 520px;
-  margin: 0 auto $spacing-xl;
-  animation: fadeIn 0.7s ease-out 0.2s both;
-}
-
-.profile-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-sm;
-  justify-content: center;
-  margin-bottom: $spacing-xl;
-  animation: fadeIn 0.7s ease-out 0.25s both;
-}
-
-.profile-link-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: $spacing-sm;
-  height: 40px;
-  padding: 0 $spacing-md;
-  border-radius: $radius-pill;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid $glass-border;
-  color: $text-secondary;
-  text-decoration: none;
-  font-size: $text-sm;
-  font-weight: $font-weight-medium;
-  letter-spacing: $tracking-normal;
-  transition: all $transition-base;
-
-  &:hover {
-    color: $brand-cyan;
-    background: rgba($brand-cyan, 0.08);
-    border-color: rgba($brand-cyan, 0.3);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba($brand-cyan, 0.15);
-  }
-
-  &:focus-visible {
-    outline: 2px solid $brand-cyan;
-    outline-offset: 2px;
-  }
-
-  &:active {
-    transform: translateY(0);
-    box-shadow: none;
-  }
-}
-
-.profile-link-icon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-}
-
-.profile-link-label {
-  white-space: nowrap;
-}
-
-// ── Hero Badge (kept for any future reuse) ────────
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-sm;
-  padding: 6px $spacing-md;
-  background: $brand-cyan-subtle;
-  border: 1px solid rgba($brand-cyan, 0.2);
-  border-radius: $radius-pill;
-  font-size: $text-xs;
-  font-weight: $font-weight-medium;
-  color: $brand-cyan;
-  margin-bottom: $spacing-xl;
-  animation: fadeIn 0.8s ease-out;
-}
-
-.badge-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: $brand-cyan;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
-}
-
-.hero-title {
-  font-size: clamp(2.2rem, 5vw, 3.5rem);
-  font-weight: $font-weight-extrabold;
-  color: $text-primary;
-  line-height: 1.15;
-  margin-bottom: $spacing-lg;
-  animation: fadeIn 0.8s ease-out 0.1s both;
-  letter-spacing: $tracking-tight;
-}
-
-// The one accent moment in the hero. Solid rather than a gradient fade: a
-// single flat accent colour is what reads as deliberate; a two-stop fade on
-// text is the dated part, not the colour itself.
-.hero-gradient-text {
-  color: $brand-cyan;
+  animation: fadeIn 0.7s ease-out 0.1s both;
 }
 
 .hero-subtitle {
   font-size: $text-md;
   color: $text-secondary;
   line-height: 1.6;
-  margin-bottom: $spacing-xl;
-  animation: fadeIn 0.8s ease-out 0.2s both;
-  max-width: 560px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.hero-link {
-  color: $brand-cyan;
-  font-weight: $font-weight-semibold;
-  transition: color $transition-fast;
-
-  &:hover {
-    color: $brand-cyan-light;
-  }
+  margin: 0 auto $spacing-xl;
+  animation: fadeIn 0.7s ease-out 0.2s both;
+  max-width: 520px;
 }
 
 .hero-ctas {
   display: flex;
   gap: $spacing-md;
   justify-content: center;
-  animation: fadeIn 0.8s ease-out 0.3s both;
+  animation: fadeIn 0.7s ease-out 0.3s both;
 }
 
 .btn-primary {
@@ -239,26 +90,15 @@
     box-shadow: 0 8px 25px rgba($brand-cyan, 0.3);
     color: $bg-dark;
   }
-}
 
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-sm;
-  padding: 12px $spacing-xl;
-  background: transparent;
-  color: $text-secondary;
-  font-weight: $font-weight-medium;
-  font-size: $text-base;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: $radius-pill;
-  text-decoration: none;
-  transition: all $transition-base;
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 3px;
+  }
 
-  &:hover {
-    color: $text-primary;
-    border-color: rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.05);
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
   }
 }
 
@@ -286,20 +126,6 @@
     width: 20px;
     height: 20px;
     animation: bounce 1.8s ease-in-out infinite;
-  }
-}
-
-// ── Music section (between the app directory and the footer) ────
-// Its own in-flow block, outside .hero-content, so the hero ScrollTrigger
-// fade does not affect it.
-.music-snapshot-section {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 $spacing-xl $spacing-3xl;
-
-  @media (max-width: $breakpoint-md) {
-    padding: 0 $spacing-md $spacing-2xl;
   }
 }
 
@@ -346,9 +172,22 @@
   color: $text-primary;
 }
 
-.footer-tagline {
+.footer-credit {
   font-size: $text-xs;
-  color: $text-muted;
+  color: $text-secondary;
+  text-decoration: none;
+  padding-block: $spacing-xs;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $brand-cyan;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-cyan;
+    outline-offset: 2px;
+    border-radius: $radius-sm;
+  }
 }
 
 .footer-links {
@@ -420,14 +259,6 @@
 
 // ── Responsive ───────────────────────────────────
 @media (max-width: $breakpoint-md) {
-  .profile-name {
-    font-size: clamp(1.6rem, 6vw, 2.2rem);
-  }
-
-  .profile-links {
-    gap: $spacing-sm;
-  }
-
   .hero-ctas {
     flex-direction: column;
     align-items: center;
@@ -445,22 +276,15 @@
 
 // ── Reduced Motion ───────────────────────────────
 @media (prefers-reduced-motion: reduce) {
-  .badge-dot,
-  .scroll-arrow,
-  .status-dot {
+  .scroll-arrow {
     animation: none !important;
   }
 
   .hero-content,
-  .hero-badge,
+  .hero-mark,
   .hero-title,
   .hero-subtitle,
-  .hero-ctas,
-  .profile-headshot,
-  .profile-name,
-  .profile-role,
-  .profile-bio,
-  .profile-links {
+  .hero-ctas {
     animation: none !important;
     opacity: 1 !important;
   }
