@@ -43,6 +43,20 @@
     <app-directory></app-directory>
   </section>
 
+  <!-- Music — the landing already fetches this profile and polls now-playing;
+       before this it was fetched and never rendered. -->
+  <section class="music-snapshot-section" id="music" #musicSection *ngIf="hasMusicData">
+    <div class="section-header">
+      <span class="section-eyebrow">// On Repeat</span>
+      <h2 class="section-title">What's playing</h2>
+      <p class="section-subtitle">Recent listening, straight out of Xomify.</p>
+    </div>
+    <app-music-snapshot
+      [profile]="landingTickerProfile"
+      [nowPlayingState]="nowPlayingState"
+    ></app-music-snapshot>
+  </section>
+
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-inner">

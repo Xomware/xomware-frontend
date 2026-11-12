@@ -129,6 +129,20 @@
   }
 }
 
+// ── Music section (between the app directory and the footer) ────
+// Its own in-flow block, outside .hero-content, so the hero ScrollTrigger
+// fade does not affect it.
+.music-snapshot-section {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 $spacing-xl $spacing-3xl;
+
+  @media (max-width: $breakpoint-md) {
+    padding: 0 $spacing-md $spacing-2xl;
+  }
+}
+
 // ── Footer ───────────────────────────────────────
 .footer {
   width: 100%;
