@@ -10,8 +10,8 @@ export interface AppCard {
   colorRgb: string;
   url: string;
   /**
-   * Wide banner/wordmark: the app directory, the /apps orbit and the intro's
-   * planet labels. It's the fuller lockup and reads as the more finished mark.
+   * Wide banner/wordmark: the app directory and the /apps orbit. It's the
+   * fuller lockup and reads as the more finished mark.
    */
   logo: string;
   /** Square app icon, for small or tilted surfaces like the factory crates. */

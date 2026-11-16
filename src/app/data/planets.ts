@@ -1,8 +1,7 @@
 import { APPS, AppCard } from './apps.data';
 
 /**
- * One product in the Xomware system: a body in the landing intro and in the
- * /apps orbit.
+ * One product in the Xomware system: a body in the /apps orbit.
  *
  * Planets are a *presentation* grouping derived from APPS — they are not a
  * second source of truth. Add or change an app in apps.data.ts and it shows
@@ -14,7 +13,7 @@ export interface Planet {
   color: string;
   colorRgb: string;
   url: string;
-  /** The banner lockup: the /apps orbit and the intro's planet labels. */
+  /** The banner lockup the /apps orbit labels each planet with. */
   logo: string;
   status: 'live' | 'coming-soon';
   /** See AppCard.beta. */
