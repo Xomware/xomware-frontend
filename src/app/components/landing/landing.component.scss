@@ -125,21 +125,15 @@
   color: $text-muted;
 }
 
-// ── Arrival out of the intro ─────────────────────
-// The intro's blast opens onto the page; the page settles in under it.
-.landing.is-arriving {
-  app-factory {
-    display: block;
-    animation: arrive 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  }
+// ── Factory intro ────────────────────────────────
+// The site nav steps aside while the factory floor builds itself.
+app-nav {
+  transition: opacity 500ms ease;
 }
 
-@keyframes arrive {
-  from {
-    opacity: 0.4;
-    transform: scale(1.06);
-    filter: brightness(1.8) blur(4px);
-  }
+.landing.is-intro app-nav {
+  opacity: 0;
+  pointer-events: none;
 }
 
 // ── Responsive ───────────────────────────────────

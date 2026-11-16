@@ -37,6 +37,17 @@ $factory-dim: #9ca2ba;
   cursor: crosshair;
 }
 
+.world,
+.hud,
+.progress {
+  transition: opacity $transition-slow;
+
+  .is-intro & {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
 .world {
   position: absolute;
   top: 0;
@@ -398,5 +409,72 @@ $factory-dim: #9ca2ba;
 @media (max-width: $breakpoint-md) {
   .hud {
     justify-content: flex-start;
+  }
+}
+
+// Above the site nav (z-index 1000) while the floor builds itself.
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.intro-title {
+  padding-inline: $spacing-md;
+  color: $factory-ink;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 900ms ease, transform 900ms ease;
+
+  &.is-shown {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.intro-name {
+  margin: 0;
+  font-family: $font-display;
+  font-size: clamp(64px, 12vw, 170px);
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-tight;
+  line-height: 0.85;
+}
+
+.intro-sub {
+  margin: $spacing-md 0 0;
+  font-size: $text-sm;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-wider;
+  text-transform: uppercase;
+  color: $factory-accent;
+}
+
+.intro-skip {
+  position: fixed;
+  top: calc(#{$spacing-md} + env(safe-area-inset-top, 0px));
+  right: $spacing-md;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
+  color: $factory-ink;
+  cursor: pointer;
+  background: rgba(16, 19, 28, 0.8);
+  border: 1px solid $factory-line;
+  border-radius: $radius-pill;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $factory-accent;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $factory-accent;
+    outline-offset: 2px;
   }
 }

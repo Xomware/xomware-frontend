@@ -1,4 +1,14 @@
-<section class="track" #track [style.height.px]="trackHeight()" aria-label="The Xomware app factory">
+@if (introPlaying()) {
+  <div class="intro" (click)="skipIntro()">
+    <div class="intro-title" [class.is-shown]="introTitle()">
+      <p class="intro-name">Xomware</p>
+      <p class="intro-sub">App factory</p>
+    </div>
+    <button type="button" class="intro-skip" (click)="skipIntro()">Skip intro</button>
+  </div>
+}
+
+<section class="track" #track [class.is-intro]="introPlaying()" [style.height.px]="trackHeight()" aria-label="The Xomware app factory">
   <div class="stage">
     <canvas class="scene" #canvas aria-hidden="true"></canvas>
 

@@ -8,9 +8,14 @@ export interface FactoryOptions {
   reducedMotion: boolean;
   /** Called with the app whose crate was clicked in the pit. */
   onPitPick?: (app: AppCard) => void;
-  /** Called after every frame with the world origin's screen position and the camera, to move DOM in step. */
-  onFrame?: (origin: { x: number; y: number }, cam: number) => void;
+  /**
+   * Called after every frame with the world origin's screen position, the camera, and intro progress (0..1, 1 once
+   * the intro is over), so DOM can move and reveal in step.
+   */
+  onFrame?: (origin: { x: number; y: number }, cam: number, intro: number) => void;
 }
+
+const INTRO_SECONDS = 4.2;
 
 /**
  * Owns the factory canvas: sizing, the animation loop, the eased camera and clicks. The landing component tells it
@@ -26,6 +31,9 @@ export class Factory {
   private raf = 0;
   private last = 0;
   private running = false;
+  private intro = 1;
+  private introStart = 0;
+  private introDone: (() => void) | null = null;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -81,6 +89,22 @@ export class Factory {
     }
   }
 
+  /** Floor tiles ripple in, machines rise, the belt spins up. Resolves when it ends or is skipped. */
+  playIntro(): Promise<void> {
+    if (this.opts.reducedMotion) return Promise.resolve();
+    this.intro = 0;
+    this.introStart = performance.now();
+    return new Promise((resolve) => (this.introDone = resolve));
+  }
+
+  skipIntro(): void {
+    const done = this.introDone;
+    if (!done) return;
+    this.intro = 1;
+    this.introDone = null;
+    done();
+  }
+
   destroy(): void {
     this.setRunning(false);
     this.canvas.removeEventListener('pointerdown', this.onPointer);
@@ -91,9 +115,14 @@ export class Factory {
     this.last = now;
     const t = this.opts.reducedMotion ? 0 : now / 1000;
     this.view.cam = this.opts.reducedMotion ? this.target : this.view.cam + (this.target - this.view.cam) * 0.14;
-    if (!this.opts.reducedMotion) this.actors.update(dt, t, this.view.cam, this.view.w);
-    this.render(t, 1);
-    this.opts.onFrame?.(this.origin(), this.view.cam);
+    if (this.introDone) {
+      this.intro = Math.min(1, (now - this.introStart) / 1000 / INTRO_SECONDS);
+      if (this.intro >= 1) this.skipIntro();
+    }
+    // The floor is still building during the intro, so the crowd moves at a crawl until it's done.
+    if (!this.opts.reducedMotion) this.actors.update(this.introDone ? dt * 0.3 : dt, t, this.view.cam, this.view.w);
+    this.render(t, this.intro);
+    this.opts.onFrame?.(this.origin(), this.view.cam, this.intro);
     this.raf = requestAnimationFrame(this.frame);
   };
 
@@ -122,12 +151,20 @@ export class Factory {
       ctx.fillStyle = `rgba(255,240,220,${actors.flash})`;
       ctx.fillRect(0, 0, this.view.w, this.view.h);
     }
+    if (intro < 1) {
+      ctx.fillStyle = `rgba(0,0,0,${1 - smooth(0, 0.25, intro)})`;
+      ctx.fillRect(0, 0, this.view.w, this.view.h);
+    }
   }
 
   private readonly iconFor = (app: AppCard | null): HTMLImageElement | undefined => (app?.icon ? this.icons.get(app.icon) : undefined);
 
   private readonly onPointer = (e: PointerEvent): void => {
     if (this.opts.reducedMotion) return;
+    if (this.introDone) {
+      this.skipIntro();
+      return;
+    }
     const rect = this.canvas.getBoundingClientRect();
     const sx = e.clientX - rect.left;
     const sy = e.clientY - rect.top;
