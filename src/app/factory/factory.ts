@@ -8,6 +8,8 @@ export interface FactoryOptions {
   reducedMotion: boolean;
   /** Called with the app whose crate was clicked in the pit. */
   onPitPick?: (app: AppCard) => void;
+  /** Called after every frame with the world origin's screen position and the camera, to move DOM in step. */
+  onFrame?: (origin: { x: number; y: number }, cam: number) => void;
 }
 
 /**
@@ -91,6 +93,7 @@ export class Factory {
     this.view.cam = this.opts.reducedMotion ? this.target : this.view.cam + (this.target - this.view.cam) * 0.14;
     if (!this.opts.reducedMotion) this.actors.update(dt, t, this.view.cam, this.view.w);
     this.render(t, 1);
+    this.opts.onFrame?.(this.origin(), this.view.cam);
     this.raf = requestAnimationFrame(this.frame);
   };
 
