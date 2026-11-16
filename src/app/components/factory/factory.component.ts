@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, NgZone, OnDestroy, ViewChild, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild, computed, inject, input, output, signal } from '@angular/core';
 import { APPS, AppCard } from '../../data/apps.data';
 import { Factory } from '../../factory/factory';
 import { COS30, SIN30 } from '../../factory/iso';
@@ -23,9 +23,15 @@ interface Placed {
   templateUrl: './factory.component.html',
   styleUrl: './factory.component.scss',
 })
-export class FactoryComponent implements AfterViewInit, OnDestroy {
+export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly zone = inject(NgZone);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** Play the factory intro on arrival. The landing decides, once per page load. */
+  readonly intro = input(false);
+  readonly introDone = output<void>();
+  readonly introPlaying = signal(false);
+  readonly introTitle = signal(false);
 
   readonly layout = layoutLine(APPS);
   readonly groups = this.layout.lines.map((line) => ({ line, stations: this.layout.stations.filter((s) => s.app.platform === line.zone.platform) }));
@@ -58,24 +64,50 @@ export class FactoryComponent implements AfterViewInit, OnDestroy {
     return { left: x * COS30 + dx, top: x * SIN30 + dy };
   }
 
+  ngOnInit(): void {
+    this.introPlaying.set(this.intro());
+  }
+
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => {
       this.factory = new Factory(this.canvas.nativeElement, this.layout, {
         reducedMotion: this.reducedMotion,
         onPitPick: (app) => this.zone.run(() => this.pick(app)),
-        onFrame: (origin, cam) => this.follow(origin, cam),
+        onFrame: (origin, cam, intro) => this.follow(origin, cam, intro),
       });
       this.measure();
       addEventListener('scroll', this.onScroll, { passive: true });
       addEventListener('resize', this.measure);
       this.observer = new IntersectionObserver(([entry]) => this.factory?.setRunning(entry.isIntersecting));
       this.observer.observe(this.track.nativeElement);
+      if (!this.introPlaying()) return;
+      addEventListener('keydown', this.onIntroKey);
+      addEventListener('wheel', this.skipIntro, { passive: true });
+      addEventListener('touchstart', this.skipIntro, { passive: true });
+      this.factory.playIntro().then(() => this.zone.run(() => this.endIntro()));
     });
+  }
+
+  readonly skipIntro = (): void => this.factory?.skipIntro();
+
+  private readonly onIntroKey = (e: KeyboardEvent): void => {
+    if (['Escape', 'Enter', ' '].includes(e.key)) this.skipIntro();
+  };
+
+  private endIntro(): void {
+    removeEventListener('keydown', this.onIntroKey);
+    removeEventListener('wheel', this.skipIntro);
+    removeEventListener('touchstart', this.skipIntro);
+    this.introPlaying.set(false);
+    this.introDone.emit();
   }
 
   ngOnDestroy(): void {
     removeEventListener('scroll', this.onScroll);
     removeEventListener('resize', this.measure);
+    removeEventListener('keydown', this.onIntroKey);
+    removeEventListener('wheel', this.skipIntro);
+    removeEventListener('touchstart', this.skipIntro);
     this.observer?.disconnect();
     this.factory?.destroy();
   }
@@ -116,7 +148,8 @@ export class FactoryComponent implements AfterViewInit, OnDestroy {
     this.factory?.setCamera(Math.max(0, Math.min(this.camMax(), scrollY - this.trackTop)));
   };
 
-  private follow(origin: { x: number; y: number }, cam: number): void {
+  private follow(origin: { x: number; y: number }, cam: number, intro: number): void {
+    if (intro > 0.55 && intro < 1 && !this.introTitle()) this.zone.run(() => this.introTitle.set(true));
     this.world.nativeElement.style.transform = `translate3d(${origin.x}px, ${origin.y}px, 0)`;
     this.bar.nativeElement.style.width = `${(cam / Math.max(1, this.camMax())) * 100}%`;
     let line = 0;

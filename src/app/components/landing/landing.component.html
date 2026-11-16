@@ -1,16 +1,11 @@
-@if (introActive()) {
-  <app-space-intro (impact)="arriving.set(true)" (done)="introActive.set(false)"></app-space-intro>
-}
-
-<!-- inert while the intro covers it, so keyboard focus can't wander in behind. -->
-<div class="landing" [class.is-arriving]="arriving()" [attr.inert]="introActive() ? '' : null">
+<div class="landing" [class.is-intro]="introOn()">
   <!-- Shared site navbar. Renders sign-in or the user menu on its own, so the
        landing page below is public to everyone — this is the marketing
        surface, not a gated dashboard. -->
   <app-nav></app-nav>
 
   <!-- The app directory, as a factory tour. Scrolling walks the line and parks at the pit, where every app is listed. -->
-  <app-factory></app-factory>
+  <app-factory [intro]="introOn()" (introDone)="introOn.set(false)"></app-factory>
 
   <!-- Music — the landing already fetches this profile and polls now-playing;
        before this it was fetched and never rendered. -->

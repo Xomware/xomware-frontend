@@ -8,7 +8,7 @@ import { NowPlayingService } from '../../services/now-playing.service';
 import { MusicProfile } from '../../models/music.model';
 import { NowPlayingState } from '../../models/now-playing.model';
 import { environment } from '../../../environments/environment';
-import { claimIntro } from '../space-intro/space-intro.component';
+import { claimIntro } from '../../factory/intro';
 
 const IDLE_STATE: NowPlayingState = {
   isPlaying: false,
@@ -27,10 +27,8 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
-  /** Claimed before the first render, so the page never shows and then gets covered. */
-  readonly introActive = signal(claimIntro());
-  /** The intro's ship has hit and the page is arriving under the blast. */
-  readonly arriving = signal(false);
+  /** Claimed before the first render, so the nav never shows and then gets covered. */
+  readonly introOn = signal(claimIntro());
 
   landingTickerProfile: MusicProfile | null = null;
   nowPlayingState: NowPlayingState | null = null;
