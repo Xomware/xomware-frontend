@@ -35,6 +35,7 @@ import { NowPlayingComponent } from './components/now-playing/now-playing.compon
 import { MusicSnapshotComponent } from './components/music-snapshot/music-snapshot.component';
 import { AppDirectoryComponent } from './components/app-directory/app-directory.component';
 import { SpaceIntroComponent } from './components/space-intro/space-intro.component';
+import { FactoryComponent } from './components/factory/factory.component';
 
 @NgModule({
   declarations: [
@@ -73,6 +74,7 @@ import { SpaceIntroComponent } from './components/space-intro/space-intro.compon
     AppRoutingModule,
     AppDirectoryComponent,
     SpaceIntroComponent,
+    FactoryComponent,
   ],
   providers: [
     provideHttpClient(withInterceptors([jwtInterceptor])),

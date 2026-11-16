@@ -1,0 +1,90 @@
+<section class="track" #track [style.height.px]="trackHeight()" aria-label="The Xomware app factory">
+  <div class="stage">
+    <canvas class="scene" #canvas aria-hidden="true"></canvas>
+
+    <div class="world" #world>
+      <div class="lead" [style.left.px]="leadAt().left" [style.top.px]="leadAt().top">
+        <p class="lead-eyebrow">Xomware app factory</p>
+        <h1 class="lead-title">Built here.<br />Shipped often.</h1>
+        <p class="lead-copy">Small apps for music, fantasy sports, fitness, cooking and the leagues you run with friends.</p>
+        <p class="lead-hint">Scroll to walk the line &rarr;</p>
+      </div>
+
+      @for (line of layout.lines; track line.zone.label) {
+        <div class="banner" [style.left.px]="at(line.x, -220).left" [style.top.px]="at(line.x, -220).top" aria-hidden="true">
+          <b>{{ line.zone.label }}</b>
+          <small>{{ line.zone.sub }}</small>
+        </div>
+      }
+
+      @for (s of layout.stations; track s.index) {
+        <article
+          class="card"
+          [style.left.px]="at(s.x, -300, 70).left"
+          [style.top.px]="at(s.x, -300, 70).top"
+          [style.--c]="s.app.color"
+          (focusin)="focusStation(s)"
+        >
+          <span class="card-no">Station {{ (s.index + 1).toString().padStart(2, '0') }}</span>
+          <div class="card-row">
+            <img [src]="s.app.icon ?? s.app.logo" alt="" width="56" height="56" loading="lazy" />
+            <div>
+              <h2 class="card-name">{{ s.app.name }}</h2>
+              <span class="card-tag">{{ s.app.tag }}@if (s.app.beta) { &middot; Beta }</span>
+            </div>
+          </div>
+          <p class="card-copy">{{ s.app.description }}</p>
+          @if (s.app.status === 'coming-soon') {
+            <span class="card-go is-soon">Coming soon</span>
+          } @else {
+            <a class="card-go" [href]="s.app.url" target="_blank" rel="noopener">{{ statusLabel(s.app) }} &rarr;</a>
+          }
+        </article>
+      }
+
+      @if (!narrow()) {
+        <section class="pit" [style.left.px]="pitAt.left" [style.top.px]="pitAt.top" id="all-apps" aria-labelledby="pit-title">
+          <ng-container *ngTemplateOutlet="pitBody"></ng-container>
+        </section>
+      }
+    </div>
+
+    <nav class="hud" aria-label="Production lines">
+      @for (line of layout.lines; track line.zone.label; let i = $index) {
+        <button type="button" [class.is-on]="activeLine() === i" (click)="jumpTo(line.x - 200)">{{ line.zone.label }} &middot; {{ line.zone.sub }}</button>
+      }
+      <button type="button" class="hud-all" (click)="jumpToPit()">All apps &darr;</button>
+    </nav>
+    <div class="progress" aria-hidden="true"><i #bar></i></div>
+  </div>
+</section>
+
+<!-- Phones have no room beside the pit, so the list follows the tour in the page instead. -->
+@if (narrow()) {
+  <section class="pit is-flow" id="all-apps" aria-labelledby="pit-title">
+    <ng-container *ngTemplateOutlet="pitBody"></ng-container>
+  </section>
+}
+
+<ng-template #pitBody>
+  <header class="pit-head">
+    <h2 class="pit-title" id="pit-title">The Pit</h2>
+    <p>Everything off the line ends up here. Every app, in one pile.</p>
+  </header>
+  <div class="pit-list">
+    @for (g of groups; track g.line.zone.label) {
+      <h3 class="pit-line">{{ g.line.zone.label }} &middot; {{ g.line.zone.sub }}</h3>
+      <ul>
+        @for (s of g.stations; track s.index) {
+          <li>
+            <a [href]="s.app.url" target="_blank" rel="noopener" [style.--c]="s.app.color" [attr.data-station]="s.index" [class.is-picked]="picked() === s.index">
+              <img [src]="s.app.icon ?? s.app.logo" alt="" width="36" height="36" loading="lazy" />
+              <span><b>{{ s.app.name }}</b><small>{{ s.app.tag }}</small></span>
+              <span class="pit-open">{{ s.app.status === 'coming-soon' ? 'Soon' : 'Open' }} &nearr;</span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</ng-template>

@@ -4,44 +4,13 @@
 
 <!-- inert while the intro covers it, so keyboard focus can't wander in behind. -->
 <div class="landing" [class.is-arriving]="arriving()" [attr.inert]="introActive() ? '' : null">
-  <!-- Page-level sky: the site stays in the same space the flight opens in. -->
-  <app-space-backdrop></app-space-backdrop>
-
   <!-- Shared site navbar. Renders sign-in or the user menu on its own, so the
        landing page below is public to everyone — this is the marketing
        surface, not a gated dashboard. -->
   <app-nav></app-nav>
 
-  <header class="hero">
-    <div class="hero-content">
-      <img src="assets/img/xomware-icon.webp" alt="" class="hero-mark" width="500" height="500" />
-      <h1 class="hero-title">Xomware</h1>
-      <p class="hero-subtitle">Apps for music, fantasy sports, fitness, cooking, and the leagues you run with friends.</p>
-      <div class="hero-ctas">
-        <a href="#apps" class="btn-primary">
-          Browse the apps
-          <svg viewBox="0 0 24 24" class="btn-icon" aria-hidden="true"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" fill="currentColor"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="scroll-hint">
-      <span>Scroll to explore</span>
-      <svg class="scroll-arrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="currentColor"/>
-      </svg>
-    </div>
-  </header>
-
-  <!-- App Cards Section -->
-  <section class="apps-section" id="apps">
-    <div class="section-header">
-      <span class="section-eyebrow">// The Suite</span>
-      <h2 class="section-title">Apps by Xomware</h2>
-      <p class="section-subtitle">Products &amp; projects from the Xomware workshop.</p>
-    </div>
-
-    <app-directory></app-directory>
-  </section>
+  <!-- The app directory, as a factory tour. Scrolling walks the line and parks at the pit, where every app is listed. -->
+  <app-factory></app-factory>
 
   <!-- Music — the landing already fetches this profile and polls now-playing;
        before this it was fetched and never rendered. -->

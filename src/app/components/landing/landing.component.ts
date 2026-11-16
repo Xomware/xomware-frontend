@@ -139,18 +139,6 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   private initScrollAnimations(): void {
-    // Hero fade out on scroll
-    gsap.to('.hero-content', {
-      scrollTrigger: {
-        trigger: '.hero',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 0.5,
-      },
-      opacity: 0,
-      y: -50,
-    });
-
     // Section headers slide in
     gsap.utils.toArray('.section-header').forEach((header: unknown) => {
       gsap.from(header as gsap.TweenTarget, {
