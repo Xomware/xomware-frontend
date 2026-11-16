@@ -34,7 +34,6 @@ import { AppNavComponent } from './components/nav/app-nav.component';
 import { NowPlayingComponent } from './components/now-playing/now-playing.component';
 import { MusicSnapshotComponent } from './components/music-snapshot/music-snapshot.component';
 import { AppDirectoryComponent } from './components/app-directory/app-directory.component';
-import { SpaceIntroComponent } from './components/space-intro/space-intro.component';
 import { FactoryComponent } from './components/factory/factory.component';
 
 @NgModule({
@@ -73,7 +72,6 @@ import { FactoryComponent } from './components/factory/factory.component';
     ReactiveFormsModule,
     AppRoutingModule,
     AppDirectoryComponent,
-    SpaceIntroComponent,
     FactoryComponent,
   ],
   providers: [
