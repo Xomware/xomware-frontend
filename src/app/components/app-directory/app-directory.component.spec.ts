@@ -52,6 +52,18 @@ describe('AppDirectoryComponent', () => {
     expect(armchair?.classList).not.toContain('tile__art--mark');
   });
 
+  it('labels each group with its factory line and numbers tiles straight through like the stations', () => {
+    const root = render();
+
+    const lines = Array.from(root.querySelectorAll('.group__line')).map((e) => e.textContent?.trim());
+    expect(lines).toEqual(['Line A', 'Line B', 'Line C']);
+    const bays = Array.from(root.querySelectorAll('.group')).map((g) =>
+      Array.from(g.querySelectorAll('.tile__bay')).map((e) => e.textContent?.trim()),
+    );
+    expect(bays[0][0]).toBe('A-01');
+    expect(bays[1][0]).toBe(`B-${String(bays[0].length + 1).padStart(2, '0')}`);
+  });
+
   it('keeps admin-only tools off the public directory', () => {
     const names = Array.from(render().querySelectorAll('.tile__link')).map((a) => a.textContent?.trim());
 
