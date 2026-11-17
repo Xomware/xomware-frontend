@@ -13,9 +13,12 @@
   // Orbs are handled by .bg-orbs overflow:hidden instead
 }
 
-// ── Music section (after the factory tour, before the footer) ────
+// ── After the factory tour: every app laid flat, then music ────
+.apps-section,
 .music-snapshot-section {
   width: 100%;
+  // Clears the fixed site nav when the factory's All apps button scrolls here.
+  scroll-margin-top: 72px;
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 $spacing-xl $spacing-3xl;

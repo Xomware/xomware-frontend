@@ -29,16 +29,19 @@ describe('FactoryComponent', () => {
     });
   });
 
-  it('lists every public app in the pit, grouped by line, and never an admin-only one', () => {
-    const names = Array.from(el.querySelectorAll('.pit-list a b')).map((b) => b.textContent);
-    expect(names).toEqual(jasmine.arrayWithExactContents(publicApps.map((a) => a.name)));
-    expect(el.querySelectorAll('.pit-line').length).toBe(3);
+  it('hangs a shipping tag on every public app, linking out unless it is coming soon', () => {
+    const tags = el.querySelectorAll<HTMLAnchorElement>('.ship');
+    expect(tags.length).toBe(publicApps.length);
+    fixture.componentInstance.layout.stations.forEach(({ app }, i) => {
+      expect(tags[i].querySelector('.ship-name')?.textContent).toContain(app.name);
+      expect(tags[i].getAttribute('href')).toBe(app.status === 'coming-soon' ? null : app.url);
+    });
     APPS.filter((a) => a.adminOnly).forEach((a) => expect(el.textContent).not.toContain(a.name));
   });
 
-  it('offers a button per line plus All apps', () => {
+  it('offers a button per line, the carousel and the flat list', () => {
     const labels = Array.from(el.querySelectorAll('.hud button')).map((b) => b.textContent?.trim());
-    expect(labels).toEqual(['Line A · Web apps', 'Line B · Leagues & pools', 'Line C · iOS', 'All apps ↓']);
+    expect(labels).toEqual(['Line A · Web apps', 'Line B · Leagues & pools', 'Line C · iOS', 'Shipping', 'All apps ↓']);
   });
 
   it('gives the page scroll distance for the whole tour', () => {

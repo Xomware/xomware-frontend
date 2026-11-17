@@ -52,10 +52,36 @@
         </article>
       }
 
-      @if (!narrow()) {
-        <section class="pit" [style.left.px]="pitAt.left" [style.top.px]="pitAt.top" id="all-apps" aria-labelledby="pit-title">
-          <ng-container *ngTemplateOutlet="pitBody"></ng-container>
-        </section>
+      <div class="shipping" [style.left.px]="endAt.left" [style.top.px]="endAt.top" aria-hidden="true">
+        <b>Shipping</b>
+        <small>Every app, going round. Hover or tap one for details.</small>
+      </div>
+
+      @for (s of layout.stations; track s.index) {
+        <!-- Coming-soon apps have nowhere to go, so their tag is focusable but not a link. -->
+        <a
+          class="ship"
+          [attr.href]="s.app.status === 'coming-soon' ? null : s.app.url"
+          [attr.tabindex]="s.app.status === 'coming-soon' ? 0 : null"
+          target="_blank"
+          rel="noopener"
+          [style.--c]="s.app.color"
+          [class.is-open]="opened() === s.index"
+          (focusin)="jumpToEnd()"
+        >
+          <span class="ship-name">
+            <img [src]="s.app.icon ?? s.app.logo" alt="" width="22" height="22" loading="lazy" />
+            {{ s.app.name }}
+            @if (s.app.status === 'coming-soon') {
+              <em>Soon</em>
+            }
+          </span>
+          <span class="ship-more">
+            <small>{{ s.app.tag }}@if (s.app.beta) { &middot; Beta }</small>
+            {{ s.app.description }}
+            <b>{{ s.app.status === 'coming-soon' ? 'Coming soon' : 'Open' }} &nearr;</b>
+          </span>
+        </a>
       }
     </div>
 
@@ -63,38 +89,9 @@
       @for (line of layout.lines; track line.zone.label; let i = $index) {
         <button type="button" [class.is-on]="activeLine() === i" (click)="jumpTo(line.x - 200)">{{ line.zone.label }} &middot; {{ line.zone.sub }}</button>
       }
-      <button type="button" class="hud-all" (click)="jumpToPit()">All apps &darr;</button>
+      <button type="button" [class.is-on]="activeLine() === layout.lines.length" (click)="jumpToEnd()">Shipping</button>
+      <button type="button" class="hud-all" (click)="showAll()">All apps &darr;</button>
     </nav>
     <div class="progress" aria-hidden="true"><i #bar></i></div>
   </div>
 </section>
-
-<!-- Phones have no room beside the pit, so the list follows the tour in the page instead. -->
-@if (narrow()) {
-  <section class="pit is-flow" id="all-apps" aria-labelledby="pit-title">
-    <ng-container *ngTemplateOutlet="pitBody"></ng-container>
-  </section>
-}
-
-<ng-template #pitBody>
-  <header class="pit-head">
-    <h2 class="pit-title" id="pit-title">The Pit</h2>
-    <p>Everything off the line ends up here. Every app, in one pile.</p>
-  </header>
-  <div class="pit-list">
-    @for (g of groups; track g.line.zone.label) {
-      <h3 class="pit-line">{{ g.line.zone.label }} &middot; {{ g.line.zone.sub }}</h3>
-      <ul>
-        @for (s of g.stations; track s.index) {
-          <li>
-            <a [href]="s.app.url" target="_blank" rel="noopener" [style.--c]="s.app.color" [attr.data-station]="s.index" [class.is-picked]="picked() === s.index">
-              <img [src]="s.app.icon ?? s.app.logo" alt="" width="36" height="36" loading="lazy" />
-              <span><b>{{ s.app.name }}</b><small>{{ s.app.tag }}</small></span>
-              <span class="pit-open">{{ s.app.status === 'coming-soon' ? 'Soon' : 'Open' }} &nearr;</span>
-            </a>
-          </li>
-        }
-      </ul>
-    }
-  </div>
-</ng-template>

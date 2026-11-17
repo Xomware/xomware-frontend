@@ -1,19 +1,27 @@
 import { AppCard } from '../data/apps.data';
 import { Actors } from './actors';
 import { COS30, Painter, SIN30, View, anchor, unproject } from './iso';
-import { LineLayout, inPit } from './layout';
-import { Shipment } from './packages';
-import { Drawable, clipToPit, drawFloor, drawPitRim, drawPitShell, machineDrawables, smooth, vignette } from './scene';
+import { CAROUSEL, LineLayout } from './layout';
+import { Shipment, packHeight } from './packages';
+import { Drawable, Spot, drawFloor, endDrawables, machineDrawables, smooth, vignette } from './scene';
+
+/** Where an app's tag hangs over its package, in the DOM world layer's coordinates. */
+export interface TagAnchor {
+  left: number;
+  top: number;
+  /** Nearer packages' tags stack over farther ones. */
+  depth: number;
+}
 
 export interface FactoryOptions {
   reducedMotion: boolean;
-  /** Called with the app whose crate was clicked in the pit. */
-  onPitPick?: (app: AppCard) => void;
+  /** Called with the station whose package was clicked on the carousel, or null for a click anywhere else. */
+  onPick?: (index: number | null) => void;
   /**
-   * Called after every frame with the world origin's screen position, the camera, and intro progress (0..1, 1 once
-   * the intro is over), so DOM can move and reveal in step.
+   * Called after every frame with the world origin's screen position, the camera, intro progress (0..1, 1 once
+   * the intro is over) and each station's tag anchor, so DOM can move and reveal in step.
    */
-  onFrame?: (origin: { x: number; y: number }, cam: number, intro: number) => void;
+  onFrame?: (origin: { x: number; y: number }, cam: number, intro: number, tags: TagAnchor[]) => void;
 }
 
 const INTRO_SECONDS = 4.2;
@@ -35,6 +43,7 @@ export class Factory {
   private intro = 1;
   private introStart = 0;
   private introDone: (() => void) | null = null;
+  private spots: Spot[] = [];
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -106,6 +115,11 @@ export class Factory {
     done();
   }
 
+  /** Stops the carousel while a tag is being read. */
+  setHold(on: boolean): void {
+    this.actors.hold = on;
+  }
+
   destroy(): void {
     this.setRunning(false);
     this.canvas.removeEventListener('pointerdown', this.onPointer);
@@ -122,8 +136,9 @@ export class Factory {
     }
     // The floor is still building during the intro, so the crowd moves at a crawl until it's done.
     if (!this.opts.reducedMotion) this.actors.update(this.introDone ? dt * 0.3 : dt, t, this.view.cam, this.view.w);
+    this.spots = this.actors.spots(t);
     this.render(t, this.intro);
-    this.opts.onFrame?.(this.origin(), this.view.cam, this.intro);
+    this.opts.onFrame?.(this.origin(), this.view.cam, this.intro, this.spots.map(tagAnchor));
     this.raf = requestAnimationFrame(this.frame);
   };
 
@@ -135,14 +150,10 @@ export class Factory {
     ctx.save();
     if (actors.shake) ctx.translate((Math.random() - 0.5) * 2 * actors.shake, (Math.random() - 0.5) * 1.2 * actors.shake);
     drawFloor(p, layout, intro, rise);
-    drawPitShell(p, layout);
-    clipToPit(p, layout);
-    actors.drawPile(p, this.shipFor);
-    ctx.restore();
-    drawPitRim(p, layout);
     const items: Drawable[] = [];
     const stations = layout.stations;
     machineDrawables(p, layout, t, rise, beltOn, (i) => this.shipFor(stations[(i + 5) % stations.length]?.app ?? null), items);
+    endDrawables(p, layout, actors.spin, this.spots, (st) => this.shipFor(st.app), Math.max(0, 1 - (t - actors.sorted) / 0.6), items);
     actors.drawables(p, t, rise, intro, this.shipFor, items);
     items.sort((a, b) => a.depth - b.depth).forEach((d) => d.draw());
     actors.drawEffects(p);
@@ -166,8 +177,22 @@ export class Factory {
     return station ? { kind: station.pack, color: app.color, icon: this.iconFor(app) } : null;
   };
 
+  /** The carousel package drawn nearest a screen point, if it's within reach. */
+  private spotAt(sx: number, sy: number): Spot | undefined {
+    let best: Spot | undefined;
+    let bestD = 50;
+    for (const s of this.spots) {
+      const [px, py] = this.painter.p(s.x, s.y, s.z + packHeight(CAROUSEL.size, s.station.pack) / 2);
+      const d = Math.hypot(px - sx, py - sy);
+      if (d < bestD) {
+        bestD = d;
+        best = s;
+      }
+    }
+    return best;
+  }
+
   private readonly onPointer = (e: PointerEvent): void => {
-    if (this.opts.reducedMotion) return;
     if (this.introDone) {
       this.skipIntro();
       return;
@@ -175,12 +200,19 @@ export class Factory {
     const rect = this.canvas.getBoundingClientRect();
     const sx = e.clientX - rect.left;
     const sy = e.clientY - rect.top;
-    const [x, y] = unproject(this.view, sx, sy);
-    if (inPit(this.layout, x, y, 40)) {
-      const app = this.actors.pickFromPile(this.painter, sx, sy);
-      if (app) this.opts.onPitPick?.(app);
+    const hit = this.spotAt(sx, sy);
+    this.opts.onPick?.(hit ? hit.station.index : null);
+    if (hit) {
+      this.actors.bump(hit.station.index, performance.now() / 1000);
       return;
     }
+    if (this.opts.reducedMotion) return;
+    const [x, y] = unproject(this.view, sx, sy);
     this.actors.boomAt(x, y, performance.now() / 1000);
   };
+}
+
+function tagAnchor(s: Spot): TagAnchor {
+  const top = s.z + packHeight(CAROUSEL.size, s.station.pack) + 14;
+  return { left: (s.x - s.y) * COS30, top: (s.x + s.y) * SIN30 - top, depth: s.x + s.y };
 }

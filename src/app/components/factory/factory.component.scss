@@ -4,7 +4,6 @@
 $factory-accent: #9b8cff;
 $factory-bg: #10131c;
 $factory-panel: #1d2031;
-$factory-panel-hover: #24283c;
 $factory-line: #2c3048;
 $factory-ink: #eceef6;
 $factory-dim: #9ca2ba;
@@ -217,124 +216,138 @@ $factory-dim: #9ca2ba;
   }
 }
 
-.pit {
+.shipping {
   position: absolute;
-  display: flex;
-  flex-direction: column;
-  width: min(430px, 92vw);
-  max-height: min(64vh, 600px);
+  // Under the carousel: above it, the back row of tags reaches nearly to the HUD.
+  transform: translate(-50%, 215px);
   color: $factory-ink;
-  background: $factory-panel;
-  border-top: 6px solid $factory-accent;
-  border-radius: $radius-2xl + 4px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
-
-  &.is-flow {
-    position: relative;
-    width: min(560px, calc(100% - #{$spacing-xl}));
-    max-height: none;
-    margin: $spacing-lg auto $spacing-2xl;
-
-    .pit-list {
-      overflow: visible;
-    }
-  }
-}
-
-.pit-head {
-  padding: 20px 20px 12px;
-
-  p {
-    margin: $spacing-sm 0 0;
-    font-size: $text-sm;
-    line-height: 1.5;
-    color: $factory-dim;
-  }
-}
-
-.pit-title {
-  margin: 0;
-  font-family: $font-display;
-  font-size: $text-3xl;
-  font-weight: $font-weight-bold;
-  letter-spacing: $tracking-tight;
-}
-
-.pit-list {
-  overflow-y: auto;
-  padding: 0 12px 12px;
-  scrollbar-width: thin;
-
-  ul {
-    display: grid;
-    gap: 4px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  a {
-    display: grid;
-    grid-template-columns: 36px minmax(0, 1fr) auto;
-    gap: 12px;
-    align-items: center;
-    padding: $spacing-sm;
-    color: $factory-ink;
-    text-decoration: none;
-    border-radius: $radius-xl;
-    transition: background-color $transition-fast;
-
-    &:hover,
-    &:focus-visible,
-    &.is-picked {
-      background: $factory-panel-hover;
-    }
-
-    &:focus-visible {
-      outline: 2px solid $factory-accent;
-      outline-offset: -2px;
-    }
-
-    &.is-picked {
-      box-shadow: inset 3px 0 0 var(--c);
-    }
-  }
-
-  img {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-    background: #000;
-    object-fit: cover;
-  }
+  text-align: center;
+  white-space: nowrap;
 
   b {
     display: block;
-    font-size: $text-sm;
+    font-family: $font-display;
+    font-size: clamp(30px, 3.6vw, 48px);
     font-weight: $font-weight-bold;
+    letter-spacing: $tracking-tight;
+    line-height: 1;
   }
 
   small {
     display: block;
-    margin-top: 2px;
-    font-size: $text-2xs;
+    margin-top: $spacing-sm;
+    font-size: $text-sm;
     color: $factory-dim;
   }
 }
 
-.pit-line {
-  margin: 14px 8px 6px;
-  font-size: $text-3xs;
-  font-weight: $font-weight-bold;
-  letter-spacing: $tracking-wider;
-  text-transform: uppercase;
-  color: $factory-accent;
+// One per app, hung over its package on the carousel; the factory moves them every frame.
+.ship {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  max-width: 230px;
+  padding: 6px 10px 6px 6px;
+  color: $factory-ink;
+  text-decoration: none;
+  cursor: pointer;
+  background: rgba(20, 23, 34, 0.92);
+  border: 1px solid $factory-line;
+  border-radius: $radius-xl;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  will-change: transform;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background: inherit;
+    border-right: 1px solid $factory-line;
+    border-bottom: 1px solid $factory-line;
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  &:hover,
+  &:focus-visible,
+  &.is-open {
+    // Above every other tag, whatever its depth.
+    z-index: 100000 !important;
+    background: $factory-panel;
+    border-color: var(--c);
+
+    &::after {
+      border-color: var(--c);
+    }
+
+    .ship-more {
+      display: block;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $factory-accent;
+    outline-offset: 3px;
+  }
 }
 
-.pit-open {
-  font-size: $text-2xs;
+.ship-name {
+  display: flex;
+  gap: $spacing-sm;
+  align-items: center;
+  font-size: $text-sm;
   font-weight: $font-weight-bold;
-  color: var(--c);
+  line-height: 1.1;
+  white-space: nowrap;
+
+  img {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  em {
+    padding: 3px 6px;
+    font-size: $text-3xs;
+    font-style: normal;
+    letter-spacing: $tracking-wide;
+    text-transform: uppercase;
+    color: $factory-dim;
+    border: 1px solid $factory-line;
+    border-radius: $radius-pill;
+  }
+}
+
+.ship-more {
+  display: none;
+  width: 214px;
+  padding: 10px 4px 4px;
+  font-size: $text-sm;
+  line-height: 1.45;
+  color: $factory-dim;
+  white-space: normal;
+
+  small {
+    display: block;
+    margin-bottom: 6px;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wider;
+    text-transform: uppercase;
+    color: var(--c);
+  }
+
+  b {
+    display: block;
+    margin-top: $spacing-sm;
+    font-size: $text-xs;
+    color: var(--c);
+  }
 }
 
 // Sits under the site nav, which is fixed to the top of the window.
