@@ -1,7 +1,4 @@
 <div class="apps-page">
-  <!-- Page-level sky, shared with the landing and /music. -->
-  <app-space-backdrop></app-space-backdrop>
-
   <!-- Shared site navbar — always-scrolled so the solid background is immediate
        (no tall hero here, transparent nav would make links unreadable at the top) -->
   <app-nav [alwaysScrolled]="true"></app-nav>
@@ -9,16 +6,11 @@
   <!-- Hero / page title -->
   <header class="apps-hero">
     <div class="apps-hero-inner">
-      <span class="section-eyebrow">// The Suite</span>
+      <span class="section-eyebrow">// Off the line</span>
       <h1 class="apps-hero-title">Apps by Xomware</h1>
-      <p class="apps-hero-subtitle">Products &amp; projects from the Xomware workshop.</p>
+      <p class="apps-hero-subtitle">Everything the factory ships, by line.</p>
     </div>
   </header>
-
-  <!-- The suite as an orbital system: one product at the front at a time,
-       magnified with its details. The grid below stays the complete,
-       scannable directory — this is the showpiece, that is the reference. -->
-  <app-orbit></app-orbit>
 
   <main class="apps-section" aria-label="App directory">
     <app-directory></app-directory>
