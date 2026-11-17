@@ -9,7 +9,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { jwtInterceptor } from './interceptors/jwt.interceptor';
 import { AppComponent } from './app.component';
 import { LandingComponent } from './components/landing/landing.component';
-import { SpaceBackdropComponent } from './components/space-backdrop/space-backdrop.component';
 import { CommandCenterComponent } from './components/command-center/command-center.component';
 import { AuthGateComponent } from './components/command-center/auth-gate/auth-gate.component';
 import { InfraDashboardComponent } from './components/command-center/infra-dashboard/infra-dashboard.component';
@@ -39,7 +38,6 @@ import { FactoryComponent } from './components/factory/factory.component';
   declarations: [
     AppComponent,
     LandingComponent,
-    SpaceBackdropComponent,
     CommandCenterComponent,
     AuthGateComponent,
     InfraDashboardComponent,

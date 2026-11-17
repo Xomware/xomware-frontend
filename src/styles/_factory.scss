@@ -1,0 +1,26 @@
+// The factory canvas's floor (src/app/factory/scene.ts), for the pages and tiles that stand on it.
+$factory-floor: #161a26;
+$factory-floor-line: #1f2335;
+
+// The floor's iso grid: hairlines at ±30°, one every $cell.
+@function iso-grid($cell) {
+  @return repeating-linear-gradient(30deg, transparent 0 ($cell - 1px), $factory-floor-line ($cell - 1px) $cell),
+    repeating-linear-gradient(150deg, transparent 0 ($cell - 1px), $factory-floor-line ($cell - 1px) $cell);
+}
+
+// A page hero on the floor under a work light. The grid fades out before the content below it.
+@mixin factory-floor-hero {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 45% 80% at 50% 0%, rgba(0, 180, 216, 0.14), transparent 70%),
+      iso-grid(32px);
+    mask-image: linear-gradient(to bottom, #000 40%, transparent);
+  }
+}
