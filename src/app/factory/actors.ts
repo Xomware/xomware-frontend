@@ -1,6 +1,7 @@
 import { AppCard } from '../data/apps.data';
 import { COS30, Painter } from './iso';
 import { LineLayout, PIT_R, inPit, lastStation } from './layout';
+import { Shipment, drawPackage } from './packages';
 import { Drawable, pressStroke, smooth, visibleRange } from './scene';
 
 const BELT_SPEED = 55;
@@ -381,7 +382,7 @@ export class Actors {
   }
 
   /** Crates on the belts and the workers, as depth-sorted drawables. `intro` fades the crates in last. */
-  drawables(p: Painter, t: number, rise: number, intro: number, iconFor: (app: AppCard | null) => HTMLImageElement | undefined, out: Drawable[]): void {
+  drawables(p: Painter, t: number, rise: number, intro: number, shipFor: (app: AppCard | null) => Shipment | null, out: Drawable[]): void {
     const { layout } = this;
     const [x0, x1] = visibleRange(p.view, layout);
     const fade = smooth(0.75, 1, intro);
@@ -389,13 +390,13 @@ export class Actors {
       if (c.dead || c.x < x0 || c.x > Math.min(x1, layout.beltEnd)) continue;
       const s = CRATE * (c.pop ? Math.min(1, (t - c.pop) / 0.35) : 1) * fade;
       if (s < 2) continue;
-      out.push({ depth: c.x + c.y, draw: () => p.crate(c.x, c.y, 40, s, iconFor(lastStation(layout, c.x)?.app ?? null)) });
+      out.push({ depth: c.x + c.y, draw: () => drawPackage(p, c.x, c.y, 40, s, shipFor(lastStation(layout, c.x)?.app ?? null)) });
     }
     for (const c of this.sideCrates) {
       if (c.x < x0 || c.x > x1) continue;
       // Diverted crates drop into the bin over their last stretch.
       const z = c.kind === 'out' && c.y > 440 ? 30 - (c.y - 440) * 2 : 30;
-      out.push({ depth: c.x + c.y + 5, draw: () => p.crate(c.x, c.y, z, 32, iconFor(c.app)) });
+      out.push({ depth: c.x + c.y + 5, draw: () => drawPackage(p, c.x, c.y, z, 32, shipFor(c.app)) });
     }
     for (const w of this.workers) {
       if (w.x < x0 || w.x > x1) continue;
@@ -403,10 +404,10 @@ export class Actors {
     }
   }
 
-  drawPile(p: Painter, iconFor: (app: AppCard | null) => HTMLImageElement | undefined): void {
+  drawPile(p: Painter, shipFor: (app: AppCard | null) => Shipment | null): void {
     [...this.pile]
       .sort((a, b) => a.x + a.y + a.z * 0.01 - (b.x + b.y + b.z * 0.01))
-      .forEach((b) => p.crate(b.x, b.y, b.z, CRATE, iconFor(b.app)));
+      .forEach((b) => drawPackage(p, b.x, b.y, b.z, CRATE, shipFor(b.app)));
   }
 
   drawEffects(p: Painter): void {

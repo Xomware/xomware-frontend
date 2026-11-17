@@ -2,6 +2,7 @@ import { AppCard } from '../data/apps.data';
 import { Actors } from './actors';
 import { COS30, Painter, SIN30, View, anchor, unproject } from './iso';
 import { LineLayout, inPit } from './layout';
+import { Shipment } from './packages';
 import { Drawable, clipToPit, drawFloor, drawPitRim, drawPitShell, machineDrawables, smooth, vignette } from './scene';
 
 export interface FactoryOptions {
@@ -136,13 +137,13 @@ export class Factory {
     drawFloor(p, layout, intro, rise);
     drawPitShell(p, layout);
     clipToPit(p, layout);
-    actors.drawPile(p, this.iconFor);
+    actors.drawPile(p, this.shipFor);
     ctx.restore();
     drawPitRim(p, layout);
     const items: Drawable[] = [];
     const stations = layout.stations;
-    machineDrawables(p, layout, t, rise, beltOn, (i) => this.iconFor(stations[(i + 5) % stations.length]?.app ?? null), items);
-    actors.drawables(p, t, rise, intro, this.iconFor, items);
+    machineDrawables(p, layout, t, rise, beltOn, (i) => this.shipFor(stations[(i + 5) % stations.length]?.app ?? null), items);
+    actors.drawables(p, t, rise, intro, this.shipFor, items);
     items.sort((a, b) => a.depth - b.depth).forEach((d) => d.draw());
     actors.drawEffects(p);
     ctx.restore();
@@ -157,7 +158,13 @@ export class Factory {
     }
   }
 
-  private readonly iconFor = (app: AppCard | null): HTMLImageElement | undefined => (app?.icon ? this.icons.get(app.icon) : undefined);
+  private readonly iconFor = (app: AppCard): HTMLImageElement | undefined => (app.icon ? this.icons.get(app.icon) : undefined);
+
+  /** A stamped crate ships in its station's packaging, with the app's colour and icon. */
+  private readonly shipFor = (app: AppCard | null): Shipment | null => {
+    const station = app && this.layout.stations.find((s) => s.app === app);
+    return station ? { kind: station.pack, color: app.color, icon: this.iconFor(app) } : null;
+  };
 
   private readonly onPointer = (e: PointerEvent): void => {
     if (this.opts.reducedMotion) return;

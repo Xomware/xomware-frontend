@@ -73,10 +73,4 @@ export class Painter {
     ctx.drawImage(img, 0, 0);
     ctx.restore();
   }
-
-  /** A cardboard crate centred on (x, y), sitting at height z, with an app icon on the lid when one is loaded. */
-  crate(x: number, y: number, z: number, s: number, icon?: HTMLImageElement): void {
-    this.box(x - s / 2, y - s / 2, z, s, s, s, CARDBOARD);
-    if (icon?.complete && icon.naturalWidth) this.topImage(icon, x - s * 0.38, y - s * 0.38, z + s + 0.5, s * 0.76, s * 0.76);
-  }
 }

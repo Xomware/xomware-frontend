@@ -1,5 +1,6 @@
 import { AppCard } from '../data/apps.data';
 import { COS30 } from './iso';
+import { PACKS, PackKind } from './packages';
 
 /** Half-width of the pit at the end of the line. */
 export const PIT_R = 230;
@@ -28,6 +29,8 @@ export interface Station {
   press: number;
   /** The gantry crane just before the station; the first station of a line has its banner there instead. */
   crane: number | null;
+  /** What this station's crates ship in. */
+  pack: PackKind;
 }
 
 export interface SideBelt {
@@ -54,7 +57,7 @@ export function layoutLine(apps: AppCard[]): LineLayout {
     if (stations.length) x += ZONE_GAP;
     lines.push({ zone, x: x - 400 });
     group.forEach((app, i) => {
-      stations.push({ app, index: stations.length, x, press: x + 240, crane: i === 0 ? null : x - 400 });
+      stations.push({ app, index: stations.length, x, press: x + 240, crane: i === 0 ? null : x - 400, pack: PACKS[stations.length % PACKS.length] });
       x += SPACING;
     });
   }
