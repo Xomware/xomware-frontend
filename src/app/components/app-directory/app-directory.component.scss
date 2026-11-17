@@ -3,7 +3,13 @@
 $status-live: #34d399;
 $status-beta: #facc15;
 $status-soon: #f59e0b;
-$space-ink: #070812;
+// The factory canvas's floor and belt colours (src/app/factory/scene.ts).
+$floor: #161a26;
+$floor-line: #1f2335;
+$belt-top: #2b3044;
+$belt-face: #1b1f2e;
+$roller: #4a5272;
+$slat: 22px;
 $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
 :host {
@@ -26,6 +32,18 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   gap: $spacing-md;
   padding-bottom: $spacing-sm;
   border-bottom: 1px solid $glass-border;
+}
+
+.group__line {
+  padding: 2px $spacing-xs;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  color: $bg-dark;
+  background: $status-beta;
+  border-radius: $radius-sm;
 }
 
 .group__title {
@@ -91,54 +109,62 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 }
 
-// A slice of the app's planet: its rim catches the light along the bottom of
-// the stage and the banner hangs in the space above it.
+// A stretch of factory floor: the iso grid, a work light in the app's colour,
+// and a conveyor along the bottom that the banner rides on.
 .tile__stage {
   position: relative;
   aspect-ratio: 16 / 7;
   overflow: hidden;
-  background-color: $space-ink;
+  background-color: $floor;
   background-image:
-    radial-gradient(1px 1px at 9% 18%, rgba(220, 232, 255, 0.75), transparent),
-    radial-gradient(1px 1px at 23% 62%, rgba(220, 232, 255, 0.4), transparent),
-    radial-gradient(1.5px 1.5px at 38% 12%, rgba(220, 232, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 61% 30%, rgba(220, 232, 255, 0.45), transparent),
-    radial-gradient(1px 1px at 77% 14%, rgba(220, 232, 255, 0.7), transparent),
-    radial-gradient(1.5px 1.5px at 88% 52%, rgba(220, 232, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 52% 70%, rgba(220, 232, 255, 0.3), transparent),
-    radial-gradient(ellipse 80% 70% at 50% 100%, rgba(var(--app-rgb), 0.16), transparent 70%);
+    radial-gradient(ellipse 50% 90% at 50% 0%, rgba(var(--app-rgb), 0.24), transparent 72%),
+    repeating-linear-gradient(30deg, transparent 0 23px, $floor-line 23px 24px),
+    repeating-linear-gradient(150deg, transparent 0 23px, $floor-line 23px 24px);
 
+  // The belt's top, its slats lit along the front edge.
   &::before {
     content: '';
     position: absolute;
-    left: -30%;
-    top: 74%;
-    width: 160%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle at 50% 0%,
-      rgba(var(--app-rgb), 0.34) 0%,
-      rgba(var(--app-rgb), 0.1) 14%,
-      $space-ink 36%
-    );
-    box-shadow:
-      0 0 0 1px rgba(var(--app-rgb), 0.5),
-      0 -4px 22px -6px rgba(var(--app-rgb), 0.55);
-    transition:
-      transform 600ms $ease-out,
-      box-shadow 600ms $ease-out;
+    inset: 78% 0 10%;
+    background:
+      repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.32) 0 2px, transparent 2px $slat),
+      $belt-top;
+    box-shadow: inset 0 -1px 0 rgba(var(--app-rgb), 0.55);
   }
+
+  // The belt's face, with its rollers.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 90% 0 0;
+    background:
+      radial-gradient(circle at 50% 45%, $roller 0 2.5px, transparent 3px) 0 0 / #{$slat} 100% repeat-x,
+      $belt-face;
+  }
+}
+
+.tile__bay {
+  position: absolute;
+  top: $spacing-xs;
+  left: $spacing-sm;
+  z-index: 1;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-wide;
+  color: rgba(255, 255, 255, 0.38);
 }
 
 .tile__art {
   position: absolute;
-  top: 10%;
+  top: 8%;
   left: 13%;
+  z-index: 1;
   width: 74%;
-  height: 62%;
+  height: 74%;
   object-fit: contain;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55));
+  object-position: 50% 100%;
+  filter: drop-shadow(0 5px 4px rgba(0, 0, 0, 0.6));
   transition: transform 500ms $ease-out;
 }
 
@@ -149,7 +175,7 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   width: auto;
   aspect-ratio: 1;
   margin-inline: auto;
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
 }
 
 .tile__body {
@@ -321,14 +347,11 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
     border-color: rgba(var(--app-rgb), 0.4);
 
     .tile__stage::before {
-      transform: translateY(-5%);
-      box-shadow:
-        0 0 0 1px rgba(var(--app-rgb), 0.8),
-        0 -6px 30px -4px rgba(var(--app-rgb), 0.75);
+      animation: belt-run 0.7s linear infinite;
     }
 
     .tile__art {
-      transform: translateY(-4px) scale(1.04);
+      transform: translateY(-3px);
     }
 
     .tile__go {
@@ -369,19 +392,17 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   .tile__stage {
     aspect-ratio: 4 / 3;
     border-radius: $radius-md;
+  }
 
-    &::before {
-      top: 76%;
-      left: -60%;
-      width: 220%;
-    }
+  .tile__bay {
+    display: none;
   }
 
   .tile__art {
-    top: 9%;
+    top: 10%;
     left: 8%;
     width: 84%;
-    height: 64%;
+    height: 72%;
   }
 
   .tile__art--mark {
@@ -407,6 +428,12 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 }
 
+@keyframes belt-run {
+  to {
+    background-position: $slat 0, 0 0;
+  }
+}
+
 // Slow colour pulse for the one app that gets it (see AppCard.logoPulse).
 @keyframes logo-colour-pulse {
   0%,
@@ -429,9 +456,12 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .tile,
-  .tile__stage::before,
   .tile__art,
   .tile__go {
     transition: none;
+  }
+
+  .tile:hover .tile__stage::before {
+    animation: none;
   }
 }

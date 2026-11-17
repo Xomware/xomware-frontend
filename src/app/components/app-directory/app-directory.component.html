@@ -2,6 +2,7 @@
   <section class="group" [attr.aria-labelledby]="'directory-' + group.id">
     <header class="group__head">
       <div class="group__title-row">
+        <span class="group__line">{{ group.line }}</span>
         <h3 class="group__title" [id]="'directory-' + group.id">{{ group.title }}</h3>
         <span class="group__count">{{ group.entries.length }} {{ group.entries.length === 1 ? 'app' : 'apps' }}</span>
       </div>
@@ -23,8 +24,9 @@
     <ul class="grid">
       @for (entry of group.entries; track entry.app.name) {
         <li class="tile" [style.--app-rgb]="entry.app.colorRgb">
-          <!-- Each app's banner over the rim of its own planet, lit in its colour. -->
+          <!-- Each app's banner riding a conveyor under a work light in its colour. -->
           <div class="tile__stage" aria-hidden="true">
+            <span class="tile__bay">{{ entry.bay }}</span>
             <img
               class="tile__art"
               [class.tile__art--mark]="entry.app.logoStyle !== 'banner'"
