@@ -44,6 +44,23 @@ describe('FactoryComponent', () => {
     expect(labels).toEqual(['Line A · Web apps', 'Line B · Leagues & pools', 'Line C · iOS', 'Shipping', 'All apps ↓']);
   });
 
+  it('shows what Xomify is playing, or what it last played, and nothing without a track', () => {
+    const track = { name: 'Midnight City', artist: 'M83', albumArt: 'art.jpg', url: 'https://open.spotify.com/track/x' };
+    const state = { isPlaying: true, track, progressMs: 0, durationMs: 1, source: 'playing' as const, playedAt: null };
+    fixture.componentRef.setInput('nowPlaying', state);
+    fixture.detectChanges();
+    const panel = () => el.querySelector<HTMLAnchorElement>('.np');
+    expect(panel()?.textContent).toContain('Now playing');
+    expect(panel()?.textContent).toContain('Midnight City');
+    expect(panel()?.getAttribute('href')).toBe(track.url);
+    fixture.componentRef.setInput('nowPlaying', { ...state, isPlaying: false, source: 'recent' as const, playedAt: '2026-11-17T10:00:00Z' });
+    fixture.detectChanges();
+    expect(panel()?.textContent).toContain('Last played');
+    fixture.componentRef.setInput('nowPlaying', { ...state, track: null, source: 'none' as const });
+    fixture.detectChanges();
+    expect(panel()).toBeNull();
+  });
+
   it('gives the page scroll distance for the whole tour', () => {
     const track = el.querySelector<HTMLElement>('.track');
     expect(track?.offsetHeight).toBeCloseTo(fixture.componentInstance.trackHeight(), -1);

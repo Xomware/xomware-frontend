@@ -44,6 +44,20 @@ describe('layoutLine', () => {
     expect(layout.beltEnd + 86).toBeLessThan(nearest);
   });
 
+  it('stands floor speakers off the belts, and two on the carousel island', () => {
+    const floor = layout.speakers.filter((s) => !s.island);
+    for (const s of floor) {
+      expect(Math.abs(s.y)).withContext('main belt').toBeGreaterThan(40 + 24);
+      for (const side of layout.sides) {
+        const sameSide = side.kind === 'in' ? s.y < 0 : s.y > 0;
+        if (sameSide) expect(Math.abs(s.x - side.x)).withContext('side belt').toBeGreaterThan(30 + 24);
+      }
+    }
+    const island = layout.speakers.filter((s) => s.island);
+    expect(island.length).toBe(2);
+    island.forEach((s) => expect(Math.hypot(s.x - layout.end.x, s.y - layout.end.y)).toBeLessThan(CAROUSEL.b - CAROUSEL.belt));
+  });
+
   it('skips a line with no public apps', () => {
     const webOnly = APPS.filter((a): a is AppCard => a.platform === 'web');
     expect(layoutLine(webOnly).lines.map((l) => l.zone.label)).toEqual(['Line A']);

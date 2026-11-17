@@ -39,11 +39,13 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
   /**
    * Gates the now-playing poll. This page is public and the poll runs every
    * 25s forever, so left ungated a single forgotten background tab would keep
-   * hitting the API indefinitely. Polling only runs while the music section is
-   * actually on screen and the tab is visible.
+   * hitting the API indefinitely. Polling only runs while the factory (whose
+   * now-playing panel shows it) or the music section is on screen, and the
+   * tab is visible.
    */
   private readonly pollActive$ = new BehaviorSubject<boolean>(false);
   private musicInView = false;
+  private factoryInView = false;
   private musicObserver?: IntersectionObserver;
 
   /**
@@ -105,8 +107,13 @@ export class LandingComponent implements AfterViewInit, OnDestroy, OnInit {
 
   private readonly onVisibilityChange = (): void => this.syncPolling();
 
+  factoryOnScreen(on: boolean): void {
+    this.factoryInView = on;
+    this.syncPolling();
+  }
+
   private syncPolling(): void {
-    this.pollActive$.next(this.musicInView && document.visibilityState === 'visible');
+    this.pollActive$.next((this.musicInView || this.factoryInView) && document.visibilityState === 'visible');
   }
 
   /**

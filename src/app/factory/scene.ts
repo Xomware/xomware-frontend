@@ -177,13 +177,14 @@ export function machineDrawables(
 
 /**
  * The end of the line: the sorter the belt runs into, and the carousel carrying one package per app. `spin` turns
- * the belt's slats with the packages; `lit` (0..1) flashes the sorter as a crate goes in.
+ * the belt's slats with the packages; `lit` (0..1) flashes the sorter as a crate goes in. `onIsland` draws
+ * whatever stands on the island, between the packages going round the back and the ones coming round the front.
  */
-export function endDrawables(p: Painter, layout: LineLayout, spin: number, spots: Spot[], shipFor: (st: Station) => Shipment | null, lit: number, out: Drawable[]): void {
+export function endDrawables(p: Painter, layout: LineLayout, spin: number, spots: Spot[], shipFor: (st: Station) => Shipment | null, lit: number, onIsland: () => void, out: Drawable[]): void {
   const [, x1] = visibleRange(p.view, layout);
   if (layout.beltEnd > x1) return;
   out.push({ depth: layout.beltEnd, draw: () => drawSorter(p, layout.beltEnd, lit) });
-  out.push({ depth: layout.end.x + layout.end.y - 400, draw: () => drawCarousel(p, layout, spin, spots, shipFor) });
+  out.push({ depth: layout.end.x + layout.end.y - 400, draw: () => drawCarousel(p, layout, spin, spots, shipFor, onIsland) });
 }
 
 function drawSorter(p: Painter, x: number, lit: number): void {
@@ -197,12 +198,11 @@ function drawSorter(p: Painter, x: number, lit: number): void {
   ctx.fill();
 }
 
-function drawCarousel(p: Painter, layout: LineLayout, spin: number, spots: Spot[], shipFor: (st: Station) => Shipment | null): void {
+function drawCarousel(p: Painter, layout: LineLayout, spin: number, spots: Spot[], shipFor: (st: Station) => Shipment | null, onIsland: () => void): void {
   const { ctx } = p;
-  const { a, b, belt, height: h, size } = CAROUSEL;
+  const { a, b, belt, height: h, island: isle, size } = CAROUSEL;
   const ia = a - belt;
   const ib = b - belt;
-  const isle = 40;
   const trace = (ea: number, eb: number, z: number, from = 0, to = Math.PI * 2, move = true) => {
     for (let i = 0; i <= 72; i++) {
       const [x, y] = ringPoint(layout, ea, eb, from + ((to - from) * i) / 72);
@@ -260,6 +260,7 @@ function drawCarousel(p: Painter, layout: LineLayout, spin: number, spots: Spot[
   });
   fill('#1f2336', () => trace(ia - 4, ib - 4, isle));
   edge('rgba(155,140,255,.4)', ia - 4, ib - 4, isle);
+  onIsland();
   sorted.filter((s) => Math.sin(s.th) >= 0).forEach(ride);
 }
 

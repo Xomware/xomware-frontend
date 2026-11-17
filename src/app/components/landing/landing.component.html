@@ -5,7 +5,7 @@
   <app-nav></app-nav>
 
   <!-- The app directory, as a factory tour. Scrolling walks the line to the shipping carousel. -->
-  <app-factory [intro]="introOn()" (introDone)="introOn.set(false)"></app-factory>
+  <app-factory [intro]="introOn()" [nowPlaying]="nowPlayingState" (introDone)="introOn.set(false)" (onScreen)="factoryOnScreen($event)"></app-factory>
 
   <!-- The same apps laid flat, for scanning them all at once. The factory's All apps button lands here. -->
   <section class="apps-section" id="all-apps">

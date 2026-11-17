@@ -1,9 +1,10 @@
 import { AppCard } from '../data/apps.data';
 import { Actors } from './actors';
 import { COS30, Painter, SIN30, View, anchor, unproject } from './iso';
-import { CAROUSEL, LineLayout } from './layout';
+import { CAROUSEL, LineLayout, Speaker } from './layout';
+import { Sound, beat, drawSpeaker } from './music';
 import { Shipment, packHeight } from './packages';
-import { Drawable, Spot, drawFloor, endDrawables, machineDrawables, smooth, vignette } from './scene';
+import { Drawable, Spot, drawFloor, endDrawables, machineDrawables, smooth, visibleRange, vignette } from './scene';
 
 /** Where an app's tag hangs over its package, in the DOM world layer's coordinates. */
 export interface TagAnchor {
@@ -44,6 +45,8 @@ export class Factory {
   private introStart = 0;
   private introDone: (() => void) | null = null;
   private spots: Spot[] = [];
+  private readonly sound = new Sound();
+  private music = false;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -120,6 +123,12 @@ export class Factory {
     this.actors.hold = on;
   }
 
+  /** Whether Xomify says a track is playing right now: the speakers pump and the crowd dances. */
+  setMusic(on: boolean): void {
+    this.music = on;
+    this.actors.music = on;
+  }
+
   destroy(): void {
     this.setRunning(false);
     this.canvas.removeEventListener('pointerdown', this.onPointer);
@@ -135,7 +144,10 @@ export class Factory {
       if (this.intro >= 1) this.skipIntro();
     }
     // The floor is still building during the intro, so the crowd moves at a crawl until it's done.
-    if (!this.opts.reducedMotion) this.actors.update(this.introDone ? dt * 0.3 : dt, t, this.view.cam, this.view.w);
+    if (!this.opts.reducedMotion) {
+      this.actors.update(this.introDone ? dt * 0.3 : dt, t, this.view.cam, this.view.w);
+      this.sound.update(dt, t, this.music, this.speakersInView());
+    }
     this.spots = this.actors.spots(t);
     this.render(t, this.intro);
     this.opts.onFrame?.(this.origin(), this.view.cam, this.intro, this.spots.map(tagAnchor));
@@ -152,11 +164,19 @@ export class Factory {
     drawFloor(p, layout, intro, rise);
     const items: Drawable[] = [];
     const stations = layout.stations;
+    const pulse = this.music && !this.opts.reducedMotion ? beat(t) : 0;
+    this.sound.drawRings(p, t, false);
     machineDrawables(p, layout, t, rise, beltOn, (i) => this.shipFor(stations[(i + 5) % stations.length]?.app ?? null), items);
-    endDrawables(p, layout, actors.spin, this.spots, (st) => this.shipFor(st.app), Math.max(0, 1 - (t - actors.sorted) / 0.6), items);
+    const onIsland = () => {
+      this.sound.drawRings(p, t, true);
+      layout.speakers.filter((s) => s.island).forEach((s) => drawSpeaker(p, s, 1, pulse));
+    };
+    endDrawables(p, layout, actors.spin, this.spots, (st) => this.shipFor(st.app), Math.max(0, 1 - (t - actors.sorted) / 0.6), onIsland, items);
+    for (const s of this.speakersInView()) if (!s.island) items.push({ depth: s.x + s.y, draw: () => drawSpeaker(p, s, rise, pulse) });
     actors.drawables(p, t, rise, intro, this.shipFor, items);
     items.sort((a, b) => a.depth - b.depth).forEach((d) => d.draw());
     actors.drawEffects(p);
+    this.sound.drawNotes(p, t);
     ctx.restore();
     vignette(ctx, this.view);
     if (actors.flash > 0) {
@@ -176,6 +196,11 @@ export class Factory {
     const station = app && this.layout.stations.find((s) => s.app === app);
     return station ? { kind: station.pack, color: app.color, icon: this.iconFor(app) } : null;
   };
+
+  private speakersInView(): Speaker[] {
+    const [x0, x1] = visibleRange(this.view, this.layout);
+    return this.layout.speakers.filter((s) => s.x > x0 && s.x < x1);
+  }
 
   /** The carousel package drawn nearest a screen point, if it's within reach. */
   private spotAt(sx: number, sy: number): Spot | undefined {

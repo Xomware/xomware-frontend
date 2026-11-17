@@ -38,6 +38,7 @@ $factory-dim: #9ca2ba;
 
 .world,
 .hud,
+.np,
 .progress {
   transition: opacity $transition-slow;
 
@@ -350,10 +351,142 @@ $factory-dim: #9ca2ba;
   }
 }
 
-// Sits under the site nav, which is fixed to the top of the window.
+// Pinned top-left of the stage, across from the HUD, for the whole tour.
+.np {
+  position: absolute;
+  top: 76px;
+  left: $spacing-md;
+  z-index: 2;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  max-width: min(400px, calc(100% - #{$spacing-xl}));
+  padding: 8px 14px 8px 8px;
+  color: $factory-ink;
+  text-decoration: none;
+  background: rgba(16, 19, 28, 0.88);
+  border: 1px solid $factory-line;
+  border-radius: $radius-xl;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  transition: border-color $transition-fast, opacity $transition-slow;
+
+  &:hover {
+    border-color: $factory-accent;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $factory-accent;
+    outline-offset: 3px;
+  }
+}
+
+.np-art {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: $factory-panel;
+}
+
+.np-text {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+
+  small {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wider;
+    text-transform: uppercase;
+    color: $factory-accent;
+  }
+
+  strong {
+    overflow: hidden;
+    font-size: $text-sm;
+    font-weight: $font-weight-bold;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.np-artist {
+  overflow: hidden;
+  font-size: $text-xs;
+  color: $factory-dim;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.np-by {
+  display: flex;
+  flex: none;
+  gap: 5px;
+  align-items: center;
+  align-self: flex-end;
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
+  color: $factory-dim;
+  white-space: nowrap;
+
+  img {
+    border-radius: 4px;
+  }
+}
+
+.eq {
+  display: inline-flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 10px;
+
+  b {
+    width: 2px;
+    height: 100%;
+    background: $factory-accent;
+    transform-origin: bottom;
+    animation: eq 0.9s ease-in-out infinite;
+
+    &:nth-child(2) {
+      animation-delay: -0.3s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: -0.6s;
+    }
+  }
+}
+
+@keyframes eq {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eq b {
+    animation: none;
+  }
+}
+
+// Sits under the site nav, which is fixed to the top of the window. Only its buttons take clicks, so the
+// now-playing panel beside it stays clickable.
 .hud {
   position: absolute;
   top: 76px;
+  pointer-events: none;
   right: $spacing-md;
   left: $spacing-md;
   display: flex;
@@ -364,6 +497,7 @@ $factory-dim: #9ca2ba;
 
   button {
     flex: none;
+    pointer-events: auto;
     padding: 9px 12px;
     font-family: inherit;
     font-size: $text-2xs;
@@ -422,6 +556,24 @@ $factory-dim: #9ca2ba;
 @media (max-width: $breakpoint-md) {
   .hud {
     justify-content: flex-start;
+  }
+
+  // The HUD needs the full width on phones, so the panel moves down to sit above the progress bar.
+  .np {
+    top: auto;
+    right: $spacing-md;
+    bottom: 30px;
+    max-width: none;
+    padding: 6px 10px 6px 6px;
+  }
+
+  .np-art {
+    width: 36px;
+    height: 36px;
+  }
+
+  .np-by span {
+    display: none;
   }
 }
 
