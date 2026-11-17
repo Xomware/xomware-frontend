@@ -1,6 +1,7 @@
 import { AppCard } from '../data/apps.data';
 import { COS30, Painter } from './iso';
-import { CAROUSEL, LineLayout, lastStation, ringPoint } from './layout';
+import { CAROUSEL, LineLayout, Speaker, lastStation, ringPoint } from './layout';
+import { beat, beatCount } from './music';
 import { Shipment, drawPackage } from './packages';
 import { Drawable, Spot, pressStroke, smooth, visibleRange } from './scene';
 
@@ -47,6 +48,8 @@ interface Worker {
   face: number;
   panic: number;
   moving: boolean;
+  /** Dancing by a speaker. */
+  groove: boolean;
   /** Where a foreman or mechanic keeps returning to. */
   home: number;
   /** A cart's direction along the line. */
@@ -86,6 +89,8 @@ export class Actors {
   hold = false;
   /** When the sorter last took a crate, for its light. */
   sorted = -9;
+  /** A track is playing, so walkers near a speaker dance. */
+  music = false;
   workers: Worker[] = [];
   puffs: Puff[] = [];
   sparks: Spark[] = [];
@@ -96,6 +101,7 @@ export class Actors {
   private lastT = 0;
   /** When each station's latest crate reached the sorter; its package on the carousel hops. */
   private readonly arrived: number[];
+  private readonly floorSpeakers: Speaker[];
 
   constructor(
     private readonly layout: LineLayout,
@@ -104,6 +110,7 @@ export class Actors {
     const { stations, sides, beltEnd } = layout;
     for (let x = 60; x < beltEnd; x += this.between(130, 190)) this.crates.push({ x, y: 0, dead: 0, pop: 0 });
     this.arrived = stations.map(() => -9);
+    this.floorSpeakers = layout.speakers.filter((s) => !s.island);
     for (let i = 0; i < Math.round(beltEnd / 150); i++) {
       const side = this.rand() < 0.5 ? -1 : 1;
       this.addWorker(this.rand() < 0.4 ? 'carrier' : 'walker', this.between(0, beltEnd - 80), side * this.between(110, 430));
@@ -139,6 +146,7 @@ export class Actors {
       face: 1,
       panic: 0,
       moving: true,
+      groove: false,
       dir: this.rand() < 0.5 ? -1 : 1,
       point: 0,
     });
@@ -271,6 +279,7 @@ export class Actors {
     const { layout } = this;
     for (const w of this.workers) {
       w.panic = Math.max(0, w.panic - dt);
+      w.groove = this.music && w.role === 'walker' && !w.panic && this.floorSpeakers.some((s) => Math.hypot(w.x - s.x, w.y - s.y) < 240);
       let vx = 0;
       let vy = 0;
       if (w.panic) {
@@ -287,7 +296,7 @@ export class Actors {
         if (Math.sin(t * 0.4 + w.phase) > 0.2) vx = Math.cos(w.heading) * w.speed * 0.6;
       } else if (w.role === 'fixer') {
         if (Math.abs(w.x - w.home) > 4) vx = (w.home - w.x) * 2;
-      } else {
+      } else if (!w.groove) {
         if (this.rand() < dt * 0.4) w.heading += this.between(-1.2, 1.2);
         vx = Math.cos(w.heading) * w.speed;
         vy = Math.sin(w.heading) * w.speed;
@@ -320,6 +329,14 @@ export class Actors {
       w.x = layout.beltEnd - 70;
       w.heading = Math.PI - w.heading;
       w.dir = -1;
+    }
+    for (const s of this.floorSpeakers) {
+      const dx = w.x - s.x;
+      const dy = w.y - s.y;
+      const d = Math.hypot(dx, dy);
+      if (d >= 44) continue;
+      w.x = s.x + (dx / (d || 1)) * 44;
+      w.y = s.y + (dy / (d || 1)) * 44;
     }
     for (const s of layout.sides) {
       const onBelt = s.kind === 'in' ? w.y < -40 : w.y > 40;
@@ -415,7 +432,8 @@ export class Actors {
     ctx.fillStyle = '#15171f';
     ctx.fillRect(-6 + stride * 2.2, -2.5, 6, 2.5);
     ctx.fillRect(-0.4 - stride * 2.2, -2.5, 6, 2.5);
-    ctx.translate(0, walking ? -Math.abs(Math.sin(ph)) * (panic ? 3 : 1.6) : 0);
+    const groove = w.groove && !walking;
+    ctx.translate(0, walking ? -Math.abs(Math.sin(ph)) * (panic ? 3 : 1.6) : groove ? -beat(t) * 3 : 0);
     const bw = 7 * w.width;
     ctx.fillStyle = w.suit;
     this.rounded(ctx, -bw, -29, bw * 2, 18, 5);
@@ -437,6 +455,10 @@ export class Actors {
     if (panic) {
       arm(front, 3, -11 + Math.sin(ph * 2) * 2);
       arm(back, -3, -11 - Math.sin(ph * 2) * 2);
+    } else if (groove) {
+      const up = beatCount(t) % 2 === 0;
+      arm(front, 4, up ? -12 : 6);
+      arm(back, -4, up ? 6 : -12);
     } else if (w.role === 'carrier') {
       arm(front, 3, -9);
       arm(back, 2, -9);

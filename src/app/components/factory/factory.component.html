@@ -85,6 +85,24 @@
       }
     </div>
 
+    @if (nowPlaying()?.track; as track) {
+      <a class="np" [class.is-recent]="!isPlaying()" [href]="track.url" target="_blank" rel="noopener">
+        <img class="np-art" [src]="track.albumArt" alt="" width="46" height="46" />
+        <span class="np-text">
+          <small>
+            @if (isPlaying()) {
+              <i class="eq" aria-hidden="true"><b></b><b></b><b></b></i>Now playing
+            } @else {
+              Last played
+            }
+          </small>
+          <strong>{{ track.name }}</strong>
+          <span class="np-artist">{{ track.artist }}</span>
+        </span>
+        <span class="np-by"><img src="assets/img/apps/xomify.webp" alt="" width="14" height="14" /><span>via Xomify</span></span>
+      </a>
+    }
+
     <nav class="hud" aria-label="Production lines">
       @for (line of layout.lines; track line.zone.label; let i = $index) {
         <button type="button" [class.is-on]="activeLine() === i" (click)="jumpTo(line.x - 200)">{{ line.zone.label }} &middot; {{ line.zone.sub }}</button>

@@ -6,7 +6,7 @@ import { PACKS, PackKind } from './packages';
  * The shipping carousel the line ends at: semi-axes a (across the screen) and b (into it), the belt's width and
  * height, and how big the packages riding it are. All in world units.
  */
-export const CAROUSEL = { a: 367, b: 255, belt: 80, height: 26, size: 54 };
+export const CAROUSEL = { a: 367, b: 255, belt: 80, height: 26, island: 40, size: 54 };
 const START = 1150;
 const SPACING = 760;
 const ZONE_GAP = 440;
@@ -42,6 +42,16 @@ export interface SideBelt {
   x: number;
 }
 
+/** A PA tower. Most stand on the floor; two stand back to back on the carousel's island. */
+export interface Speaker {
+  x: number;
+  y: number;
+  /** Height of whatever it stands on. */
+  z: number;
+  h: number;
+  island: boolean;
+}
+
 export interface LineLayout {
   stations: Station[];
   lines: { zone: Zone; x: number }[];
@@ -50,6 +60,7 @@ export interface LineLayout {
   end: { x: number; y: number };
   /** Where the belt runs into the sorter in front of the carousel. */
   beltEnd: number;
+  speakers: Speaker[];
 }
 
 export function layoutLine(apps: AppCard[]): LineLayout {
@@ -72,7 +83,11 @@ export function layoutLine(apps: AppCard[]): LineLayout {
     if (i % 4 === 2) sides.push({ kind: 'out', x: s.x + 430 });
   });
   const end = { x: x + 480, y: -184 };
-  return { stations, lines, sides, end, beltEnd: end.x - 520 };
+  const floor = (sx: number, sy: number): Speaker => ({ x: sx, y: sy, z: 0, h: 124, island: false });
+  const island = (dx: number): Speaker => ({ x: end.x + dx, y: end.y - dx, z: CAROUSEL.island, h: 78, island: true });
+  // One by the opening headline, one along the front, one at each line's banner and a pair on the carousel.
+  const speakers = [floor(330, -380), floor(900, 330), ...lines.map((l) => floor(l.x + 120, -360)), island(-30), island(30)];
+  return { stations, lines, sides, end, beltEnd: end.x - 520, speakers };
 }
 
 /** Furthest the camera travels: far enough to park the carousel in the middle of the screen. */

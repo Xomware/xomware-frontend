@@ -1,8 +1,9 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild, computed, inject, input, output, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild, computed, effect, inject, input, output, signal } from '@angular/core';
 import { APPS, AppCard } from '../../data/apps.data';
 import { Factory, TagAnchor } from '../../factory/factory';
 import { COS30, SIN30 } from '../../factory/iso';
 import { Station, cameraMax, layoutLine } from '../../factory/layout';
+import { NowPlayingState } from '../../models/now-playing.model';
 
 interface Placed {
   left: number;
@@ -28,6 +29,11 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Play the factory intro on arrival. The landing decides, once per page load. */
   readonly intro = input(false);
   readonly introDone = output<void>();
+  /** What Xomify says is playing, or last played. The landing polls it while it's worth showing. */
+  readonly nowPlaying = input<NowPlayingState | null>(null);
+  readonly isPlaying = computed(() => this.nowPlaying()?.source === 'playing');
+  /** True while any of the factory is on screen. */
+  readonly onScreen = output<boolean>();
   readonly introPlaying = signal(false);
   readonly introTitle = signal(false);
 
@@ -58,6 +64,10 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
   private tagEls: HTMLElement[] = [];
   private readonly reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  constructor() {
+    effect(() => this.factory?.setMusic(this.isPlaying()));
+  }
+
   at(x: number, dy: number, dx = 0): Placed {
     return { left: x * COS30 + dx, top: x * SIN30 + dy };
   }
@@ -73,11 +83,15 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
         onPick: (index) => this.zone.run(() => this.opened.set(index)),
         onFrame: (origin, cam, intro, tags) => this.follow(origin, cam, intro, tags),
       });
+      this.factory.setMusic(this.isPlaying());
       this.tagEls = Array.from(this.world.nativeElement.querySelectorAll<HTMLElement>('.ship'));
       this.measure();
       addEventListener('scroll', this.onScroll, { passive: true });
       addEventListener('resize', this.measure);
-      this.observer = new IntersectionObserver(([entry]) => this.factory?.setRunning(entry.isIntersecting));
+      this.observer = new IntersectionObserver(([entry]) => {
+        this.factory?.setRunning(entry.isIntersecting);
+        this.zone.run(() => this.onScreen.emit(entry.isIntersecting));
+      });
       this.observer.observe(this.track.nativeElement);
       if (!this.introPlaying()) return;
       addEventListener('keydown', this.onIntroKey);

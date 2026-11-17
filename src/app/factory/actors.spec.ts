@@ -43,6 +43,20 @@ describe('Actors', () => {
     expect(a.sorted).toBe(10);
   });
 
+  it('makes walkers by a speaker dance, but only while a track plays', () => {
+    const a = new Actors(layout, seeded(5));
+    const [speaker] = layout.speakers;
+    const walker = a.workers.find((w) => w.role === 'walker')!;
+    const park = () => Object.assign(walker, { x: speaker.x + 80, y: speaker.y, panic: 0 });
+    park();
+    a.update(0.01, 1, 0, 1440);
+    expect(walker.groove).toBeFalse();
+    a.music = true;
+    park();
+    a.update(0.01, 2, 0, 1440);
+    expect(walker.groove).toBeTrue();
+  });
+
   it('makes workers near a malfunction panic and leaves distant ones alone', () => {
     const a = new Actors(layout, seeded(4));
     const x = layout.stations[2].x;
