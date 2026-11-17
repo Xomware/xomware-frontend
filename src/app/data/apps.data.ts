@@ -199,12 +199,16 @@ export const APPS: AppCard[] = [
     color: '#e83fd0',
     colorRgb: '232, 63, 208',
     url: 'https://armchairjudge.com',
-    logo: 'assets/img/apps/armchair-judge.webp',
+    logo: 'assets/img/banners/armchair-judge.webp',
     icon: 'assets/img/apps/armchair-judge.webp',
+    logoStyle: 'banner',
     tag: 'Web App',
     status: 'live',
     platform: 'web',
-    links: [{ label: 'Dancing with the Stars', url: 'https://dwts.armchairjudge.com' }],
+    links: [
+      { label: 'Dancing with the Stars', url: 'https://dwts.armchairjudge.com' },
+      { label: 'The Traitors', url: 'https://traitors.armchairjudge.com' },
+    ],
   },
   {
     name: 'Xomify',
