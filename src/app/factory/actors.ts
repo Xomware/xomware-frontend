@@ -1,13 +1,14 @@
 import { AppCard } from '../data/apps.data';
 import { COS30, Painter } from './iso';
-import { LineLayout, PIT_R, inPit, lastStation } from './layout';
+import { CAROUSEL, LineLayout, lastStation, ringPoint } from './layout';
 import { Shipment, drawPackage } from './packages';
-import { Drawable, pressStroke, smooth, visibleRange } from './scene';
+import { Drawable, Spot, pressStroke, smooth, visibleRange } from './scene';
 
 const BELT_SPEED = 55;
 const SIDE_SPEED = 50;
-const PILE_MAX = 48;
 const CRATE = 36;
+const LAP_SECONDS = 80;
+const HOP_SECONDS = 0.5;
 const SUITS = ['#ff7a1a', '#2f7cf6', '#22b573', '#9b5cff', '#e8475f', '#f2c230', '#e9e6df', '#18a3b8'];
 const HATS = ['#ffd23f', '#ff8c1a', '#ffffff', '#3a86ff', '#ef476f', '#7ae582'];
 const SKIN = ['#f1c9a5', '#d9a27c', '#a86f4c', '#7a4a2f', '#f5d6c6', '#c68b62'];
@@ -29,17 +30,6 @@ interface SideCrate {
   x: number;
   y: number;
   app: AppCard | null;
-}
-
-export interface PileCrate {
-  x: number;
-  y: number;
-  z: number;
-  vx: number;
-  vy: number;
-  vz: number;
-  app: AppCard | null;
-  settled: boolean;
 }
 
 interface Worker {
@@ -87,16 +77,15 @@ interface Spark {
   life: number;
 }
 
-/** Height of the pile's surface: a cone peaking over the middle of the pit. */
-export function mound(layout: LineLayout, x: number, y: number): number {
-  const d = Math.hypot(x - layout.pit, y) / PIT_R;
-  return -150 + 150 * Math.max(0, 1 - d) ** 0.8;
-}
-
 export class Actors {
   crates: Crate[] = [];
   sideCrates: SideCrate[] = [];
-  pile: PileCrate[] = [];
+  /** How far the carousel has turned. */
+  spin = 0;
+  /** Holds the carousel still while someone reads a tag. */
+  hold = false;
+  /** When the sorter last took a crate, for its light. */
+  sorted = -9;
   workers: Worker[] = [];
   puffs: Puff[] = [];
   sparks: Spark[] = [];
@@ -105,25 +94,19 @@ export class Actors {
   private nextBoom = 3;
   private feeders: number[];
   private lastT = 0;
+  /** When each station's latest crate reached the sorter; its package on the carousel hops. */
+  private readonly arrived: number[];
 
   constructor(
     private readonly layout: LineLayout,
     private readonly rand: Rand = Math.random,
   ) {
-    const { stations, sides, beltEnd, pit } = layout;
+    const { stations, sides, beltEnd } = layout;
     for (let x = 60; x < beltEnd; x += this.between(130, 190)) this.crates.push({ x, y: 0, dead: 0, pop: 0 });
-    for (const s of stations) {
-      for (let n = 0; n < 2; n++) {
-        const r = this.between(0, PIT_R * 0.85);
-        const a = this.between(0, Math.PI * 2);
-        const x = pit + Math.cos(a) * r;
-        const y = Math.sin(a) * r;
-        this.pile.push({ x, y, z: mound(layout, x, y), vx: 0, vy: 0, vz: 0, app: s.app, settled: true });
-      }
-    }
-    for (let i = 0; i < Math.round(pit / 150); i++) {
+    this.arrived = stations.map(() => -9);
+    for (let i = 0; i < Math.round(beltEnd / 150); i++) {
       const side = this.rand() < 0.5 ? -1 : 1;
-      this.addWorker(this.rand() < 0.4 ? 'carrier' : 'walker', this.between(0, pit - PIT_R - 40), side * this.between(110, 430));
+      this.addWorker(this.rand() < 0.4 ? 'carrier' : 'walker', this.between(0, beltEnd - 80), side * this.between(110, 430));
     }
     for (const s of stations) {
       this.addWorker('foreman', s.x + this.between(-80, 80), this.between(150, 185), s.x);
@@ -187,26 +170,28 @@ export class Actors {
     this.boom(hit ? hit.x : x, hit ? hit.y : y, hit ? 70 : 10);
   }
 
-  /** The pile crate drawn nearest a screen point, if it's within reach. Bounces it as feedback. */
-  pickFromPile(p: Painter, sx: number, sy: number): AppCard | null {
-    let best: PileCrate | null = null;
-    let bestD = 60;
-    for (const b of this.pile) {
-      const [px, py] = p.p(b.x, b.y, b.z + CRATE);
-      const d = Math.hypot(px - sx, py - sy);
-      if (d < bestD) {
-        bestD = d;
-        best = b;
-      }
-    }
-    if (!best) return null;
-    best.vz = 260;
-    best.settled = false;
-    return best.app;
+  /** Where each app's package rides on the carousel right now. */
+  spots(t: number): Spot[] {
+    const { stations } = this.layout;
+    const a = CAROUSEL.a - CAROUSEL.belt / 2;
+    const b = CAROUSEL.b - CAROUSEL.belt / 2;
+    return stations.map((station, i) => {
+      const th = (i / stations.length) * Math.PI * 2 + this.spin;
+      const [x, y] = ringPoint(this.layout, a, b, th);
+      const since = t - this.arrived[i];
+      const hop = since > 0 && since < HOP_SECONDS ? Math.sin((Math.PI * since) / HOP_SECONDS) * 16 : 0;
+      return { station, x, y, z: CAROUSEL.height + hop, th };
+    });
+  }
+
+  /** Makes a station's package hop, as feedback when it's picked. */
+  bump(index: number, t: number): void {
+    this.arrived[index] = t;
   }
 
   update(dt: number, t: number, cam: number, viewW: number): void {
     const { layout } = this;
+    if (!this.hold) this.spin += (dt * Math.PI * 2) / LAP_SECONDS;
     for (const c of this.crates) {
       const prev = c.x;
       c.x += BELT_SPEED * dt;
@@ -222,7 +207,9 @@ export class Actors {
         continue;
       }
       if (c.x > layout.beltEnd && !c.dead) {
-        this.pile.push({ x: layout.beltEnd, y: c.y, z: 40, vx: this.between(110, 220), vy: this.between(-90, 90), vz: this.between(80, 220), app: lastStation(layout, c.x)?.app ?? null, settled: false });
+        const station = lastStation(layout, c.x);
+        if (station) this.arrived[station.index] = t;
+        this.sorted = t;
         this.recycle(c, t);
       }
     }
@@ -243,7 +230,6 @@ export class Actors {
     });
     // Feeders add crates faster than diverters take them, so trim the oldest to keep the belt from clogging.
     if (this.crates.length > 90) this.crates.splice(0, this.crates.length - 90);
-    this.settlePile(dt);
     this.moveWorkers(dt, t);
     this.pressSparks(t);
     this.nextBoom -= dt;
@@ -279,29 +265,6 @@ export class Actors {
   private recycle(c: Crate, t: number): void {
     c.x = this.between(-160, -20);
     c.pop = t;
-  }
-
-  settlePile(dt: number): void {
-    const { layout } = this;
-    for (const b of this.pile) {
-      if (b.settled) continue;
-      b.vz -= 900 * dt;
-      b.x = Math.min(layout.pit + PIT_R - 20, Math.max(layout.pit - PIT_R + 20, b.x + b.vx * dt));
-      b.y = Math.min(PIT_R - 20, Math.max(-PIT_R + 20, b.y + b.vy * dt));
-      b.z += b.vz * dt;
-      const floor = mound(layout, b.x, b.y);
-      if (b.z > floor) continue;
-      b.z = floor;
-      if (Math.abs(b.vz) > 160) {
-        b.vz *= -0.3;
-        b.vx *= 0.5;
-        b.vy *= 0.5;
-      } else {
-        b.settled = true;
-        this.puffs.push({ x: b.x, y: b.y, z: b.z, r: 6, vr: 40, vz: 20, t: 0, life: 0.5 });
-      }
-    }
-    if (this.pile.length > PILE_MAX) this.pile.splice(0, this.pile.length - PILE_MAX);
   }
 
   private moveWorkers(dt: number, t: number): void {
@@ -341,7 +304,7 @@ export class Actors {
     }
   }
 
-  /** Off the belt, inside the floor slab, out of the pit and clear of the side belts. */
+  /** Off the belt, inside the floor slab, short of the sorter and clear of the side belts. */
   private keepOnFloor(w: Worker): void {
     const { layout } = this;
     if (Math.abs(w.y) < 85) {
@@ -352,8 +315,9 @@ export class Actors {
       w.y = Math.sign(w.y) * 450;
       w.heading = -w.heading;
     }
-    if (inPit(layout, w.x, w.y, 30)) {
-      w.x = Math.min(w.x, layout.pit - PIT_R - 30);
+    // The end of the line is for packages, not people.
+    if (w.x > layout.beltEnd - 70) {
+      w.x = layout.beltEnd - 70;
       w.heading = Math.PI - w.heading;
       w.dir = -1;
     }
@@ -402,12 +366,6 @@ export class Actors {
       if (w.x < x0 || w.x > x1) continue;
       out.push({ depth: w.x + w.y, draw: () => this.drawWorker(p, w, t, rise) });
     }
-  }
-
-  drawPile(p: Painter, shipFor: (app: AppCard | null) => Shipment | null): void {
-    [...this.pile]
-      .sort((a, b) => a.x + a.y + a.z * 0.01 - (b.x + b.y + b.z * 0.01))
-      .forEach((b) => drawPackage(p, b.x, b.y, b.z, CRATE, shipFor(b.app)));
   }
 
   drawEffects(p: Painter): void {

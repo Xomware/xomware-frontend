@@ -1,9 +1,8 @@
-import { NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild, computed, inject, input, output, signal } from '@angular/core';
 import { APPS, AppCard } from '../../data/apps.data';
-import { Factory } from '../../factory/factory';
+import { Factory, TagAnchor } from '../../factory/factory';
 import { COS30, SIN30 } from '../../factory/iso';
-import { PIT_R, Station, cameraMax, layoutLine } from '../../factory/layout';
+import { Station, cameraMax, layoutLine } from '../../factory/layout';
 
 interface Placed {
   left: number;
@@ -13,19 +12,18 @@ interface Placed {
 /**
  * The landing page's app directory as an isometric factory tour. A tall track gives the page scroll distance; a
  * sticky stage inside it holds the canvas and a DOM layer of station cards that moves with the camera. Scrolling
- * the track walks the camera down the line until it parks at the pit, where every app is listed.
+ * the track walks the camera down the line until it parks at the shipping carousel, where every app rides past
+ * with a tag. The flat list of apps follows the factory on the landing page.
  */
 @Component({
   selector: 'app-factory',
   standalone: true,
-  imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './factory.component.html',
   styleUrl: './factory.component.scss',
 })
 export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly zone = inject(NgZone);
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** Play the factory intro on arrival. The landing decides, once per page load. */
   readonly intro = input(false);
@@ -34,21 +32,20 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly introTitle = signal(false);
 
   readonly layout = layoutLine(APPS);
-  readonly groups = this.layout.lines.map((line) => ({ line, stations: this.layout.stations.filter((s) => s.app.platform === line.zone.platform) }));
   readonly viewport = signal({ w: 1440, h: 900 });
   readonly camMax = computed(() => cameraMax(this.layout, this.viewport().w));
   readonly trackHeight = computed(() => this.camMax() + this.viewport().h);
-  readonly narrow = computed(() => this.viewport().w < 800);
   /** World-layer coordinates; the anchor depends on the viewport, so the lead is re-placed on resize. */
   readonly leadAt = computed<Placed>(() => {
     const { w, h } = this.viewport();
     return { left: 40 - w * 0.3, top: h * 0.2 - h * 0.52 };
   });
-  /** Beside the pit on wide screens. Phones get the list in the page flow below the tour instead. */
-  readonly pitAt: Placed = this.at(this.layout.pit + PIT_R * 2, -300 - PIT_R * 2 * SIN30, 30);
+  /** The carousel's centre in the world layer, for the Shipping heading above it. */
+  readonly endAt: Placed = { left: (this.layout.end.x - this.layout.end.y) * COS30, top: (this.layout.end.x + this.layout.end.y) * SIN30 };
+  /** Which HUD stop the camera is at: a line's index, or lines.length at the carousel. */
   readonly activeLine = signal(0);
-  /** Station index of the app last picked out of the pit. Names repeat (Xomify on web and iOS), indexes don't. */
-  readonly picked = signal<number | null>(null);
+  /** Station whose tag was opened by clicking its package. */
+  readonly opened = signal<number | null>(null);
 
   @ViewChild('track', { static: true }) private track!: ElementRef<HTMLElement>;
   @ViewChild('canvas', { static: true }) private canvas!: ElementRef<HTMLCanvasElement>;
@@ -58,6 +55,7 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
   private factory?: Factory;
   private observer?: IntersectionObserver;
   private trackTop = 0;
+  private tagEls: HTMLElement[] = [];
   private readonly reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   at(x: number, dy: number, dx = 0): Placed {
@@ -72,9 +70,10 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.zone.runOutsideAngular(() => {
       this.factory = new Factory(this.canvas.nativeElement, this.layout, {
         reducedMotion: this.reducedMotion,
-        onPitPick: (app) => this.zone.run(() => this.pick(app)),
-        onFrame: (origin, cam, intro) => this.follow(origin, cam, intro),
+        onPick: (index) => this.zone.run(() => this.opened.set(index)),
+        onFrame: (origin, cam, intro, tags) => this.follow(origin, cam, intro, tags),
       });
+      this.tagEls = Array.from(this.world.nativeElement.querySelectorAll<HTMLElement>('.ship'));
       this.measure();
       addEventListener('scroll', this.onScroll, { passive: true });
       addEventListener('resize', this.measure);
@@ -118,9 +117,13 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
     scrollTo({ top, behavior: this.reducedMotion ? 'auto' : 'smooth' });
   }
 
-  jumpToPit(): void {
-    if (this.narrow()) this.host.nativeElement.querySelector('#all-apps')?.scrollIntoView({ behavior: this.reducedMotion ? 'auto' : 'smooth' });
-    else this.jumpTo(this.camMax());
+  jumpToEnd(): void {
+    this.jumpTo(this.camMax());
+  }
+
+  /** The flat list of every app is the landing's next section, after the factory. */
+  showAll(): void {
+    document.getElementById('all-apps')?.scrollIntoView({ behavior: this.reducedMotion ? 'auto' : 'smooth' });
   }
 
   /** Keyboard users tab onto cards the camera hasn't reached yet, so bring their station into view. */
@@ -148,7 +151,7 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.factory?.setCamera(Math.max(0, Math.min(this.camMax(), scrollY - this.trackTop)));
   };
 
-  private follow(origin: { x: number; y: number }, cam: number, intro: number): void {
+  private follow(origin: { x: number; y: number }, cam: number, intro: number, tags: TagAnchor[]): void {
     if (intro > 0.55 && intro < 1 && !this.introTitle()) this.zone.run(() => this.introTitle.set(true));
     this.world.nativeElement.style.transform = `translate3d(${origin.x}px, ${origin.y}px, 0)`;
     this.bar.nativeElement.style.width = `${(cam / Math.max(1, this.camMax())) * 100}%`;
@@ -156,16 +159,15 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.layout.lines.forEach((l, i) => {
       if (cam + 400 >= l.x) line = i;
     });
+    if (cam >= this.camMax() - 300) line = this.layout.lines.length;
     if (line !== this.activeLine()) this.zone.run(() => this.activeLine.set(line));
-  }
-
-  private pick(app: AppCard): void {
-    const station = this.layout.stations.find((s) => s.app === app);
-    if (!station) return;
-    this.picked.set(station.index);
-    // On phones the list is further down the page; scrolling to it would yank the reader away from the pit.
-    if (this.narrow()) return;
-    const row = this.host.nativeElement.querySelector(`[data-station="${station.index}"]`);
-    row?.scrollIntoView({ block: 'nearest', behavior: this.reducedMotion ? 'auto' : 'smooth' });
+    tags.forEach((tag, i) => {
+      const el = this.tagEls[i];
+      if (!el) return;
+      el.style.transform = `translate(${tag.left}px, ${tag.top}px) translate(-50%, calc(-100% - 8px))`;
+      el.style.zIndex = String(Math.round(tag.depth) + 4000);
+    });
+    // Hovering, focusing or opening a tag holds the carousel still so it can be read.
+    this.factory?.setHold(!!this.world.nativeElement.querySelector('.ship:hover, .ship:focus-visible, .ship.is-open'));
   }
 }

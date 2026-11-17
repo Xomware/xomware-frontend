@@ -1,5 +1,6 @@
 import { APPS, AppCard } from '../data/apps.data';
-import { PIT_R, ZONES, cameraMax, lastStation, layoutLine } from './layout';
+import { project } from './iso';
+import { CAROUSEL, ZONES, cameraMax, lastStation, layoutLine, ringPoint } from './layout';
 
 describe('layoutLine', () => {
   const layout = layoutLine(APPS);
@@ -36,9 +37,11 @@ describe('layoutLine', () => {
     }
   });
 
-  it('ends the belt at the near edge of the pit, past the last station', () => {
-    expect(layout.beltEnd).toBe(layout.pit - PIT_R);
+  it('ends the belt at the sorter, past the last station and clear of the carousel', () => {
     expect(layout.beltEnd).toBeGreaterThan(layout.stations[layout.stations.length - 1].press);
+    // The sorter box reaches 86 past the belt's end.
+    const nearest = Math.min(...Array.from({ length: 360 }, (_, d) => ringPoint(layout, CAROUSEL.a, CAROUSEL.b, (d * Math.PI) / 180)[0]));
+    expect(layout.beltEnd + 86).toBeLessThan(nearest);
   });
 
   it('skips a line with no public apps', () => {
@@ -61,8 +64,10 @@ describe('lastStation', () => {
 describe('cameraMax', () => {
   const layout = layoutLine(APPS);
 
-  it('parks the pit at the anchor on wide screens and stops short of it on phones', () => {
-    expect(cameraMax(layout, 1440)).toBe(layout.pit);
-    expect(cameraMax(layout, 390)).toBeLessThan(layout.pit);
+  it('parks the carousel in the middle of the screen at any width', () => {
+    for (const w of [390, 1024, 1440]) {
+      const [x] = project({ w, h: 900, cam: cameraMax(layout, w) }, layout.end.x, layout.end.y, 0);
+      expect(x).withContext(`${w}px`).toBeCloseTo(w / 2, 6);
+    }
   });
 });

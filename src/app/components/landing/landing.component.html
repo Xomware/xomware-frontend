@@ -4,8 +4,18 @@
        surface, not a gated dashboard. -->
   <app-nav></app-nav>
 
-  <!-- The app directory, as a factory tour. Scrolling walks the line and parks at the pit, where every app is listed. -->
+  <!-- The app directory, as a factory tour. Scrolling walks the line to the shipping carousel. -->
   <app-factory [intro]="introOn()" (introDone)="introOn.set(false)"></app-factory>
+
+  <!-- The same apps laid flat, for scanning them all at once. The factory's All apps button lands here. -->
+  <section class="apps-section" id="all-apps">
+    <div class="section-header">
+      <span class="section-eyebrow">// Every app</span>
+      <h2 class="section-title">All apps</h2>
+      <p class="section-subtitle">Everything off the line, laid flat.</p>
+    </div>
+    <app-directory></app-directory>
+  </section>
 
   <!-- Music — the landing already fetches this profile and polls now-playing;
        before this it was fetched and never rendered. -->

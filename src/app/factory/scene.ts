@@ -1,5 +1,5 @@
 import { COS30, Faces, Painter, View } from './iso';
-import { LineLayout, PIT_R, inPit } from './layout';
+import { CAROUSEL, LineLayout, Station, ringPoint } from './layout';
 import { Shipment, drawPackage, packHeight } from './packages';
 
 export interface Drawable {
@@ -11,17 +11,28 @@ export interface Drawable {
 const BG = '#10131c';
 const TILE = 80;
 const FLOOR_Y = 480;
-const PIT_DEPTH = -170;
 const BELT: Faces = { top: '#2b3044', left: '#1b1f2e', right: '#232838' };
 const PRESS: Faces = { top: '#4a5170', left: '#2f3550', right: '#3a4160' };
 const ARM: Faces = { top: '#565e80', left: '#353b58', right: '#424a6c' };
 const POST: Faces = { top: '#5a6280', left: '#363c58', right: '#434a69' };
 const BEAM: Faces = { top: '#646d8e', left: '#3a405c', right: '#4a5272' };
 const BIN: Faces = { top: '#14172a', left: '#3a4160', right: '#4a5272' };
+const SORTER: Faces = { top: '#3a4160', left: '#232838', right: '#2c3248' };
 
-/** World x range worth drawing for this view: a margin either side of what's on screen, never past the pit. */
+/** One app's package riding the carousel. */
+export interface Spot {
+  station: Station;
+  x: number;
+  y: number;
+  /** Height it rests at, including its hop when a crate of its arrives. */
+  z: number;
+  /** Angle round the loop. The back half (sin < 0) is drawn before the island, the front half after. */
+  th: number;
+}
+
+/** World x range worth drawing for this view: a margin either side of what's on screen, never past the carousel. */
 export function visibleRange(v: View, layout: LineLayout): [number, number] {
-  return [v.cam - 900, Math.min(v.cam + v.w / COS30 + 600, layout.pit + PIT_R + 900)];
+  return [v.cam - 900, Math.min(v.cam + v.w / COS30 + 600, layout.end.x + 900)];
 }
 
 /** The press's stroke: 0 up, 1 down on the crate. Shared so sparks fire on the downstroke. */
@@ -45,7 +56,6 @@ export function drawFloor(p: Painter, layout: LineLayout, intro: number, rise: n
   const centre = view.cam + view.w * 0.4;
   for (let x = Math.floor(x0 / TILE) * TILE; x < x1; x += TILE) {
     for (let y = -FLOOR_Y; y < FLOOR_Y; y += TILE) {
-      if (inPit(layout, x + TILE / 2, y + TILE / 2, -TILE / 2 + 1)) continue;
       const grow = intro >= 1 ? 1 : smooth(0, 1, intro * 2.2 - Math.hypot(x - centre, y) / 1400);
       if (grow <= 0) continue;
       const inset = ((1 - grow) * TILE) / 2;
@@ -64,54 +74,8 @@ export function drawFloor(p: Painter, layout: LineLayout, intro: number, rise: n
   ctx.globalAlpha = 1;
 }
 
-/** The pit's floor and the two walls you can see into. The pile goes on top, then drawPitRim. */
-export function drawPitShell(p: Painter, layout: LineLayout): void {
-  const l0 = layout.pit - PIT_R;
-  const l1 = layout.pit + PIT_R;
-  p.poly([p.p(l0, -PIT_R, PIT_DEPTH), p.p(l1, -PIT_R, PIT_DEPTH), p.p(l1, PIT_R, PIT_DEPTH), p.p(l0, PIT_R, PIT_DEPTH)], '#0b0d14');
-  p.poly([p.p(l0, -PIT_R, 0), p.p(l1, -PIT_R, 0), p.p(l1, -PIT_R, PIT_DEPTH), p.p(l0, -PIT_R, PIT_DEPTH)], '#171a28');
-  p.poly([p.p(l0, -PIT_R, 0), p.p(l0, PIT_R, 0), p.p(l0, PIT_R, PIT_DEPTH), p.p(l0, -PIT_R, PIT_DEPTH)], '#131622');
-}
-
-/** Clips to what shows above the pit's front rim, so crates deep in the pile are hidden by the floor. Caller restores. */
-export function clipToPit(p: Painter, layout: LineLayout): void {
-  const l0 = layout.pit - PIT_R;
-  const l1 = layout.pit + PIT_R;
-  const [lx, ly] = p.p(l0, PIT_R, 0);
-  const [rx, ry] = p.p(l1, -PIT_R, 0);
-  const [fx, fy] = p.p(l1, PIT_R, 0);
-  const { ctx } = p;
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(lx, ly - 600);
-  ctx.lineTo(rx, ry - 600);
-  ctx.lineTo(rx, ry);
-  ctx.lineTo(fx, fy);
-  ctx.lineTo(lx, ly);
-  ctx.closePath();
-  ctx.clip();
-}
-
-export function drawPitRim(p: Painter, layout: LineLayout): void {
-  const l0 = layout.pit - PIT_R;
-  const l1 = layout.pit + PIT_R;
-  const stripe = (ax: number, ay: number, bx: number, by: number) => {
-    for (let i = 0; i < 14; i++) {
-      const u0 = i / 14;
-      const u1 = (i + 1) / 14;
-      const x0 = ax + (bx - ax) * u0;
-      const y0 = ay + (by - ay) * u0;
-      const x1 = ax + (bx - ax) * u1;
-      const y1 = ay + (by - ay) * u1;
-      p.poly([p.p(x0, y0, 0), p.p(x1, y1, 0), p.p(x1, y1, 4), p.p(x0, y0, 4)], i % 2 ? '#1b1d24' : '#f2c230');
-    }
-  };
-  stripe(l0, PIT_R, l1, PIT_R);
-  stripe(l1, -PIT_R, l1, PIT_R);
-}
-
 /**
- * The machinery, as depth-sorted drawables: the main belt up to the pit, side belts and their bins, presses and
+ * The machinery, as depth-sorted drawables: the main belt up to the sorter, side belts and their bins, presses and
  * gantry cranes. `rise` grows the machines out of the floor during the intro; `beltOn` spins the belts up.
  * `shipFor` decides what hangs from each station's crane.
  */
@@ -209,6 +173,94 @@ export function machineDrawables(
       },
     });
   }
+}
+
+/**
+ * The end of the line: the sorter the belt runs into, and the carousel carrying one package per app. `spin` turns
+ * the belt's slats with the packages; `lit` (0..1) flashes the sorter as a crate goes in.
+ */
+export function endDrawables(p: Painter, layout: LineLayout, spin: number, spots: Spot[], shipFor: (st: Station) => Shipment | null, lit: number, out: Drawable[]): void {
+  const [, x1] = visibleRange(p.view, layout);
+  if (layout.beltEnd > x1) return;
+  out.push({ depth: layout.beltEnd, draw: () => drawSorter(p, layout.beltEnd, lit) });
+  out.push({ depth: layout.end.x + layout.end.y - 400, draw: () => drawCarousel(p, layout, spin, spots, shipFor) });
+}
+
+function drawSorter(p: Painter, x: number, lit: number): void {
+  const { ctx } = p;
+  p.box(x - 6, -64, 0, 92, 128, 118, SORTER);
+  p.poly([p.p(x + 86.5, -48, 84), p.p(x + 86.5, 48, 84), p.p(x + 86.5, 48, 96), p.p(x + 86.5, -48, 96)], `rgba(155,140,255,${0.35 + 0.65 * lit})`);
+  const [bx, by] = p.p(x + 40, 0, 119);
+  ctx.fillStyle = `rgba(255,190,60,${0.3 + 0.7 * lit})`;
+  ctx.beginPath();
+  ctx.arc(bx, by - 5, 9, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawCarousel(p: Painter, layout: LineLayout, spin: number, spots: Spot[], shipFor: (st: Station) => Shipment | null): void {
+  const { ctx } = p;
+  const { a, b, belt, height: h, size } = CAROUSEL;
+  const ia = a - belt;
+  const ib = b - belt;
+  const isle = 40;
+  const trace = (ea: number, eb: number, z: number, from = 0, to = Math.PI * 2, move = true) => {
+    for (let i = 0; i <= 72; i++) {
+      const [x, y] = ringPoint(layout, ea, eb, from + ((to - from) * i) / 72);
+      const [sx, sy] = p.p(x, y, z);
+      if (i === 0 && move) ctx.moveTo(sx, sy);
+      else ctx.lineTo(sx, sy);
+    }
+  };
+  const fill = (color: string, shape: () => void, rule: CanvasFillRule = 'nonzero') => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    shape();
+    ctx.closePath();
+    ctx.fill(rule);
+  };
+  const edge = (color: string, ea: number, eb: number, z: number) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    trace(ea, eb, z);
+    ctx.stroke();
+  };
+  fill('rgba(0,0,0,.35)', () => trace(a + 14, b + 14, 0));
+  // The outer wall's front half: along the top edge, then back along the floor.
+  fill('#1b1f2e', () => {
+    trace(a, b, h, 0, Math.PI);
+    trace(a, b, 0, Math.PI, 0, false);
+  });
+  fill('#2b3044', () => {
+    trace(a, b, h);
+    ctx.closePath();
+    trace(ia, ib, h);
+  }, 'evenodd');
+  ctx.strokeStyle = '#1d2131';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let k = 0; k < 84; k++) {
+    const th = (k / 84) * Math.PI * 2 + spin;
+    const [ox, oy] = ringPoint(layout, a - 3, b - 3, th);
+    const [ix, iy] = ringPoint(layout, ia + 3, ib + 3, th);
+    const [sx, sy] = p.p(ox, oy, h);
+    const [ex, ey] = p.p(ix, iy, h);
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(ex, ey);
+  }
+  ctx.stroke();
+  edge('#4a5272', a, b, h);
+  const sorted = [...spots].sort((m, n) => m.x + m.y - (n.x + n.y));
+  const ride = (s: Spot) => drawPackage(p, s.x, s.y, s.z, size, shipFor(s.station));
+  sorted.filter((s) => Math.sin(s.th) < 0).forEach(ride);
+  // The raised island in the middle hides the bottom of the packages going round the back.
+  fill('#232838', () => {
+    trace(ia - 4, ib - 4, isle, 0, Math.PI);
+    trace(ia - 4, ib - 4, h, Math.PI, 0, false);
+  });
+  fill('#1f2336', () => trace(ia - 4, ib - 4, isle));
+  edge('rgba(155,140,255,.4)', ia - 4, ib - 4, isle);
+  sorted.filter((s) => Math.sin(s.th) >= 0).forEach(ride);
 }
 
 /** A darkened edge so the eye settles in the middle of the floor. */
