@@ -1,5 +1,6 @@
 import { COS30, Faces, Painter, View } from './iso';
 import { LineLayout, PIT_R, inPit } from './layout';
+import { Shipment, drawPackage, packHeight } from './packages';
 
 export interface Drawable {
   /** x + y of the thing's front-most point; drawn in ascending order so nearer things cover farther ones. */
@@ -112,7 +113,7 @@ export function drawPitRim(p: Painter, layout: LineLayout): void {
 /**
  * The machinery, as depth-sorted drawables: the main belt up to the pit, side belts and their bins, presses and
  * gantry cranes. `rise` grows the machines out of the floor during the intro; `beltOn` spins the belts up.
- * `iconFor` resolves an app icon for the crate hanging from each crane.
+ * `shipFor` decides what hangs from each station's crane.
  */
 export function machineDrawables(
   p: Painter,
@@ -120,7 +121,7 @@ export function machineDrawables(
   t: number,
   rise: number,
   beltOn: number,
-  iconFor: (i: number) => HTMLImageElement | undefined,
+  shipFor: (i: number) => Shipment | null,
   out: Drawable[],
 ): void {
   const { ctx } = p;
@@ -203,7 +204,8 @@ export function machineDrawables(
         ctx.moveTo(tx, ty);
         ctx.lineTo(bx, by);
         ctx.stroke();
-        p.crate(crane, hookY, (hookZ - 36) * rise, 36, iconFor(st.index));
+        const held = shipFor(st.index);
+        drawPackage(p, crane, hookY, (hookZ - packHeight(36, held?.kind)) * rise, 36, held);
       },
     });
   }
