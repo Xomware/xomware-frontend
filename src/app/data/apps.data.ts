@@ -10,7 +10,7 @@ export interface AppCard {
   colorRgb: string;
   url: string;
   /**
-   * Wide banner/wordmark: the app directory and the /apps orbit. It's the
+   * Wide banner/wordmark, for the app list. It's the
    * fuller lockup and reads as the more finished mark.
    */
   logo: string;

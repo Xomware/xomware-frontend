@@ -43,8 +43,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   /**
    * Outbound clicks are caught here rather than with a handler per link. The
-   * app URLs appear in at least four templates (the landing planets, the
-   * /apps grid, the orbit body and its CTA), so per-link handlers would be
+   * app URLs appear in several templates (the factory's station cards and
+   * shipping tags, and the app list), so per-link handlers would be
    * repetitive to add and easy to forget on the next surface. One delegated
    * listener matching against APPS covers every current and future link.
    */
