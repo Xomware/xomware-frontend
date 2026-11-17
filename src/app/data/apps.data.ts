@@ -112,8 +112,8 @@ export const APPS: AppCard[] = [
     name: "Reese's Playoff Challenge",
     description:
       'NFL playoff pool. Draft one player per playoff team and ride them through January.',
-    color: '#8B4513',
-    colorRgb: '139, 69, 19',
+    color: '#F8B732',
+    colorRgb: '248, 183, 50',
     url: 'https://playoffs.xomware.com',
     logo: 'assets/img/banners/reeses.webp',
     icon: 'assets/img/apps/reeses.webp',
