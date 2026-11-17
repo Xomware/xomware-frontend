@@ -30,13 +30,15 @@ describe('AppDirectoryComponent', () => {
     expect(tile(root, 'Xomify').querySelector('.tile__wip')).toBeNull();
   });
 
-  it('lists Armchair Judge with a separate link to its DWTS app', () => {
+  it('lists Armchair Judge with separate links to its DWTS and Traitors apps', () => {
     const t = tile(render(), 'Armchair Judge');
 
     expect(t.querySelector<HTMLAnchorElement>('.tile__link')?.href).toBe('https://armchairjudge.com/');
-    const sub = t.querySelector<HTMLAnchorElement>('.tile__sublink');
-    expect(sub?.textContent).toContain('Dancing with the Stars');
-    expect(sub?.href).toBe('https://dwts.armchairjudge.com/');
+    const subs = Array.from(t.querySelectorAll<HTMLAnchorElement>('.tile__sublink'));
+    expect(subs.map((a) => [a.textContent?.trim(), a.href])).toEqual([
+      ['Dancing with the Stars', 'https://dwts.armchairjudge.com/'],
+      ['The Traitors', 'https://traitors.armchairjudge.com/'],
+    ]);
   });
 
   it('shows each app by its banner where it has one, not its square mark', () => {
@@ -45,9 +47,9 @@ describe('AppDirectoryComponent', () => {
     const xomify = tile(root, 'Xomify').querySelector<HTMLImageElement>('.tile__art');
     expect(xomify?.getAttribute('src')).toBe('assets/img/banners/xomify.webp');
     expect(xomify?.classList).not.toContain('tile__art--mark');
-    // Armchair Judge has no banner yet; its mark keeps a square slot.
     const armchair = tile(root, 'Armchair Judge').querySelector<HTMLImageElement>('.tile__art');
-    expect(armchair?.classList).toContain('tile__art--mark');
+    expect(armchair?.getAttribute('src')).toBe('assets/img/banners/armchair-judge.webp');
+    expect(armchair?.classList).not.toContain('tile__art--mark');
   });
 
   it('keeps admin-only tools off the public directory', () => {
