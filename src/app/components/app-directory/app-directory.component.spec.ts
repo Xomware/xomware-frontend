@@ -69,4 +69,15 @@ describe('AppDirectoryComponent', () => {
 
     expect(names).not.toContain('Xomcron');
   });
+
+  it('sends iOS testers to the contact page instead of showing an email address', () => {
+    const root = render();
+    const note = root.querySelector('#directory-ios')?.closest('.group__head')?.querySelector('.group__note');
+    const link = note?.querySelector<HTMLAnchorElement>('a');
+
+    expect(link?.textContent?.trim()).toBe('Request access');
+    expect(link?.href).toBe('https://dominickgiordano.com/#contact');
+    expect(root.querySelector('a[href^="mailto:"]')).toBeNull();
+    expect(root.textContent).not.toContain('@');
+  });
 });
