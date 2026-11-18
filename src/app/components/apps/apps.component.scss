@@ -1,5 +1,6 @@
 @import 'styles/variables';
 @import 'styles/app-cards';
+@import 'styles/factory';
 
 .apps-page {
   min-height: 100vh;
@@ -12,23 +13,9 @@
 
 // ── Hero ─────────────────────────────────────────────
 .apps-hero {
-  position: relative;
-  isolation: isolate;
+  @include factory-floor-hero;
   padding: calc(#{$spacing-3xl} + var(--nav-h)) $spacing-xl $spacing-md;
   text-align: center;
-
-  // The factory floor's iso grid under a work light, fading out before the list.
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      radial-gradient(ellipse 45% 80% at 50% 0%, rgba(0, 180, 216, 0.14), transparent 70%),
-      repeating-linear-gradient(30deg, transparent 0 31px, #1f2335 31px 32px),
-      repeating-linear-gradient(150deg, transparent 0 31px, #1f2335 31px 32px);
-    mask-image: linear-gradient(to bottom, #000 40%, transparent);
-  }
 
   @media (max-width: $breakpoint-md) {
     padding: calc(#{$spacing-3xl} + var(--nav-h)) $spacing-md $spacing-xl;

@@ -1,11 +1,10 @@
 @import 'styles/variables';
+@import 'styles/factory';
 
 $status-live: #34d399;
 $status-beta: #facc15;
 $status-soon: #f59e0b;
-// The factory canvas's floor and belt colours (src/app/factory/scene.ts).
-$floor: #161a26;
-$floor-line: #1f2335;
+// The factory canvas's belt colours (src/app/factory/scene.ts).
 $belt-top: #2b3044;
 $belt-face: #1b1f2e;
 $roller: #4a5272;
@@ -115,11 +114,10 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   position: relative;
   aspect-ratio: 16 / 7;
   overflow: hidden;
-  background-color: $floor;
+  background-color: $factory-floor;
   background-image:
     radial-gradient(ellipse 50% 90% at 50% 0%, rgba(var(--app-rgb), 0.24), transparent 72%),
-    repeating-linear-gradient(30deg, transparent 0 23px, $floor-line 23px 24px),
-    repeating-linear-gradient(150deg, transparent 0 23px, $floor-line 23px 24px);
+    iso-grid(24px);
 
   // The belt's top, its slats lit along the front edge.
   &::before {
