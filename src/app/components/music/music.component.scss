@@ -110,6 +110,9 @@
 
   @media (max-width: $breakpoint-md) {
     padding: 0 $spacing-md;
+    // Four tabs need ~350px; on the narrowest phones the row scrolls rather than widening the page.
+    overflow-x: auto;
+    scrollbar-width: none;
   }
 }
 
@@ -130,6 +133,10 @@
     color $transition-fast,
     border-color $transition-fast;
   white-space: nowrap;
+
+  @media (max-width: 359px) {
+    padding: $spacing-md $spacing-sm;
+  }
 
   .music-tab-icon {
     width: 16px;
