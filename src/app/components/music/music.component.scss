@@ -435,7 +435,7 @@
   }
 
   @media (max-width: $breakpoint-md) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     padding: $spacing-2xl $spacing-md;
     gap: $spacing-3xl;
   }
