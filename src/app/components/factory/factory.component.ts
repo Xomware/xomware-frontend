@@ -1,14 +1,18 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild, computed, effect, inject, input, output, signal } from '@angular/core';
 import { APPS, AppCard } from '../../data/apps.data';
 import { Factory, TagAnchor } from '../../factory/factory';
 import { COS30, SIN30 } from '../../factory/iso';
-import { Station, cameraMax, layoutLine } from '../../factory/layout';
+import { Station, cameraMax, layoutLine, stationNear } from '../../factory/layout';
 import { NowPlayingState } from '../../models/now-playing.model';
 
 interface Placed {
   left: number;
   top: number;
 }
+
+/** Matches $breakpoint-md: at or under it the stylesheet docks one station card instead of hanging them all. */
+const PHONE = 768;
 
 /**
  * The landing page's app directory as an isometric factory tour. A tall track gives the page scroll distance; a
@@ -19,6 +23,7 @@ interface Placed {
 @Component({
   selector: 'app-factory',
   standalone: true,
+  imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './factory.component.html',
   styleUrl: './factory.component.scss',
@@ -39,15 +44,28 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   readonly layout = layoutLine(APPS);
   readonly viewport = signal({ w: 1440, h: 900 });
-  readonly camMax = computed(() => cameraMax(this.layout, this.viewport().w));
-  readonly trackHeight = computed(() => this.camMax() + this.viewport().h);
+  readonly phone = computed(() => this.viewport().w <= PHONE);
+  /** Phones see the floor zoomed out, so a screen holds about what a desktop's does. */
+  readonly zoom = computed(() => (this.phone() ? Math.min(1, this.viewport().w / 680) : 1));
+  /**
+   * Page scroll per world unit walked. At 1 a phone needed ~15,000px of scrolling to reach the carousel; on phones
+   * the walk runs a little ahead of the finger instead.
+   */
+  private readonly pace = computed(() => (this.phone() ? this.zoom() * 0.6 : 1));
+  readonly camMax = computed(() => cameraMax(this.layout, this.viewport().w / this.zoom()));
+  readonly trackHeight = computed(() => this.camMax() * this.pace() + this.viewport().h);
+  /** On phones, the station nearest mid-screen, shown in one card docked to the bottom. */
+  readonly docked = signal<Station | null>(null);
   /** World-layer coordinates; the anchor depends on the viewport, so the lead is re-placed on resize. */
   readonly leadAt = computed<Placed>(() => {
     const { w, h } = this.viewport();
-    return { left: 40 - w * 0.3, top: h * 0.2 - h * 0.52 };
+    return { left: (this.phone() ? 16 : 40) - w * 0.3, top: h * 0.2 - h * 0.52 };
   });
   /** The carousel's centre in the world layer, for the Shipping heading above it. */
-  readonly endAt: Placed = { left: (this.layout.end.x - this.layout.end.y) * COS30, top: (this.layout.end.x + this.layout.end.y) * SIN30 };
+  readonly endAt = computed<Placed>(() => {
+    const { x, y } = this.layout.end;
+    return { left: (x - y) * COS30 * this.zoom(), top: (x + y) * SIN30 * this.zoom() };
+  });
   /** Which HUD stop the camera is at: a line's index, or lines.length at the carousel. */
   readonly activeLine = signal(0);
   /** Station whose tag was opened by clicking its package. */
@@ -69,7 +87,8 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   at(x: number, dy: number, dx = 0): Placed {
-    return { left: x * COS30 + dx, top: x * SIN30 + dy };
+    const k = this.zoom();
+    return { left: (x * COS30 + dx) * k, top: (x * SIN30 + dy) * k };
   }
 
   ngOnInit(): void {
@@ -127,7 +146,7 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /** Scrolls the page so the camera lands at x along the line. */
   jumpTo(x: number): void {
-    const top = this.trackTop + Math.max(0, Math.min(this.camMax(), x));
+    const top = this.trackTop + Math.max(0, Math.min(this.camMax(), x)) * this.pace();
     scrollTo({ top, behavior: this.reducedMotion ? 'auto' : 'smooth' });
   }
 
@@ -153,7 +172,7 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
     const w = innerWidth;
     const h = innerHeight;
     this.zone.run(() => this.viewport.set({ w, h }));
-    this.factory?.resize(w, h);
+    this.factory?.resize(w, h, this.zoom());
     // The track's height comes from the viewport, so read its position once layout has caught up.
     requestAnimationFrame(() => {
       this.trackTop = this.track.nativeElement.getBoundingClientRect().top + scrollY;
@@ -162,7 +181,7 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private readonly onScroll = (): void => {
-    this.factory?.setCamera(Math.max(0, Math.min(this.camMax(), scrollY - this.trackTop)));
+    this.factory?.setCamera(Math.max(0, Math.min(this.camMax(), (scrollY - this.trackTop) / this.pace())));
   };
 
   private follow(origin: { x: number; y: number }, cam: number, intro: number, tags: TagAnchor[]): void {
@@ -175,6 +194,9 @@ export class FactoryComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     if (cam >= this.camMax() - 300) line = this.layout.lines.length;
     if (line !== this.activeLine()) this.zone.run(() => this.activeLine.set(line));
+    // Mid-screen sits 0.2 of the width right of the anchor, which is 0.2w / (zoom * cos30) along the line.
+    const docked = this.phone() ? stationNear(this.layout, cam + (this.viewport().w * 0.2) / (this.zoom() * COS30)) : null;
+    if (docked !== this.docked()) this.zone.run(() => this.docked.set(docked));
     tags.forEach((tag, i) => {
       const el = this.tagEls[i];
       if (!el) return;

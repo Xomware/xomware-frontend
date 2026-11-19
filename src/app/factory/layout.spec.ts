@@ -1,6 +1,6 @@
 import { APPS, AppCard } from '../data/apps.data';
 import { project } from './iso';
-import { CAROUSEL, ZONES, cameraMax, lastStation, layoutLine, ringPoint } from './layout';
+import { CAROUSEL, ZONES, cameraMax, lastStation, layoutLine, ringPoint, stationNear } from './layout';
 
 describe('layoutLine', () => {
   const layout = layoutLine(APPS);
@@ -19,6 +19,16 @@ describe('layoutLine', () => {
     const between = gaps.filter((_, i) => layout.stations[i].app.platform !== layout.stations[i + 1].app.platform);
     expect(new Set(within).size).toBe(1);
     between.forEach((g) => expect(g).toBeGreaterThan(within[0]));
+  });
+
+  it('docks the station nearest a point on the line, and none at the start, between lines or past the end', () => {
+    const [first, second] = layout.stations;
+    expect(stationNear(layout, first.x + 100)).toBe(first);
+    expect(stationNear(layout, (first.x + second.x) / 2 + 1)).toBe(second);
+    expect(stationNear(layout, 0)).toBeNull();
+    const lineB = layout.stations.findIndex((s) => s.app.platform === 'pool');
+    expect(stationNear(layout, (layout.stations[lineB - 1].x + layout.stations[lineB].x) / 2)).toBeNull();
+    expect(stationNear(layout, layout.end.x)).toBeNull();
   });
 
   it('gives the first station of each line a banner instead of a crane', () => {
