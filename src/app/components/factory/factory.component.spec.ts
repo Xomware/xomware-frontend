@@ -40,7 +40,7 @@ describe('FactoryComponent', () => {
   });
 
   it('offers a button per line, the carousel and the flat list', () => {
-    const labels = Array.from(el.querySelectorAll('.hud button')).map((b) => b.textContent?.trim());
+    const labels = Array.from(el.querySelectorAll('.hud button')).map((b) => b.getAttribute('aria-label') ?? b.textContent?.trim());
     expect(labels).toEqual(['Line A · Web apps', 'Line B · Leagues & pools', 'Line C · iOS', 'Shipping', 'All apps ↓']);
   });
 

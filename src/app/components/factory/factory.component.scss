@@ -39,6 +39,7 @@ $factory-dim: #9ca2ba;
 .world,
 .hud,
 .np,
+.dock,
 .progress {
   transition: opacity $transition-slow;
 
@@ -220,7 +221,7 @@ $factory-dim: #9ca2ba;
 .shipping {
   position: absolute;
   // Under the carousel: above it, the back row of tags reaches nearly to the HUD.
-  transform: translate(-50%, 215px);
+  transform: translate(-50%, calc(215px * var(--k, 1)));
   color: $factory-ink;
   text-align: center;
   white-space: nowrap;
@@ -522,6 +523,10 @@ $factory-dim: #9ca2ba;
     }
   }
 
+  .hud-short {
+    display: none;
+  }
+
   .hud-all {
     color: #11121c;
     background: $factory-accent;
@@ -553,9 +558,98 @@ $factory-dim: #9ca2ba;
   }
 }
 
+// On phones one card at a time docks above the now-playing panel, in place of the cards hanging over the line.
+.dock {
+  position: absolute;
+  right: $spacing-md;
+  bottom: 30px;
+  left: $spacing-md;
+  z-index: 2;
+  padding: 14px $spacing-md;
+  color: $factory-ink;
+  background: rgba(29, 32, 49, 0.95);
+  border-top: 5px solid var(--c);
+  border-radius: $radius-2xl;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+
+  .card-row {
+    margin: 8px 0;
+
+    img {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  .card-name {
+    font-size: $text-lg;
+  }
+
+  .card-copy {
+    display: -webkit-box;
+    margin-bottom: 12px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .card-go {
+    padding: 9px 14px;
+  }
+}
+
+.np ~ .dock {
+  bottom: 112px;
+}
+
 @media (max-width: $breakpoint-md) {
   .hud {
     justify-content: flex-start;
+
+    button {
+      padding: 9px 11px;
+    }
+
+    .hud-long {
+      display: none;
+    }
+
+    .hud-short {
+      display: inline;
+    }
+  }
+
+  .card {
+    display: none;
+  }
+
+  // Sixteen names would pile up over a carousel this small, so a tag is just its icon until it's opened.
+  .ship {
+    padding: 4px;
+
+    .ship-label,
+    em {
+      display: none;
+    }
+
+    &:focus-visible,
+    &.is-open {
+      padding: 6px 10px 6px 6px;
+
+      .ship-label,
+      em {
+        display: inline;
+      }
+    }
+  }
+
+  // The belt runs under the headline at this size, so it gets a panel to stay readable.
+  .lead {
+    width: calc(100vw - #{$spacing-xl});
+    padding: $spacing-md;
+    background: rgba(16, 19, 28, 0.82);
+    border-radius: $radius-xl;
+    backdrop-filter: blur(6px);
   }
 
   // The HUD needs the full width on phones, so the panel moves down to sit above the progress bar.
@@ -641,5 +735,20 @@ $factory-dim: #9ca2ba;
   &:focus-visible {
     outline: 2px solid $factory-accent;
     outline-offset: 2px;
+  }
+}
+
+// The smallest phones lose "apps" from the last button so all five still fit across.
+@media (max-width: 359px) {
+  .hud {
+    gap: 4px;
+
+    button {
+      padding: 8px 9px;
+    }
+  }
+
+  .hud-apps {
+    display: none;
   }
 }

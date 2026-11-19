@@ -8,8 +8,25 @@
   </div>
 }
 
+<ng-template #cardBody let-s>
+  <span class="card-no">Station {{ (s.index + 1).toString().padStart(2, '0') }}</span>
+  <div class="card-row">
+    <img [src]="s.app.icon ?? s.app.logo" alt="" width="56" height="56" loading="lazy" />
+    <div>
+      <h2 class="card-name">{{ s.app.name }}</h2>
+      <span class="card-tag">{{ s.app.tag }}@if (s.app.beta) { &middot; Beta }</span>
+    </div>
+  </div>
+  <p class="card-copy">{{ s.app.description }}</p>
+  @if (s.app.status === 'coming-soon') {
+    <span class="card-go is-soon">Coming soon</span>
+  } @else {
+    <a class="card-go" [href]="s.app.url" target="_blank" rel="noopener">{{ statusLabel(s.app) }} &rarr;</a>
+  }
+</ng-template>
+
 <section class="track" #track [class.is-intro]="introPlaying()" [style.height.px]="trackHeight()" aria-label="The Xomware app factory">
-  <div class="stage">
+  <div class="stage" [style.--k]="zoom()">
     <canvas class="scene" #canvas aria-hidden="true"></canvas>
 
     <div class="world" #world>
@@ -35,24 +52,11 @@
           [style.--c]="s.app.color"
           (focusin)="focusStation(s)"
         >
-          <span class="card-no">Station {{ (s.index + 1).toString().padStart(2, '0') }}</span>
-          <div class="card-row">
-            <img [src]="s.app.icon ?? s.app.logo" alt="" width="56" height="56" loading="lazy" />
-            <div>
-              <h2 class="card-name">{{ s.app.name }}</h2>
-              <span class="card-tag">{{ s.app.tag }}@if (s.app.beta) { &middot; Beta }</span>
-            </div>
-          </div>
-          <p class="card-copy">{{ s.app.description }}</p>
-          @if (s.app.status === 'coming-soon') {
-            <span class="card-go is-soon">Coming soon</span>
-          } @else {
-            <a class="card-go" [href]="s.app.url" target="_blank" rel="noopener">{{ statusLabel(s.app) }} &rarr;</a>
-          }
+          <ng-container *ngTemplateOutlet="cardBody; context: { $implicit: s }" />
         </article>
       }
 
-      <div class="shipping" [style.left.px]="endAt.left" [style.top.px]="endAt.top" aria-hidden="true">
+      <div class="shipping" [style.left.px]="endAt().left" [style.top.px]="endAt().top" aria-hidden="true">
         <b>Shipping</b>
         <small>Every app, going round. Hover or tap one for details.</small>
       </div>
@@ -71,7 +75,7 @@
         >
           <span class="ship-name">
             <img [src]="s.app.icon ?? s.app.logo" alt="" width="22" height="22" loading="lazy" />
-            {{ s.app.name }}
+            <span class="ship-label">{{ s.app.name }}</span>
             @if (s.app.status === 'coming-soon') {
               <em>Soon</em>
             }
@@ -103,12 +107,20 @@
       </a>
     }
 
+    @if (docked(); as s) {
+      <article class="dock" [style.--c]="s.app.color">
+        <ng-container *ngTemplateOutlet="cardBody; context: { $implicit: s }" />
+      </article>
+    }
+
     <nav class="hud" aria-label="Production lines">
       @for (line of layout.lines; track line.zone.label; let i = $index) {
-        <button type="button" [class.is-on]="activeLine() === i" (click)="jumpTo(line.x - 200)">{{ line.zone.label }} &middot; {{ line.zone.sub }}</button>
+        <button type="button" [class.is-on]="activeLine() === i" [attr.aria-label]="line.zone.label + ' · ' + line.zone.sub" (click)="jumpTo(line.x - 200)">
+          <span class="hud-long">{{ line.zone.label }} &middot; {{ line.zone.sub }}</span><span class="hud-short">{{ line.zone.short }}</span>
+        </button>
       }
       <button type="button" [class.is-on]="activeLine() === layout.lines.length" (click)="jumpToEnd()">Shipping</button>
-      <button type="button" class="hud-all" (click)="showAll()">All apps &darr;</button>
+      <button type="button" class="hud-all" (click)="showAll()">All<span class="hud-apps"> apps</span> &darr;</button>
     </nav>
     <div class="progress" aria-hidden="true"><i #bar></i></div>
   </div>

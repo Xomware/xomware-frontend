@@ -47,6 +47,7 @@ export class Factory {
   private spots: Spot[] = [];
   private readonly sound = new Sound();
   private music = false;
+  private zoom = 1;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -68,14 +69,18 @@ export class Factory {
     canvas.addEventListener('pointerdown', this.onPointer);
   }
 
-  /** Matches the canvas to its CSS size at the device pixel ratio. */
-  resize(w: number, h: number): void {
+  /**
+   * Matches the canvas to its CSS size at the device pixel ratio. A zoom below 1 draws the floor smaller, so a
+   * phone sees as much of it as a desktop does; the scene then works in a viewport 1/zoom times the screen.
+   */
+  resize(w: number, h: number, zoom = 1): void {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.view.w = w;
-    this.view.h = h;
+    this.zoom = zoom;
+    this.view.w = w / zoom;
+    this.view.h = h / zoom;
     this.canvas.width = Math.round(w * dpr);
     this.canvas.height = Math.round(h * dpr);
-    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.ctx.setTransform(dpr * zoom, 0, 0, dpr * zoom, 0, 0);
     if (!this.running) this.render(0, 0);
   }
 
@@ -84,10 +89,10 @@ export class Factory {
     this.target = cam;
   }
 
-  /** Screen position of the world origin, for translating DOM that is laid out in world coordinates. */
+  /** Screen position of the world origin, in CSS pixels, for translating DOM laid out in world coordinates. */
   origin(): { x: number; y: number } {
     const [ax, ay] = anchor(this.view);
-    return { x: ax - this.view.cam * COS30, y: ay - this.view.cam * SIN30 };
+    return { x: (ax - this.view.cam * COS30) * this.zoom, y: (ay - this.view.cam * SIN30) * this.zoom };
   }
 
   /** Runs the loop while the factory is on screen; pausing it keeps a scrolled-away tab idle. */
@@ -150,7 +155,7 @@ export class Factory {
     }
     this.spots = this.actors.spots(t);
     this.render(t, this.intro);
-    this.opts.onFrame?.(this.origin(), this.view.cam, this.intro, this.spots.map(tagAnchor));
+    this.opts.onFrame?.(this.origin(), this.view.cam, this.intro, this.spots.map((spot) => tagAnchor(spot, this.zoom)));
     this.raf = requestAnimationFrame(this.frame);
   };
 
@@ -223,8 +228,8 @@ export class Factory {
       return;
     }
     const rect = this.canvas.getBoundingClientRect();
-    const sx = e.clientX - rect.left;
-    const sy = e.clientY - rect.top;
+    const sx = (e.clientX - rect.left) / this.zoom;
+    const sy = (e.clientY - rect.top) / this.zoom;
     const hit = this.spotAt(sx, sy);
     this.opts.onPick?.(hit ? hit.station.index : null);
     if (hit) {
@@ -237,7 +242,7 @@ export class Factory {
   };
 }
 
-function tagAnchor(s: Spot): TagAnchor {
+function tagAnchor(s: Spot, zoom: number): TagAnchor {
   const top = s.z + packHeight(CAROUSEL.size, s.station.pack) + 14;
-  return { left: (s.x - s.y) * COS30, top: (s.x + s.y) * SIN30 - top, depth: s.x + s.y };
+  return { left: (s.x - s.y) * COS30 * zoom, top: ((s.x + s.y) * SIN30 - top) * zoom, depth: s.x + s.y };
 }

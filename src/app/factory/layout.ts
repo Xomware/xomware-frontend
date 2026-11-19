@@ -15,12 +15,14 @@ export interface Zone {
   platform: AppCard['platform'];
   label: string;
   sub: string;
+  /** Button label where the full one doesn't fit, on phones. */
+  short: string;
 }
 
 export const ZONES: Zone[] = [
-  { platform: 'web', label: 'Line A', sub: 'Web apps' },
-  { platform: 'pool', label: 'Line B', sub: 'Leagues & pools' },
-  { platform: 'ios', label: 'Line C', sub: 'iOS' },
+  { platform: 'web', label: 'Line A', sub: 'Web apps', short: 'Web' },
+  { platform: 'pool', label: 'Line B', sub: 'Leagues & pools', short: 'Pools' },
+  { platform: 'ios', label: 'Line C', sub: 'iOS', short: 'iOS' },
 ];
 
 export interface Station {
@@ -93,6 +95,11 @@ export function layoutLine(apps: AppCard[]): LineLayout {
 /** Furthest the camera travels: far enough to park the carousel in the middle of the screen. */
 export function cameraMax(layout: LineLayout, width: number): number {
   return layout.end.x - layout.end.y - (width * 0.2) / COS30;
+}
+
+/** The station within half a station's spacing of x along the line, if any. */
+export function stationNear(layout: LineLayout, x: number): Station | null {
+  return layout.stations.find((s) => Math.abs(s.x - x) < SPACING / 2) ?? null;
 }
 
 /**
