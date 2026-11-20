@@ -112,7 +112,8 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 // and a conveyor along the bottom that the banner rides on.
 .tile__stage {
   position: relative;
-  aspect-ratio: 16 / 7;
+  // 2:1 rather than 16:7: square badges (Reese's, Smirnoff) are held by the height and read small any shorter.
+  aspect-ratio: 2 / 1;
   overflow: hidden;
   background-color: $factory-floor;
   background-image:
@@ -153,13 +154,15 @@ $ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   color: rgba(255, 255, 255, 0.38);
 }
 
+// The art box is wider than it is tall relative to the stage, so a long wordmark (Sun God Derby, Curbside) gets
+// close to the full width while a square badge is held by the height. Its foot stays on the belt at 83%.
 .tile__art {
   position: absolute;
-  top: 8%;
-  left: 13%;
+  top: 4%;
+  left: 6%;
   z-index: 1;
-  width: 74%;
-  height: 74%;
+  width: 88%;
+  height: 79%;
   object-fit: contain;
   object-position: 50% 100%;
   filter: drop-shadow(0 5px 4px rgba(0, 0, 0, 0.6));
