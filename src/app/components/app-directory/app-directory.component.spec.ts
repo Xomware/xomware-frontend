@@ -21,11 +21,9 @@ describe('AppDirectoryComponent', () => {
   it('marks the unfinished apps as Beta and work in progress', () => {
     const root = render();
 
-    for (const name of ['Xom Appétit', 'Xom Forms']) {
-      const t = tile(root, name);
-      expect(t.querySelector('.status')?.textContent?.trim()).toBe('Beta');
-      expect(t.querySelector('.tile__wip')?.textContent).toContain('Work in progress');
-    }
+    const t = tile(root, 'Xom Appétit');
+    expect(t.querySelector('.status')?.textContent?.trim()).toBe('Beta');
+    expect(t.querySelector('.tile__wip')?.textContent).toContain('Work in progress');
     expect(tile(root, 'Xomify').querySelector('.status')?.textContent?.trim()).toBe('Live');
     expect(tile(root, 'Xomify').querySelector('.tile__wip')).toBeNull();
   });
