@@ -179,20 +179,6 @@ export const APPS: AppCard[] = [
     platform: 'web',
   },
   {
-    name: 'Xom Forms',
-    description: 'Group availability scheduler — When2meet done right. Drag-paint your availability, see the best time instantly.',
-    color: '#4caf50',
-    colorRgb: '76, 175, 80',
-    url: 'https://xomforms.xomware.com',
-    logo: 'assets/img/banners/xomforms.webp',
-    icon: 'assets/img/apps/xomforms.webp',
-    logoStyle: 'banner',
-    tag: 'Web App',
-    status: 'live',
-    beta: true,
-    platform: 'web',
-  },
-  {
     name: 'Today In Sports',
     description:
       "Daily sports history quiz. Five questions every day, anchored to what happened on today's date.",
